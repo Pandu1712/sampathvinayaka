@@ -1,0 +1,40 @@
+﻿
+> vite_react_shadcn_ts@0.0.0 lint
+> eslint .
+
+
+E:\Downloads\Sampath Vinayaka\Sampath Vinayaka\src\components\ui\badge.tsx
+  29:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+E:\Downloads\Sampath Vinayaka\Sampath Vinayaka\src\components\ui\button.tsx
+  47:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+E:\Downloads\Sampath Vinayaka\Sampath Vinayaka\src\components\ui\command.tsx
+  24:11  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+E:\Downloads\Sampath Vinayaka\Sampath Vinayaka\src\components\ui\form.tsx
+  129:10  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+E:\Downloads\Sampath Vinayaka\Sampath Vinayaka\src\components\ui\navigation-menu.tsx
+  111:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+E:\Downloads\Sampath Vinayaka\Sampath Vinayaka\src\components\ui\sidebar.tsx
+  636:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+E:\Downloads\Sampath Vinayaka\Sampath Vinayaka\src\components\ui\sonner.tsx
+  27:19  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+E:\Downloads\Sampath Vinayaka\Sampath Vinayaka\src\components\ui\textarea.tsx
+  5:18  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+E:\Downloads\Sampath Vinayaka\Sampath Vinayaka\src\components\ui\toggle.tsx
+  37:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+E:\Downloads\Sampath Vinayaka\Sampath Vinayaka\src\pages\Events.tsx
+  16:125  error  Parsing error: Unterminated string literal
+
+E:\Downloads\Sampath Vinayaka\Sampath Vinayaka\tailwind.config.ts
+  86:13  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+Γ£û 11 problems (4 errors, 7 warnings)
+
