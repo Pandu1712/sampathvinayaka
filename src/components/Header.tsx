@@ -35,23 +35,23 @@ const Header = () => {
 
   const navLinks = isHome
     ? [
-        { name: "Home", href: "#home" },
-        { name: "History", href: "#history" },
-        { name: "Services", href: "#services" },
-        { name: "Gallery", href: "#gallery" },
-        { name: "Events", href: "#events" },
-        { name: "Members", href: "#members" },
-        { name: "Contact Us", href: "#contact" },
-      ]
+      { name: "Home", href: "#home" },
+      { name: "History", href: "#history" },
+      { name: "Services", href: "#services" },
+      { name: "Gallery", href: "#gallery" },
+      { name: "Events", href: "#events" },
+      { name: "Members", href: "#members" },
+      { name: "Contact Us", href: "#contact" },
+    ]
     : [
-        { name: "Home", href: "/" },
-        { name: "History", href: "/history" },
-        { name: "Services", href: "/services" },
-        { name: "Gallery", href: "/gallery" },
-        { name: "Events", href: "/events" },
-        { name: "Members", href: "/members" },
-        { name: "Contact Us", href: "/contact" },
-      ];
+      { name: "Home", href: "/" },
+      { name: "History", href: "/history" },
+      { name: "Services", href: "/services" },
+      { name: "Gallery", href: "/gallery" },
+      { name: "Events", href: "/events" },
+      { name: "Members", href: "/members" },
+      { name: "Contact Us", href: "/contact" },
+    ];
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id.replace("#", ""));
@@ -70,9 +70,8 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-white border-b border-border ${
-        scrolled ? "shadow-md" : "shadow-sm"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-white border-b border-border ${scrolled ? "shadow-md" : "shadow-sm"
+        }`}
     >
       {/* Top accent bar */}
       <div className="h-[4px] w-full bg-gradient-to-r from-transparent via-primary to-transparent opacity-80" />
@@ -81,9 +80,10 @@ const Header = () => {
         <div className="flex items-center justify-between h-20 sm:h-24">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-4 flex-shrink-0 group">
-            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/80 p-1 flex items-center justify-center border border-primary/20 shadow-inner group-hover:border-primary/40 transition-all duration-500 overflow-hidden">
-              <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-primary/10 to-transparent" />
-              <img src="https://www.freeiconspng.com/uploads/lord-ganesh-png-28.png" alt="Sampath Vinayaka" className="w-[85%] h-[85%] object-contain relative z-10 drop-shadow-md group-hover:scale-110 transition-transform duration-500" />
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full glass p-1.5 flex items-center justify-center border border-primary/30 shadow-[0_0_20px_rgba(var(--primary),0.2)] group-hover:border-primary/50 group-hover:shadow-[0_0_30px_rgba(var(--primary),0.3)] transition-all duration-500 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5" />
+              <div className="absolute inset-0 animate-pulse bg-primary/5 blur-xl" />
+              <img src="/logo-circular.png" alt="Sampath Vinayaka" className="w-[95%] h-[95%] object-contain relative z-10 drop-shadow-md group-hover:scale-110 transition-transform duration-700 rounded-full" />
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-bold tracking-tight text-foreground leading-tight font-serif italic text-shadow-sm">
@@ -112,11 +112,10 @@ const Header = () => {
                     key={link.name}
                     href={link.href}
                     onClick={(e) => handleClick(link.href, e)}
-                    className={`px-3 xl:px-4 py-1.5 xl:py-2 whitespace-nowrap rounded-full text-sm  transition-all duration-300 cursor-pointer ${
-                      isActive
-                        ? "bg-primary text-primary-foreground font-medium shadow-sm"
-                        : "text-muted-foreground hover:text-foreground hover:bg-background"
-                    }`}
+                    className={`px-3 xl:px-4 py-1.5 xl:py-2 whitespace-nowrap rounded-full text-sm  transition-all duration-300 cursor-pointer ${isActive
+                      ? "bg-primary text-primary-foreground font-medium shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-background"
+                      }`}
                   >
                     {link.name}
                   </a>
@@ -124,11 +123,10 @@ const Header = () => {
                   <Link
                     key={link.name}
                     to={link.href}
-                    className={`px-3 xl:px-4 py-1.5 xl:py-2 whitespace-nowrap rounded-full text-sm  transition-all duration-300 ${
-                      isActive
-                        ? "bg-primary text-primary-foreground font-medium shadow-sm"
-                        : "text-muted-foreground hover:text-foreground hover:bg-background"
-                    }`}
+                    className={`px-3 xl:px-4 py-1.5 xl:py-2 whitespace-nowrap rounded-full text-sm  transition-all duration-300 ${isActive
+                      ? "bg-primary text-primary-foreground font-medium shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-background"
+                      }`}
                   >
                     {link.name}
                   </Link>
@@ -177,9 +175,8 @@ const Header = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`xl:hidden overflow-hidden transition-all duration-500 ease-in-out ${
-          mobileOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
-        }`}
+        className={`xl:hidden overflow-hidden transition-all duration-500 ease-in-out ${mobileOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+          }`}
       >
         <div className="glass-dark mx-4 my-2 rounded-2xl overflow-hidden border border-white/20">
           <nav className="flex flex-col px-4 py-4 gap-2">
@@ -193,11 +190,10 @@ const Header = () => {
                   key={link.name}
                   href={link.href}
                   onClick={(e) => handleClick(link.href, e)}
-                  className={`px-4 py-3.5 rounded-xl text-sm transition-all duration-300 cursor-pointer ${
-                    isActive
-                      ? "bg-primary text-primary-foreground font-semibold shadow-lg scale-105"
-                      : "text-white/80 hover:text-white hover:bg-white/10"
-                  }`}
+                  className={`px-4 py-3.5 rounded-xl text-sm transition-all duration-300 cursor-pointer ${isActive
+                    ? "bg-primary text-primary-foreground font-semibold shadow-lg scale-105"
+                    : "text-white/80 hover:text-white hover:bg-white/10"
+                    }`}
                 >
                   {link.name}
                 </a>
@@ -206,11 +202,10 @@ const Header = () => {
                   key={link.name}
                   to={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className={`px-4 py-3.5 rounded-xl text-sm transition-all duration-300 ${
-                    isActive
-                      ? "bg-primary text-primary-foreground font-semibold shadow-lg scale-105"
-                      : "text-white/80 hover:text-white hover:bg-white/10"
-                  }`}
+                  className={`px-4 py-3.5 rounded-xl text-sm transition-all duration-300 ${isActive
+                    ? "bg-primary text-primary-foreground font-semibold shadow-lg scale-105"
+                    : "text-white/80 hover:text-white hover:bg-white/10"
+                    }`}
                 >
                   {link.name}
                 </Link>

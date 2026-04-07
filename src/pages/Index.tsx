@@ -1,11 +1,11 @@
 import { useState } from "react";
 import Layout from "@/components/Layout";
 import HeroCarousel from "@/components/HeroCarousel";
-import templeHero1 from "@/assets/temple-hero-1.jpg";
-import templeHero2 from "@/assets/temple-hero-2.jpg";
-import templeHero3 from "@/assets/temple-hero-3.jpg";
-import templeHero4 from "@/assets/temple-hero-4.jpg";
-import templeHero5 from "@/assets/temple-hero-5.jpg";
+import Ashtothram from "@/components/Ashtothram";
+import Donations from "@/components/Donations";
+import Panchangam from "@/components/Panchangam";
+import FestivalList from "@/components/FestivalList";
+import ganeshaImage from "/logo.png";
 import purohit1 from "@/assets/purohit-1.jpg";
 import male1 from "@/assets/member-male-1.png";
 import male2 from "@/assets/member-male-2.png";
@@ -40,20 +40,20 @@ const milestones = [
 ];
 
 const galleryImages = [
-  { src: templeHero1, title: "Temple at Golden Hour", span: "col-span-2 row-span-2" },
-  { src: templeHero2, title: "Sacred Lamps", span: "col-span-1 row-span-1" },
-  { src: templeHero5, title: "Temple Bell & Lamp", span: "col-span-1 row-span-1" },
-  { src: templeHero3, title: "Lotus Pond", span: "col-span-1 row-span-1" },
-  { src: templeHero4, title: "Ancient Corridor", span: "col-span-2 row-span-1" },
-  { src: templeHero2, title: "Interior Light", span: "col-span-1 row-span-1" },
+  { src: ganeshaImage, title: "Temple Darshan", span: "col-span-2 row-span-2" },
+  { src: ganeshaImage, title: "Sacred Ganesha", span: "col-span-1 row-span-1" },
+  { src: ganeshaImage, title: "Divine Presence", span: "col-span-1 row-span-1" },
+  { src: ganeshaImage, title: "Lord of Wisdom", span: "col-span-1 row-span-1" },
+  { src: ganeshaImage, title: "Ancient Deity", span: "col-span-2 row-span-1" },
+  { src: ganeshaImage, title: "Temple Icon", span: "col-span-1 row-span-1" },
 ];
 
 const upcomingEvents = [
-  { date: "Apr 14", month: "2025", title: "Vishu / Tamil New Year", time: "5:00 AM – 10:00 PM", desc: "Grand celebration with special Ganapathi pooja, cultural programs, and prasadam distribution.", type: "Festival" },
-  { date: "May 12", month: "2025", title: "Akshaya Tritiya", time: "5:30 AM – 8:00 PM", desc: "Auspicious day for new beginnings. Special Lakshmi-Ganapathi pooja and gold offering ceremony.", type: "Auspicious" },
-  { date: "Jun 15", month: "2025", title: "Maha Ganapathi Homam", time: "6:00 AM – 2:00 PM", desc: "Grand fire ritual for Lord Ganesha with 1008 chants for prosperity and obstacle removal.", type: "Homam" },
-  { date: "Aug 27", month: "2025", title: "Vinayaka Chaturthi", time: "All Day & Night", desc: "Grand celebration of Lord Ganesha's birth with elaborate decorations, special abhishekam, and cultural programs.", type: "Festival" },
-  { date: "Sep 22", month: "2025", title: "Navaratri Begins", time: "5:00 AM – 10:00 PM", desc: "Nine nights of worship with daily special alankaram and cultural events at the temple.", type: "Festival" },
+  { date: "Apr 14", month: "2026", title: "Vishu / Tamil New Year", time: "5:00 AM – 10:00 PM", desc: "Grand celebration with special Ganapathi pooja, cultural programs, and prasadam distribution.", type: "Festival" },
+  { date: "May 12", month: "2026", title: "Akshaya Tritiya", time: "5:30 AM – 8:00 PM", desc: "Auspicious day for new beginnings. Special Lakshmi-Ganapathi pooja and gold offering ceremony.", type: "Auspicious" },
+  { date: "Jun 15", month: "2026", title: "Maha Ganapathi Homam", time: "6:00 AM – 2:00 PM", desc: "Grand fire ritual for Lord Ganesha with 1008 chants for prosperity and obstacle removal.", type: "Homam" },
+  { date: "Aug 27", month: "2026 ", title: "Vinayaka Chaturthi", time: "All Day & Night", desc: "Grand celebration of Lord Ganesha's birth with elaborate decorations, special abhishekam, and cultural programs.", type: "Festival" },
+  { date: "Sep 22", month: "2026", title: "Navaratri Begins", time: "5:00 AM – 10:00 PM", desc: "Nine nights of worship with daily special alankaram and cultural events at the temple.", type: "Festival" },
 ];
 
 const weeklySchedule = [
@@ -89,11 +89,11 @@ const Index = () => {
             <div className="h-1 w-20 bg-primary/40 rounded-full my-4" />
             <div className="space-y-3 text-sm text-muted-foreground leading-loose font-sans font-light">
               <p>
-                The temple stands in the heart of <strong className="text-foreground font-semibold">Asilmetta, Visakhapatnam</strong>, where thousands visit daily for peace and guidance. 
+                The temple stands in the heart of <strong className="text-foreground font-semibold">Asilmetta, Visakhapatnam</strong>, where thousands visit daily for peace and guidance.
                 Many believe the shrine supports students during exams and brings luck, especially when they come for <strong className="text-primary/80 font-medium">hall ticket blessings</strong> before important tests.
               </p>
               <p>
-                You'll often see families arriving with new vehicles for the traditional <strong className="text-foreground font-semibold">vehicle puja in Vizag</strong>, a ritual believed to bring safety and prosperity. 
+                You'll often see families arriving with new vehicles for the traditional <strong className="text-foreground font-semibold">vehicle puja in Vizag</strong>, a ritual believed to bring safety and prosperity.
                 The temple remains a top Visakhapatnam attraction, drawing both locals and travelers seeking spiritual comfort.
               </p>
             </div>
@@ -104,7 +104,7 @@ const Index = () => {
                 Cultural Importance
               </p>
               <p className="text-white/80 text-sm leading-relaxed font-light italic">
-                "As a cultural landmark of Vizag, it becomes a hub of devotion during festivals like <span className="text-primary font-bold">Vinayaka Chavithi</span>. 
+                "As a cultural landmark of Vizag, it becomes a hub of devotion during festivals like <span className="text-primary font-bold">Vinayaka Chavithi</span>.
                 It represents centuries of faith and is considered a protective force for the city."
               </p>
             </div>
@@ -114,7 +114,7 @@ const Index = () => {
             <div className="absolute -inset-4 border-2 border-primary/5 rounded-3xl rotate-2 pointer-events-none" />
             <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
               <img
-                src={templeHero2}
+                src={ganeshaImage}
                 alt="Temple interior with sacred lamps"
                 className="w-full h-[400px] sm:h-[500px] lg:h-[650px] object-cover transition-transform duration-1000 group-hover:scale-105"
                 loading="lazy"
@@ -144,11 +144,11 @@ const Index = () => {
                 <div className="absolute left-0 top-6 -translate-x-[17px] w-8 h-8 rounded-full bg-background border-[4px] border-primary/20 flex items-center justify-center group-hover:border-primary transition-all duration-500 shadow-xl group-hover:scale-110">
                   <div className="w-2.5 h-2.5 rounded-full bg-primary group-hover:scale-[1.3] transition-transform duration-500" />
                 </div>
-                
+
                 {/* Content Card */}
                 <div className="glass p-5 sm:p-5 rounded-[2.5rem] border border-white/40 shadow-xl group-hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-500 relative overflow-hidden backdrop-blur-md">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/10 transition-colors duration-700 pointer-events-none" />
-                  
+
                   <div className="inline-flex px-5 py-2 rounded-full bg-primary/10 text-primary text-sm font-black tracking-widest uppercase mb-6 border border-primary/20 shadow-inner">
                     {m.year}
                   </div>
@@ -175,8 +175,8 @@ const Index = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
             {services.map((s, i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className="premium-card p-5 flex flex-col items-center text-center group cursor-pointer hover:-translate-y-2"
               >
                 <div className="w-20 h-20 rounded-full bg-primary/5 flex items-center justify-center text-4xl mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-inner">
@@ -204,7 +204,7 @@ const Index = () => {
           <div className="order-2 lg:order-1 animate-fade-in opacity-0 [animation-fill-mode:forwards]">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl group">
               <img
-                src={templeHero4}
+                src={ganeshaImage}
                 alt="Temple corridor"
                 className="w-full h-[400px] sm:h-[550px] object-cover transition-transform duration-[5s] group-hover:scale-110"
                 loading="lazy"
@@ -220,8 +220,8 @@ const Index = () => {
             <div className="h-1 w-20 bg-primary/40 rounded-full my-4" />
             <div className="space-y-4">
               {timings.map((t, i) => (
-                <div 
-                  key={i} 
+                <div
+                  key={i}
                   className="flex justify-between items-center p-5 rounded-2xl glass border border-white/40 hover:border-primary/20 hover:scale-[1.02] transition-all duration-300 group shadow-sm hover:shadow-lg"
                 >
                   <span className="text-foreground text-sm font-bold font-serif group-hover:text-primary transition-colors">{t.period}</span>
@@ -248,8 +248,8 @@ const Index = () => {
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[200px] sm:auto-rows-[300px]">
             {galleryImages.map((img, i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className={`${img.span} relative rounded-3xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-700`}
               >
                 <img
@@ -283,21 +283,21 @@ const Index = () => {
 
           <div className="flex flex-col gap-4 w-full relative">
             <div className="absolute left-8 sm:left-12 top-0 bottom-0 w-px bg-gradient-to-b from-primary/10 via-primary/30 to-primary/10 hidden md:block" />
-            
+
             {upcomingEvents.map((e, i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className="relative glass overflow-hidden flex flex-col md:flex-row gap-4 p-5 sm:p-5 rounded-[2.5rem] items-center md:items-stretch group cursor-pointer border border-white/40 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 backdrop-blur-md animate-fade-rise opacity-0 [animation-fill-mode:forwards]"
                 style={{ animationDelay: `${i * 150}ms` }}
               >
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/15 transition-colors duration-700 pointer-events-none" />
-                
+
                 <div className="flex-shrink-0 w-36 flex flex-col items-center justify-center bg-background rounded-3xl p-4 border-4 border-primary/10 group-hover:border-primary transition-all duration-500 shadow-inner relative z-10 group-hover:scale-105">
                   <div className="text-4xl font-black text-primary transition-colors leading-none drop-shadow-sm">{e.date.split(' ')[1]}</div>
                   <div className="text-sm font-bold text-primary/80 uppercase tracking-[0.2em] mt-3">{e.date.split(' ')[0]}</div>
                   <div className="text-sm font-black text-primary/50 mt-1">{e.month}</div>
                 </div>
-                
+
                 <div className="flex-1 text-center md:text-left py-2 relative z-10 flex flex-col justify-center">
                   <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-5">
                     <h3 className="text-2xl font-bold text-foreground font-serif group-hover:text-primary transition-colors duration-500">{e.title}</h3>
@@ -305,7 +305,7 @@ const Index = () => {
                   </div>
                   <p className="text-muted-foreground text-sm font-light leading-relaxed max-w-4xl">{e.desc}</p>
                 </div>
-                
+
                 <div className="flex-shrink-0 flex flex-col items-center justify-center p-4 bg-white/40 rounded-3xl border border-white/60 min-w-[220px] shadow-sm group-hover:shadow-md transition-shadow relative z-10 backdrop-blur-sm self-center md:self-stretch">
                   <div className="text-primary mb-3 flex items-center gap-2">
                     <div className="h-px w-4 bg-primary/40" />
@@ -426,6 +426,13 @@ const Index = () => {
         </div>
       </section>
 
+      {/* ═══════ ASHTOTHRAM ═══════ */}
+      <Ashtothram />
+
+      {/* ═══════ PANCHANGAM & FESTIVALS ═══════ */}
+      <Panchangam />
+      <FestivalList />
+
       {/* ═══════ CONTACT ═══════ */}
       <section id="contact" className="section-padding px-4 sm:px-4 relative">
         <div className="absolute inset-0 bg-primary/[0.01] pointer-events-none" />
@@ -463,7 +470,7 @@ const Index = () => {
           <div className="animate-fade-in opacity-0 [animation-fill-mode:forwards] [animation-delay:0.3s]">
             <form onSubmit={handleSubmit} className="glass p-5 sm:p-6 rounded-3xl border border-white/20 shadow-2xl relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
-              
+
               <div className="space-y-3 relative z-10">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -495,7 +502,7 @@ const Index = () => {
                     />
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <label className="text-sm text-primary font-bold uppercase tracking-widest flex items-center gap-2">
                     <span className="w-1 h-1 bg-primary rounded-full" />
@@ -510,7 +517,7 @@ const Index = () => {
                     placeholder="How can we assist you?"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <label className="text-sm text-primary font-bold uppercase tracking-widest flex items-center gap-2">
                     <span className="w-1 h-1 bg-primary rounded-full" />
@@ -560,6 +567,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* ═══════ DONATIONS ═══════ */}
+      <Donations />
     </Layout>
   );
 };

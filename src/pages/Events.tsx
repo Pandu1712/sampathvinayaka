@@ -1,10 +1,11 @@
 import Layout from "@/components/Layout";
-import templeHero3 from "@/assets/temple-hero-3.jpg";
+import ganeshaImage from "/logo.png";
 
 const upcomingEvents = [
-  { date: "Aug 27", month: "2025", title: "Vinayaka Chavithi", time: "All Day", desc: "The grandest festival of the year! Celebrated with exquisite decorations, special poojas, and community prayers for prosperity.", type: "Festival" },
-  { date: "Sep 07", month: "2025", title: "Ganesh Chaturthi", time: "All Day & Night", desc: "Witness grand decorations and special poojas that attract thousands of devotees from across Visakhapatnam.", type: "Festival" },
-  { date: "Oct 02", month: "2025", title: "Navaratri Ganapati", time: "5:00 AM – 10:00 PM", desc: "Nine nights of traditional rituals, music, and festive spiritual practices highlighting various forms of Ganesha.", type: "Festival" },
+  { date: "Sep 14", month: "2026", title: "Vinayaka Chavithi", time: "All Day", desc: "The grandest festival of the year! Celebrated with exquisite decorations, special poojas, and community prayers for prosperity.", type: "Festival" },
+  { date: "Oct 11", month: "2026", title: "Ganesha Navaratri", time: "5:00 AM – 10:00 PM", desc: "Nine nights of traditional rituals, music, and festive spiritual practices highlighting various forms of Ganesha.", type: "Festival" },
+  { date: "Sep 04", month: "2027", title: "Vinayaka Chavithi", time: "All Day & Night", desc: "Witness grand decorations and special poojas that attract thousands of devotees from across the city.", type: "Festival" },
+  { date: "Sep 30", month: "2027", title: "Ganesha Navaratri", time: "5:00 AM – 10:00 PM", desc: "Nine nights of sacred celebrations and community spiritual gatherings.", type: "Festival" },
   { date: "Ongoing", month: "Daily", title: "Hall Ticket Blessings", time: "6:00 AM – 8:00 PM", desc: "Special guidance and blessings for students during exam seasons before their important tests.", type: "Devotion" },
 ];
 
@@ -22,7 +23,7 @@ const Events = () => {
       {/* Hero */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden bg-black">
         <img 
-          src={templeHero3} 
+          src={ganeshaImage} 
           alt="Temple festival" 
           className="absolute inset-0 w-full h-full object-cover opacity-60 animate-ken-burns scale-110" 
           width={1920} 

@@ -1,16 +1,10 @@
 import { useState, useEffect } from "react";
-import templeHero1 from "@/assets/temple-hero-1.jpg";
-import templeHero2 from "@/assets/temple-hero-2.jpg";
-import templeHero3 from "@/assets/temple-hero-3.jpg";
-import templeHero4 from "@/assets/temple-hero-4.jpg";
-import templeHero5 from "@/assets/temple-hero-5.jpg";
+import ganeshaImage from "/logo.png";
 
 const slides = [
-  { image: templeHero1, title: "Welcome to Sampath Vinayaka Temple", subtitle: "A timeless sanctuary of Lord Ganesha's divine blessings" },
-  { image: templeHero2, title: "Divine Light Within", subtitle: "Experience the sacred glow of thousand lamps" },
-  { image: templeHero3, title: "Peace & Serenity", subtitle: "Find solace in the heart of ancient traditions" },
-  { image: templeHero4, title: "Architectural Marvel", subtitle: "Centuries of devotion carved in stone" },
-  { image: templeHero5, title: "Sacred Rituals", subtitle: "Connecting souls through timeless ceremonies" },
+  { image: ganeshaImage, title: "Sampath Vinayaka Temple", subtitle: "Seek divine blessings from the Lord of Obstacles" },
+  { image: ganeshaImage, title: "Sacred Darshan", subtitle: "Experience the peace and power of Lord Ganesha" },
+  { image: ganeshaImage, title: "Timeless Devotion", subtitle: "A legacy of faith for generations" },
 ];
 
 const HeroCarousel = () => {
@@ -39,11 +33,9 @@ const HeroCarousel = () => {
           <img
             src={slide.image}
             alt={slide.title}
-            className={`w-full h-full object-cover transition-transform duration-[10000ms] ease-linear ${
+            className={`w-full h-full object-contain mix-blend-screen transition-transform duration-[10000ms] ease-linear ${
               index === current ? "scale-110" : "scale-100"
             }`}
-            width={1920}
-            height={1080}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70" />
           <div className="absolute inset-0 bg-black/20" />
