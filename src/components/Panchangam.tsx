@@ -44,7 +44,7 @@ const Panchangam = () => {
   const day = formatDay(date);
 
   return (
-    <section id="panchangam" className="section-padding bg-gradient-to-b from-white to-primary/5 py-16 sm:py-24 relative overflow-hidden">
+    <section id="panchangam" className="section-padding bg-gradient-to-b from-white to-primary/5 py-6 sm:py-8 relative overflow-hidden">
       {/* Decorative Background */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />

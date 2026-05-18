@@ -1,5 +1,5 @@
 import Layout from "@/components/Layout";
-import ganeshaImage from "/logo.png";
+const ganeshaImage = "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png";
 
 const upcomingEvents = [
   { date: "Sep 14", month: "2026", title: "Vinayaka Chavithi", time: "All Day", desc: "The grandest festival of the year! Celebrated with exquisite decorations, special poojas, and community prayers for prosperity.", type: "Festival" },

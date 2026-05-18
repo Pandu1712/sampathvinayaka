@@ -52,7 +52,7 @@ const FestivalList = () => {
   const currentFestivals = activeYear === '2026' ? festivals2026 : festivals2027;
 
   return (
-    <section id="festivals" className="section-padding bg-white py-16 sm:py-24 relative overflow-hidden">
+    <section id="festivals" className="section-padding bg-white py-6 sm:py-8 relative overflow-hidden">
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-primary/[0.02] pointer-events-none" />
       
       <div className="container-custom relative z-10 px-4">

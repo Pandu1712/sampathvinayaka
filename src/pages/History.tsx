@@ -1,162 +1,240 @@
+import { useState } from "react";
 import Layout from "@/components/Layout";
-import templeHero1 from "@/assets/temple-hero-1.jpg";
-import templeHero4 from "@/assets/temple-hero-4.jpg";
-
-const milestones = [
-  { year: "Early 1960s", title: "Humble Beginnings", desc: "Built by local devotees in Asilmetta, Visakhapatnam, who envisioned a serene sanctuary for peace and ancient Vedic traditions in the growing city." },
-  { year: "1971 AD", title: "The Protector of Vizag", desc: "During the Indo-Pak war, it is widely believed the temple's divine blessings shielded Visakhapatnam and its vital coastline from naval threats." },
-  { year: "1980s-90s", title: "A Student's Beacon", desc: "Became famous as the 'Hall Ticket Ganesha', where thousands of students seek blessings for academic success and clarity before exams." },
-  { year: "Present Day", title: "Vibrant Tradition", desc: "A thriving spiritual hub in Asilmetta, attracting thousands daily and standing as a testament to Vizag's deep-rooted faith." },
-];
+import { MapPin, Train, Plane, Sparkles, Languages } from "lucide-react";
 
 const History = () => {
+  const [lang, setLang] = useState<"en" | "te" | "hi">("en");
+
+  // English history content
+  const englishHistory = {
+    title: "Temple History",
+    subtitle: "A Divine Legacy of Faith and Protection",
+    paragraphs: [
+      "The temple is located in the compound of M/s. S.G. Sambandan & Co., Asilmetta and it was constructed by Late. S.G. Sambandan, Late T.S. Selvaganesan and Late T.S. Rajeswaran with their funds in the year 1962 for their worship and as well as their family members. During the course of time, Jalaries (local fishermen) used to offer prayers and perform Deeparadhana every day before going to the market for their daily business. Five years later the Paramacharya of Kanchi His Holiness Sri Chandrasekharendra Saraswathi reconsecrated the shrine by placing \"Ganapathi Yantram\" with his own hands.",
+      "Sri Sampat Vinayagar Temple came into prominence from 1971 when Admiral Krishnan, Eastern Naval Commander, broke 1001 coconuts before the Lord for saving Vizag from the Pakistani attack when its submarine Ghazi sank off the coast. Here, most of the new vehicles come to perform vehicle pooja in front of the presiding deity. Presently it is organized by Sri T.S. Rajeswaran, Founder Trustee, Sri T.R. Cholan and Sri T.S. Chezhian as founder family members.",
+      "Sri Sampath Vinayagar temple has become one of the most famous temples in Visakhapatnam city attracting daily a number of devotees. Sri Sampath Vinayagar is a powerful deity in Visakhapatnam. There is a staunch belief among the devotees that their sins are washed off and desires fulfilled by offering prayers to the Deity. Sri Sampath Vinayagar Temple has constructed with its funds Sri Vijaya Vinayagar Temple in the compound of Old Age Home at Gandigundam Village.",
+      "The temple has also donated a sum of Rs. 1.20 Crores to Sri Sitaramachandra Swamy Temple, Ambicabagh for construction of Rajagophuram and Prakaram.",
+      "The temple is located very near, almost walking distance from the R.T.C. Complex and about 2 kms. from the Visakhapatnam railway station. Public conveyance is available to reach this temple from every nook and corner of Visakhapatnam city. Thus it is easily reachable and accessible to all devotees."
+    ],
+    reachTitle: "How to Reach Sri Sampath Vinayagar Temple",
+    reach: [
+      { type: "RTC Complex", value: "Walkable distance / 1/2 km", icon: <MapPin className="text-primary" size={20} /> },
+      { type: "Railway Station", value: "2 kms away", icon: <Train className="text-primary" size={20} /> },
+      { type: "Airport", value: "16 kms away", icon: <Plane className="text-primary" size={20} /> }
+    ],
+    blessing: "If you have the Lord's grace, you have everything."
+  };
+
+  // Telugu history content
+  const teluguHistory = {
+    title: "ఆలయ చరిత్ర",
+    subtitle: "భక్తి మరియు రక్షణ యొక్క దైవిక వారసత్వం",
+    paragraphs: [
+      "1962 వ సం॥లో విశాఖలోని ఆశీలుమెట్ట వద్ద ఉన్న మెసర్స్ యస్.జి. సంబంధన్ అండ్ కో వారి ఆవరణలో కీ॥శే॥ యస్.జి. సంబంధన్, కీ॥శే॥ టి.యస్. సెల్వగణేశన్ మరియు కీ॥శే॥ టి.యస్. రాజేశ్వరన్ గారి ఆధ్వర్యంలో వారి కుటుంబ సభ్యులచే శ్రీ సంపత్ వినాయగర్ స్వామివారి దేవాలయము స్థాపించబడినది. సమీప జాలరులు ప్రతిరోజు స్వామిని అర్చించి, నమస్కరించి వారి వృత్తి వ్యాపారములను మొదలు పెట్టెడివారు. 5 సం॥ల తరువాత కంచి పీఠాధిపతులు శ్రీశ్రీశ్రీ చంద్రశేఖర సరస్వతి వారి స్వహస్తములతో \"గణపతి యంత్రము\" స్థాపన చేసినారు. శ్రీ టి.యస్.రాజేశ్వరన్ గారు వ్యవస్థాపక ధర్మకర్తగా మరియు వంశపారంపర్య ధర్మకర్తలుగా శ్రీ టి.ఆర్. చోళన్, శ్రీ టి.యస్.చెజియన్ వ్యవహరించు చున్నారు.",
+      "1971 లో ఇండియా, పాకిస్తాన్ యుద్ద సమయమున సముద్రంలో ఘాజి అను వారి సబ్మెరైన్పై విజయం సాధించిన సమయములో విశాఖను రక్షించినందుకు ఈస్ట్రన్ నేవల్ కమాండర్ శ్రీ అడ్మిరల్ క్రిష్ణన్ 1001 కొబ్బరికాయలు కొట్టి స్వామిని వేడుకొన్నారు. అప్పటి నుండి దేవాలయము మరింత ప్రసిద్ధిగాంచినది. ఈ దేవాలయములో చాలమంది భక్తులు తమయొక్క నూతన వాహనములను స్వామివారి ముందు పూజలు చేయించుకుంటారు. శ్రీ సంపత్ వినాయగర్ దేవాలయం యొక్క నిధులతో గండిగుండం గ్రామంలో నిర్మాణం గావించబడిన ఓల్డ్ ఏజ్ హోమ్ నందు శ్రీ విజయ వినాయగర్ దేవాలయం నిర్मించబడినది.",
+      "శ్రీ సీతారామచంద్ర స్వామి దేవాలయం, అంబికాబాగ్ నకు శ్రీ సంపత్ వినాయగర్ దేవాలయ నిధుల నుండి సుమారు కోటి 20 లక్షల రూపాయలు రాజగోపురం మరియు ప్రాకారం నిర్మాణం కొరకు విరాళం చెల్లించుట జరిగినది.",
+      "విశాఖలో బహుళ ప్రచారమే గాక భక్తుల పాప ప్రక్షాళనతోబాటు కోర్కెలు తీర్చు ప్రభువు గణాధుడుగా ప్రసిద్ధికెక్కిన దేవాలయము. అభిషేక, అలంకారములకు ఈ దేవాలయము ఏకైక ప్రత్యేకత. శ్రీ సంపత్ వినాయగర్ దేవాలయమునకు భక్తులు వేల సంఖ్యలో దర్శించుకొందురు. వినాయక చవితి ఉత్సవములలో 9 రోజులు స్వామివారికి 9 రకములైన అలంకారములతో అవతరింపజేయుట జరుగును. ఆలయ ప్రధాన అర్చకులు శ్రీ పి. మోహన్ స్వామి గురుక్కల్ వారిచే సంప్రదాయ రీతిలో నిత్యాభిషేకములు జరుగును. ఈ 9 రోజులు అన్న సంతర్పణ విరివిగా జరుపబడుటయే గాక సాయం సమయములందు ఆధ్యాత్మిక కార్యక్రమములు నిర్వహించబడును."
+    ],
+    reachTitle: "శ్రీ సంపత్ వినాయగర్ దేవాలయమును చేరుటకు",
+    reach: [
+      { type: "ఆర్.టి.సి. కాంప్లెక్స్ నుండి", value: "నడవగలిగే దూరం (1/2 కి.మీ.)", icon: <MapPin className="text-primary" size={20} /> },
+      { type: "రైల్వే స్టేషన్ నుండి", value: "2 కిలోమీటర్లు", icon: <Train className="text-primary" size={20} /> },
+      { type: "విమానాశ్రయ కేంద్రము నుండి", value: "16 కిలోమీటర్లు", icon: <Plane className="text-primary" size={20} /> }
+    ],
+    blessing: "స్వామి దయ ఉంటే అన్నీ ఉన్నట్లే"
+  };
+
+  // Hindi history content
+  const hindiHistory = {
+    title: "मंदिर का इतिहास",
+    subtitle: "श्रद्धा और सुरक्षा की एक दिव्य विरासत",
+    paragraphs: [
+      "यह मंदिर असीलमेट्टा में मेसर्स एस.जी. सम्बन्धन एंड कंपनी के परिसर में स्थित है। इसका निर्माण स्वर्गीय एस.जी. सम्बन्धन, स्वर्गीय टी.एस. सेल्वागणेशन और स्वर्गीय टी.एस. राजेश्वरन द्वारा 1962 में उनके और उनके परिवार के सदस्यों की पूजा-अर्चना के लिए अपने स्वयं के धन से कराया गया था। समय बीतने के साथ, स्थानीय मछुआरे (जलारी) अपने दैनिक व्यवसाय के लिए बाजार जाने से पहले हर दिन यहाँ प्रार्थना करते थे और दीपाराधना करते थे। पांच साल बाद, कांची के पीठाधिपति परम पावन श्री चन्द्रशेखरेन्द्र सरस्वती ने अपने कर-कमलों से 'गणपति यंत्र' की स्थापना करके मंदिर की पुनर्प्रतिष्ठा की थी।",
+      "श्री संपत विनायगर मंदिर 1971 से अत्यधिक प्रमुखता में आया जब पूर्वी नौसेना कमान के एडमिरल कृष्णन ने पाकिस्तानी नौसैनिक हमले से विशाखापत्तनम को सुरक्षित बचाने के लिए भगवान के सामने 1001 नारियल तोड़े, जब पाकिस्तानी पनडुब्बी गाजी तट के पास डूब गई थी। यहाँ अधिकांश नए वाहन पीठासीन देवता के सामने वाहन पूजा करने के लिए आते हैं। वर्तमान में इसका संचालन संस्थापक ट्रस्टी श्री टी.एस. राजेश्वरन, संस्थापक परिवार के सदस्य श्री टी.आर. चोलन और श्री टी.एस. चेझियान द्वारा किया जाता है।",
+      "श्री संपत विनायगर मंदिर विशाखापत्तनम शहर के सबसे प्रसिद्ध मंदिरों में से एक बन गया है, जो दैनिक रूप से बड़ी संख्या में भक्तों को आकर्षित करता है। श्री संपत विनायगर विशाखापत्तनम में एक अत्यंत शक्तिशाली देवता हैं। भक्तों में यह दृढ़ विश्वास है कि भगवान की पूजा करने से उनके पाप धुल जाते हैं और मनोकामनाएं पूरी होती हैं। श्री संपत विनायगर मंदिर ने अपने स्वयं के धन से गंदीगुंडम गांव में ओल्ड एज होम के परिसर में श्री विजय विनायगर मंदिर का निर्माण कराया है।",
+      "मंदिर ने राजगोपुरम और प्राकार के निर्माण के लिए अम्बिकाबाग स्थित श्री सीतारामचंद्र स्वामी मंदिर को 1.20 करोड़ रुपये की राशि भी दान में दी है।",
+      "यह मंदिर आर.टी.सी. कॉम्प्लेक्स से बहुत पास, लगभग पैदल दूरी पर स्थित है और विशाखापत्तनम रेलवे स्टेशन से लगभग 2 किमी दूर है। विशाखापत्तनम शहर के हर कोने से इस मंदिर तक पहुँचने के लिए सार्वजनिक वाहन आसानी से उपलब्ध हैं। इस प्रकार यह सभी भक्तों के लिए आसानी से सुलभ और पहुँच योग्य है।"
+    ],
+    reachTitle: "श्री संपत विनायगर मंदिर कैसे पहुँचें",
+    reach: [
+      { type: "आर.टी.सी. कॉम्प्लेक्स से", value: "पैदल दूरी (1/2 किमी)", icon: <MapPin className="text-primary" size={20} /> },
+      { type: "रेलवे स्टेशन से", value: "2 किमी दूर", icon: <Train className="text-primary" size={20} /> },
+      { type: "हवाई अड्डे से", value: "16 किमी दूर", icon: <Plane className="text-primary" size={20} /> }
+    ],
+    blessing: "यदि आप पर भगवान की कृपा है, तो आपके पास सब कुछ है।"
+  };
+
+  const getHistory = () => {
+    if (lang === "en") return englishHistory;
+    if (lang === "te") return teluguHistory;
+    return hindiHistory;
+  };
+
+  const current = getHistory();
+
   return (
     <Layout>
-      {/* Hero */}
-      <section className="relative h-[70vh] flex items-center justify-center overflow-hidden bg-black">
-        <img 
-          src={templeHero1} 
-          alt="Temple exterior" 
-          className="absolute inset-0 w-full h-full object-cover opacity-60 animate-ken-burns scale-110" 
-          width={1920} 
-          height={1080} 
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/90" />
-        <div className="relative z-10 text-center px-4">
-          <div className="animate-fade-rise opacity-0 [animation-fill-mode:forwards]">
-            <p className="text-primary text-sm tracking-[0.4em] uppercase mb-4 font-bold drop-shadow-lg">Our Sacred Legacy</p>
-            <h1 className="hero-title !font-serif !italic drop-shadow-2xl">Temple History</h1>
-            <div className="h-1 w-24 bg-primary/60 mx-auto mt-4 rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
-          </div>
+      {/* Hero Header */}
+      <section className="relative h-[45vh] sm:h-[50vh] flex items-center justify-center overflow-hidden bg-[#251804] border-b border-primary/20">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsla(38,72%,50%,0.15)_0,transparent_70%)] pointer-events-none" />
+        
+        {/* Soft Background Image Overlay */}
+        <div className="absolute inset-0 bg-[url('https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087507/IMG_5684_xxnzl6.jpg')] bg-cover bg-center opacity-25 mix-blend-overlay" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#251804]/50 via-transparent to-[#120B02]" />
+
+        <div className="relative z-10 text-center px-4 max-w-4xl animate-fade-rise">
+          <p className="text-primary text-xs sm:text-sm tracking-[0.4em] uppercase mb-4 font-black drop-shadow-md">🙏 Sri Sampath Vinayakar</p>
+          <h1 className="text-4xl sm:text-6xl font-bold font-serif text-white tracking-wide">
+            {lang === "en" ? "Temple History" : lang === "te" ? "ఆలయ చరిత్ర" : "मंदिर का इतिहास"}
+          </h1>
+          <div className="h-1 w-32 bg-gradient-to-r from-transparent via-primary/60 to-transparent mx-auto mt-6 rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
         </div>
       </section>
 
-      {/* Timeline */}
-      <section className="section-padding px-4 bg-transparent relative">
-        <div className="container-custom max-w-5xl mx-auto relative">
-          <div className="absolute left-[31px] sm:left-[47px] top-4 bottom-4 w-px bg-gradient-to-b from-primary/5 via-primary/40 to-primary/5" />
+      {/* Main Content Section */}
+      <section className="py-12 sm:py-20 px-4 bg-background relative overflow-hidden">
+        {/* Sacred Traditional Ornament Pattern Background */}
+        <div className="absolute inset-0 opacity-[0.015] bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
+
+        <div className="container-custom max-w-6xl relative z-10">
           
-          <div className="space-y-10 relative">
-            {milestones.map((m, i) => (
-              <div key={i} className="flex gap-4 sm:gap-6 items-start group animate-fade-rise" style={{ animationDelay: `${i * 150}ms`, opacity: 0, animationFillMode: "forwards" }}>
-                <div className="flex-shrink-0 w-16 sm:w-24 text-right pt-2">
-                  <span className="text-primary font-black text-sm tracking-tighter opacity-50 group-hover:opacity-100 transition-all duration-500">{m.year}</span>
-                </div>
-                <div className="flex-shrink-0 relative z-10">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full glass border border-primary/30 flex items-center justify-center shadow-xl group-hover:scale-125 group-hover:bg-primary group-hover:text-white transition-all duration-700 group-hover:rotate-[360deg]">
-                    <div className="w-2.5 h-2.5 rounded-full bg-primary group-hover:bg-white shadow-[0_0_10px_rgba(var(--primary),0.8)]" />
-                  </div>
-                </div>
-                <div className="flex-1 pb-4">
-                  <h3 className="text-2xl font-bold text-foreground mb-4 font-serif group-hover:text-primary transition-colors leading-tight">{m.title}</h3>
-                  <div className="p-5 rounded-3xl glass-dark border border-white/10 group-hover:border-primary/20 transition-all duration-500 shadow-lg group-hover:shadow-primary/5">
-                    <p className="text-white/80 text-sm leading-relaxed font-light">{m.desc}</p>
-                  </div>
-                </div>
+          {/* Elegant Language Selector Panel */}
+          <div className="flex justify-end mb-8 sm:mb-12">
+            <div className="bg-gradient-to-b from-[#2E200C] to-[#120B02] p-1.5 rounded-2xl border border-primary/35 shadow-xl flex items-center gap-1">
+              <div className="p-2 text-primary flex items-center justify-center shrink-0">
+                <Languages size={18} className="animate-pulse" />
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Architecture */}
-      <section className="section-padding px-4 bg-primary/[0.02] relative translate-y-0">
-        <div className="container-custom grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-          <div className="relative group">
-            <div className="absolute -inset-4 border-2 border-primary/10 rounded-[2.5rem] -rotate-3 transition-transform group-hover:rotate-0 duration-700" />
-            <div className="absolute -inset-4 border-2 border-primary/5 rounded-[2.5rem] rotate-2 transition-transform group-hover:rotate-0 duration-700" />
-            <div className="relative rounded-[2rem] overflow-hidden shadow-2xl">
-              <img 
-                src={templeHero4} 
-                alt="Temple pillars" 
-                className="w-full h-[400px] sm:h-[600px] object-cover transition-transform duration-[5s] group-hover:scale-110" 
-                loading="lazy" 
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent mix-blend-overlay" />
+              <button
+                onClick={() => setLang("en")}
+                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-serif font-black tracking-widest transition-all duration-300 ${
+                  lang === "en"
+                    ? "bg-primary text-primary-foreground shadow-md scale-102"
+                    : "text-white/60 hover:text-white"
+                }`}
+              >
+                ENGLISH
+              </button>
+              <button
+                onClick={() => setLang("te")}
+                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-serif font-black tracking-widest transition-all duration-300 ${
+                  lang === "te"
+                    ? "bg-primary text-primary-foreground shadow-md scale-102"
+                    : "text-white/60 hover:text-white"
+                }`}
+              >
+                తెలుగు
+              </button>
+              <button
+                onClick={() => setLang("hi")}
+                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-serif font-black tracking-widest transition-all duration-300 ${
+                  lang === "hi"
+                    ? "bg-primary text-primary-foreground shadow-md scale-102"
+                    : "text-white/60 hover:text-white"
+                }`}
+              >
+                हिन्दी
+              </button>
             </div>
           </div>
-          
-          <div className="animate-fade-rise opacity-0 [animation-fill-mode:forwards]">
-            <p className="text-primary text-sm tracking-[0.4em] uppercase mb-4 font-bold">Divine Architecture</p>
-            <h2 className="text-4xl font-bold text-foreground font-serif leading-tight">
-              Dravidian <span className="gold-shimmer italic">Masterpiece</span>
-            </h2>
-            <div className="h-1 w-20 bg-primary/40 rounded-full my-4" />
-            <div className="space-y-4 text-sm text-muted-foreground font-light leading-relaxed">
-              <p>
-                The temple showcases the finest Dravidian architecture with its towering gopuram rising <strong className="text-foreground font-bold">65 feet</strong>, 
-                adorned with hundreds of sculpted deities and celestial beings that tell a silent story of divine craftsmanship.
-              </p>
-              <p>
-                The mandapam features <strong className="text-foreground font-bold">96 intricately carved stone pillars</strong>, each telling a unique story from Hindu mythology. 
-                The sanctum is designed to channel natural light during specific times of the year, creating a divine spectacle that awes every devotee.
-              </p>
-              <div className="premium-card p-5 border-l-4 border-l-primary bg-white relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-primary/10 transition-all" />
-                <p className="text-primary text-sm font-serif italic font-bold mb-3">"A spiritual comfort in a calm and welcoming space. The vibrations here are truly transformative."</p>
-                <div className="flex items-center gap-3">
-                  <div className="h-px w-6 bg-primary/40" />
-                  <p className="text-sm text-muted-foreground uppercase tracking-[0.2em] font-bold">Devotee Feedback</p>
+
+          {/* History Core Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+            
+            {/* Left side: Premium Deity Circular Plaque (matches screenshot concept) */}
+            <div className="lg:col-span-4 flex flex-col items-center lg:sticky lg:top-28">
+              <div className="relative group">
+                {/* Traditional Decorative Borders */}
+                <div className="absolute -inset-4 border border-primary/20 rounded-full rotate-6 pointer-events-none animate-spin-slow duration-[10000ms]" />
+                <div className="absolute -inset-4 border-2 border-primary/10 rounded-full -rotate-3 pointer-events-none" />
+                
+                {/* Deity Image Holder */}
+                <div className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-full overflow-hidden border-[6px] border-white shadow-[0_15px_45px_rgba(0,0,0,0.3)] bg-gradient-to-b from-primary/10 to-primary/5">
+                  <img
+                    src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087509/IMG_5686_ixb1rc.jpg"
+                    alt="Presiding Deity Lord Ganesha"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1500ms]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-45" />
                 </div>
               </div>
+              
+              <div className="text-center mt-6">
+                <h3 className="font-serif text-lg font-bold text-foreground tracking-wide">
+                  {lang === "en" ? "Sri Sampath Vinayagar" : "శ్రీ సంపత్ వినాయగర్"}
+                </h3>
+                <p className="text-primary text-xs uppercase tracking-[0.2em] font-bold mt-1">
+                  {lang === "en" ? "Presiding Deity" : "ప్రధాన అర్చనా మూర్తి"}
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Visitor Guide */}
-      <section className="section-padding px-4">
-        <div className="container-custom">
-          <div className="text-center mb-10">
-            <p className="text-primary text-sm tracking-[0.4em] uppercase mb-4 font-bold">Visitor Guide</p>
-            <h2 className="text-4xl font-bold text-foreground font-serif">
-              Plan Your <span className="gold-shimmer italic">Journey</span>
-            </h2>
-            <div className="gold-divider max-w-[200px] mx-auto mt-4 opacity-60" />
-          </div>
+            {/* Right side: Detailed narrative paragraphs */}
+            <div className="lg:col-span-8 space-y-6 sm:space-y-8">
+              <div className="text-left">
+                <h2 className="text-2xl sm:text-3xl font-bold font-serif text-foreground leading-tight flex items-center gap-3">
+                  <Sparkles className="text-primary shrink-0 animate-bounce" size={24} />
+                  {current.title}
+                </h2>
+                <p className="text-muted-foreground text-xs sm:text-sm tracking-widest uppercase mt-2 font-bold font-serif">
+                  {current.subtitle}
+                </p>
+                <div className="h-1 w-20 bg-primary/40 rounded-full mt-4 shadow-sm" />
+              </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Travel Tips */}
-            <div className="space-y-4">
-              <h3 className="text-2xl font-bold text-foreground font-serif flex items-center gap-4">
-                <span className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl shadow-inner">💡</span> 
-                Travel Wisely
-              </h3>
-              <div className="space-y-3">
-                {[
-                  { title: "Best Time to Visit", desc: "Visit early morning (6:00 AM) to avoid crowds and witness the peaceful morning rituals in their full glory." },
-                  { title: "Dress Code", desc: "Dress modestly and follow the temple dress code, respecting ancient customs and traditional vibes." },
-                  { title: "Photography", desc: "Photography is generally not allowed inside the sanctum sanctorum. Please respect the sanctity of the shrine." },
-                ].map((tip, i) => (
-                  <div key={i} className="premium-card p-4 border border-primary/10 hover:border-primary transition-all duration-500 group">
-                    <h4 className="font-bold text-foreground text-sm mb-2 font-serif group-hover:text-primary transition-colors">{tip.title}</h4>
-                    <p className="text-muted-foreground text-sm font-light leading-relaxed">{tip.desc}</p>
-                  </div>
+              {/* Narrative Texts */}
+              <div className="space-y-5 text-sm sm:text-base text-muted-foreground leading-loose font-light font-sans text-justify">
+                {current.paragraphs.map((p, idx) => (
+                  <p key={idx} className="indent-4 sm:indent-8 first:indent-0 hover:text-foreground transition-colors duration-300">
+                    {p}
+                  </p>
                 ))}
               </div>
             </div>
 
-            {/* Nearby Attractions */}
-            <div className="space-y-4">
-              <h3 className="text-2xl font-bold text-foreground font-serif flex items-center gap-4">
-                <span className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl shadow-inner">🏖️</span> 
-                Nearby Wonders
+          </div>
+
+          {/* Reach details / Transportation Options */}
+          <div className="mt-16 sm:mt-24 pt-12 border-t border-primary/25">
+            <div className="text-center mb-8">
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-foreground">
+                {current.reachTitle}
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[
-                  { name: "Kailasagiri", desc: "Scenic hill park with panoramic city views and ropeway." },
-                  { name: "RK Beach", desc: "Famous beach for evening strolls and spiritual sunsets." },
-                  { name: "INS Kursura", desc: "Submarine museum showcasing India's rich naval history." },
-                  { name: "Dolphin's Nose", desc: "Breathtaking coastal views and a historic lighthouse." },
-                ].map((place, i) => (
-                  <div key={i} className="premium-card p-4 border border-primary/5 hover:border-primary/40 transition-all duration-500 group">
-                    <h4 className="font-bold text-primary text-sm mb-2 font-serif group-hover:scale-105 transition-transform origin-left">{place.name}</h4>
-                    <p className="text-muted-foreground text-sm font-light leading-relaxed">{place.desc}</p>
+              <div className="h-[2px] w-24 bg-gradient-to-r from-transparent via-primary/40 to-transparent mx-auto mt-3" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {current.reach.map((r, i) => (
+                <div 
+                  key={i} 
+                  className="bg-[#2E200C]/[0.02] border border-primary/15 hover:border-primary/40 p-6 rounded-2xl flex items-center gap-4 transition-all duration-300 group hover:-translate-y-1 shadow-sm hover:shadow-md"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
+                    {r.icon}
                   </div>
-                ))}
-              </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">{r.type}</span>
+                    <span className="text-sm sm:text-base font-serif font-bold text-foreground mt-1 tracking-wide">{r.value}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
+
+          {/* Spiritual Blessing Card / Traditional Footer */}
+          <div className="mt-16 text-center">
+            <div className="inline-block relative px-8 py-6 rounded-2xl bg-gradient-to-b from-[#2E200C] to-[#120B02] border-2 border-primary/45 shadow-xl">
+              {/* Ornate corners */}
+              <div className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-primary/60 rounded-tl" />
+              <div className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-primary/60 rounded-tr" />
+              <div className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-primary/60 rounded-bl" />
+              <div className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-primary/60 rounded-br" />
+
+              <p className="text-primary text-xl sm:text-2xl font-serif italic font-black tracking-widest animate-pulse px-4">
+                {current.blessing} 🙏
+              </p>
+            </div>
+          </div>
+
         </div>
       </section>
     </Layout>

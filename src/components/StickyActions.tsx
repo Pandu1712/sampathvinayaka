@@ -1,11 +1,12 @@
 import { MessageCircle, MapPin } from "lucide-react";
+import BackgroundMusic from "./BackgroundMusic";
 
 const StickyActions = () => {
   const whatsappNumber = "919704438668";
   const mapsLink = "https://www.google.com/maps/search/Sri+Sampath+Vinayaka+Temple+Visakhapatnam";
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-4 animate-fade-in">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-4 animate-fade-in mobile-menu-hideable">
       {/* WhatsApp Button */}
       <a
         href={`https://wa.me/${whatsappNumber}`}
@@ -33,6 +34,9 @@ const StickyActions = () => {
           Get Directions
         </span>
       </a>
+
+      {/* Music Button */}
+      <BackgroundMusic />
     </div>
   );
 };
