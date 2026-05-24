@@ -1,5 +1,6 @@
 import Layout from "@/components/Layout";
 import prasadRao from "@/assets/prasad-rao.jpg";
+import { getOptimizedImageUrl } from "@/utils/cloudinary";
 
 const membersList = [
   {
@@ -55,7 +56,7 @@ const Members = () => (
                 {/* Image Wrap */}
                 <div className="relative aspect-[4/5] overflow-hidden bg-zinc-100">
                   <img 
-                    src={m.img} 
+                    src={getOptimizedImageUrl(m.img, 600)} 
                     alt={m.name} 
                     loading="lazy" 
                     className="w-full h-full object-cover transition-transform duration-[1500ms] group-hover:scale-105" 

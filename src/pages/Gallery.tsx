@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Layout from "@/components/Layout";
+import { getOptimizedImageUrl } from "@/utils/cloudinary";
 
 const images = [
   { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087509/IMG_5686_ixb1rc.jpg", span: "col-span-2 row-span-2" },
@@ -62,7 +63,7 @@ const Gallery = () => {
       {/* Hero */}
       <section className="relative h-[55vh] flex items-center justify-center overflow-hidden bg-zinc-950">
         <img 
-          src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087511/DSC_2151_k72wsc.jpg" 
+          src={getOptimizedImageUrl("https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087511/DSC_2151_k72wsc.jpg", 1200)} 
           alt="Temple gopuram alankaram" 
           className="absolute inset-0 w-full h-full object-cover opacity-60 animate-ken-burns scale-110" 
           width={1920} 
@@ -97,12 +98,12 @@ const Gallery = () => {
                 {/* Thin Inner Gold Border Frame */}
                 <div className="relative w-full h-full rounded-lg sm:rounded-xl overflow-hidden border border-primary/40">
                   <img
-                    src={img.src}
+                    src={getOptimizedImageUrl(img.src, 600)}
                     alt={`Temple Gallery ${i + 1}`}
                     className="w-full h-full object-cover transition-transform duration-[2.5s] ease-out group-hover:scale-105"
                     loading="lazy"
-                    width={1920}
-                    height={1080}
+                    width={600}
+                    height={400}
                   />
                   {/* Subtle warm overlay that fades on hover */}
                   <div className="absolute inset-0 bg-gradient-to-t from-amber-950/40 via-transparent to-transparent opacity-80 group-hover:opacity-20 transition-opacity duration-500" />
@@ -141,7 +142,7 @@ const Gallery = () => {
           {/* Main Image Frame */}
           <div className="relative max-w-[90vw] max-h-[80vh] sm:max-h-[85vh] p-3 sm:p-4 bg-amber-950/30 border border-primary/40 rounded-2xl shadow-[0_0_50px_rgba(251,191,36,0.2)] flex items-center justify-center">
             <img 
-              src={images[lightboxIndex].src} 
+              src={getOptimizedImageUrl(images[lightboxIndex].src, 1200)} 
               alt={`Temple Deity Darshan ${lightboxIndex + 1}`}
               className="max-w-full max-h-[75vh] object-contain rounded-lg border border-primary/20"
             />

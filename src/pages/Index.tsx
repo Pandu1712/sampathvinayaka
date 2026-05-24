@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
+import { getOptimizedImageUrl } from "@/utils/cloudinary";
 import HeroCarousel from "@/components/HeroCarousel";
 import Ashtothram from "@/components/Ashtothram";
 import Donations from "@/components/Donations";
@@ -206,7 +207,7 @@ const Index = () => {
                   {aboutImages.map((img, idx) => (
                     <img
                       key={idx}
-                      src={img}
+                      src={getOptimizedImageUrl(img, 600)}
                       alt="Temple interior with sacred lamps"
                       className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
                         idx === aboutImageIndex ? "opacity-100 z-10" : "opacity-0 z-0"
@@ -321,7 +322,7 @@ const Index = () => {
             <div className="animate-fade-in opacity-0 [animation-fill-mode:forwards]">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl group">
                 <img
-                  src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086046/DSC_1883_aelmrp.jpg"
+                  src={getOptimizedImageUrl("https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086046/DSC_1883_aelmrp.jpg", 800)}
                   alt="Temple corridor"
                   className="w-full h-[400px] sm:h-[550px] object-cover transition-transform duration-[5s] group-hover:scale-110"
                   loading="lazy"
@@ -385,7 +386,7 @@ const Index = () => {
                 {/* Thin Inner Gold Border Frame */}
                 <div className="relative w-full h-full rounded-lg sm:rounded-xl overflow-hidden border border-primary/40">
                   <img
-                    src={img.src}
+                    src={getOptimizedImageUrl(img.src, 600)}
                     alt={`Temple Gallery ${i + 1}`}
                     className="w-full h-full object-cover transition-transform duration-[2.5s] ease-out group-hover:scale-105"
                     loading="lazy"
@@ -437,7 +438,7 @@ const Index = () => {
           {/* Main Image Frame */}
           <div className="relative max-w-[90vw] max-h-[80vh] sm:max-h-[85vh] p-3 sm:p-4 bg-amber-950/30 border border-primary/40 rounded-2xl shadow-[0_0_50px_rgba(var(--primary),0.2)] flex items-center justify-center">
             <img 
-              src={galleryImages[homeLightboxIndex].src} 
+              src={getOptimizedImageUrl(galleryImages[homeLightboxIndex].src, 1200)} 
               alt={`Temple Deity Darshan ${homeLightboxIndex + 1}`}
               className="max-w-full max-h-[75vh] object-contain rounded-lg border border-primary/20"
             />
@@ -588,7 +589,7 @@ const Index = () => {
             ].map((m) => (
               <div key={m.name} className="premium-card group hover:-translate-y-3">
                 <div className="relative aspect-[4/5] overflow-hidden">
-                  <img src={m.img} alt={m.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                  <img src={getOptimizedImageUrl(m.img, 600)} alt={m.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-4">
                     <span className="text-primary text-sm tracking-[0.3em] font-bold uppercase mb-2">Sacred Service</span>
                     <h4 className="text-white text-sm font-bold font-serif">{m.name}</h4>

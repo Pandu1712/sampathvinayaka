@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getOptimizedImageUrl } from "@/utils/cloudinary";
 
 const slides = [
   { image: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086041/DSC_1411_cobm4f.jpg" },
@@ -32,7 +33,7 @@ export default function HeroCarousel() {
         {/* Dynamic Blurred Background for depth */}
         <div 
           className="absolute inset-0 bg-cover bg-center blur-2xl opacity-40 transition-all duration-1000 scale-110"
-          style={{ backgroundImage: `url(${slides[active].image})` }}
+          style={{ backgroundImage: `url(${getOptimizedImageUrl(slides[active].image, 200)})` }}
         />
 
         {/* Cards Wrapper */}
@@ -58,7 +59,7 @@ export default function HeroCarousel() {
                 }}
               >
                 <img
-                  src={slide.image}
+                  src={getOptimizedImageUrl(slide.image, 1200)}
                   alt={`Temple Darshan ${index + 1}`}
                   className="w-full h-full object-cover object-top origin-top rounded-xl sm:rounded-2xl border-2 sm:border-4 border-white/10"
                 />

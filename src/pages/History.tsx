@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Layout from "@/components/Layout";
+import { getOptimizedImageUrl } from "@/utils/cloudinary";
 import { MapPin, Train, Plane, Sparkles, Languages } from "lucide-react";
 
 const History = () => {
@@ -79,7 +80,10 @@ const History = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsla(38,72%,50%,0.15)_0,transparent_70%)] pointer-events-none" />
         
         {/* Soft Background Image Overlay */}
-        <div className="absolute inset-0 bg-[url('https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087507/IMG_5684_xxnzl6.jpg')] bg-cover bg-center opacity-25 mix-blend-overlay" />
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-overlay" 
+          style={{ backgroundImage: `url(${getOptimizedImageUrl("https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087507/IMG_5684_xxnzl6.jpg", 400)})` }}
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-[#251804]/50 via-transparent to-[#120B02]" />
 
         <div className="relative z-10 text-center px-4 max-w-4xl animate-fade-rise">
@@ -150,7 +154,7 @@ const History = () => {
                 {/* Deity Image Holder */}
                 <div className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-full overflow-hidden border-[6px] border-white shadow-[0_15px_45px_rgba(0,0,0,0.3)] bg-gradient-to-b from-primary/10 to-primary/5">
                   <img
-                    src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087509/IMG_5686_ixb1rc.jpg"
+                    src={getOptimizedImageUrl("https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087509/IMG_5686_ixb1rc.jpg", 600)}
                     alt="Presiding Deity Lord Ganesha"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1500ms]"
                   />
