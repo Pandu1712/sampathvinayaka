@@ -11,26 +11,64 @@ import purohit1 from "@/assets/purohit-1.jpg";
 import male1 from "@/assets/member-male-1.png";
 import male2 from "@/assets/member-male-2.png";
 import male3 from "@/assets/member-male-3.png";
+import prasadRao from "@/assets/prasad-rao.jpg";
+
 
 /* ─── Data ─── */
 const services = [
   { icon: "🪔", title: "Daily Pooja", desc: "Morning and evening worship rituals performed by temple priests", timing: "6:00 AM & 7:00 PM", price: "Free" },
   { icon: "🔔", title: "Maha Aarti", desc: "Grand evening aarti ceremony with 108 lamps and devotional music", timing: "7:00 PM Daily", price: "Free" },
   { icon: "📿", title: "Archana", desc: "Personalized pooja with recitation of 108 or 1008 sacred names", timing: "On Request", price: "₹101 / ₹251" },
-  { icon: "💐", title: "Abhishekam", desc: "Sacred bathing ritual of the deity with milk, honey, and holy water", timing: "6:30 AM Daily", price: "₹501" },
-  { icon: "🎋", title: "Homam / Havan", desc: "Sacred fire ritual for prosperity, health, and spiritual growth", timing: "By Appointment", price: "₹1,001" },
+  { icon: "💐", title: "Abhishekam", desc: "Sacred bathing ritual of the deity with milk, honey, and holy water", timing: "6:30 AM – 8:00 AM Daily", price: "₹501" },
+  { icon: "🎋", title: "Homam / Havan", desc: "Sacred fire ritual for prosperity, health, and spiritual growth", timing: "5:00 AM – 6:30 AM Daily", price: "₹1,001" },
   { icon: "🙏", title: "Special Darshan", desc: "VIP darshan with direct access to the sanctum sanctorum", timing: "All Day", price: "₹201" },
   { icon: "🎊", title: "Marriage Ceremony", desc: "Traditional temple wedding conducted by temple priests", timing: "Muhurtam Days", price: "₹5,001" },
   { icon: "📖", title: "Vedic Classes", desc: "Learn ancient scriptures, shlokas, and spiritual practices", timing: "Sat & Sun 8 AM", price: "Free" },
 ];
 
 const timings = [
-  { period: "Daily Opening Hours", time: "6:00 AM – 8:00 PM" },
-  { period: "Abhishekam Ritual", time: "6:00 AM – 7:30 AM" },
-  { period: "Vehicle Pooja", time: "9:00 AM – 11:00 AM" },
-  { period: "Archana Pooja", time: "6:00 PM – 7:00 PM" },
-  { period: "Special Festival Pooja", time: "7:00 AM – 12:00 PM" },
-  { period: "Vahana Pooja Details", time: "10:00 AM – 1:00 PM" },
+  { 
+    period: "Sarva Darshanam (General Darshan)", 
+    periodTe: "సర్వదర్శనం టైమింగ్స్",
+    time: "6:00 AM – 11:00 AM & 5:30 PM – 8:00 PM", 
+    timeTe: "ఉదయం 6:00 నుండి 11:00 వరకు & సాయంత్రం 5:30 నుండి 8:00 వరకు" 
+  },
+  { 
+    period: "Abhishekam Ritual", 
+    periodTe: "అభిషేకము టైమింగ్స్",
+    time: "6:30 AM – 8:00 AM Daily", 
+    timeTe: "ఉదయం 6:30 నుండి 8:00 వరకు మాత్రమే" 
+  },
+  { 
+    period: "Homam / Havan", 
+    periodTe: "హోమము టైమింగ్స్",
+    time: "5:00 AM – 6:30 AM Daily", 
+    timeTe: "ఉదయం 5:00 నుండి 6:30 వరకు మాత్రమే" 
+  },
+  { 
+    period: "Vehicle Pooja", 
+    periodTe: "వాహన పూజ",
+    time: "9:00 AM – 11:00 AM", 
+    timeTe: "ఉదయం 9:00 నుండి 11:00 వరకు" 
+  },
+  { 
+    period: "Archana Pooja", 
+    periodTe: "అర్చన పూజ",
+    time: "6:00 PM – 7:00 PM", 
+    timeTe: "సాయంత్రం 6:00 నుండి 7:00 వరకు" 
+  },
+  { 
+    period: "Special Festival Pooja", 
+    periodTe: "ప్రత్యేక పండుగ పూజలు",
+    time: "7:00 AM – 12:00 PM", 
+    timeTe: "ఉదయం 7:00 నుండి 12:00 వరకు" 
+  },
+  { 
+    period: "Vahana Pooja Details", 
+    periodTe: "వాహన పూజ వివరాలు",
+    time: "10:00 AM – 1:00 PM", 
+    timeTe: "ఉదయం 10:00 నుండి మధ్యాహ్నం 1:00 వరకు" 
+  },
 ];
 
 const milestonesEn = [
@@ -74,7 +112,9 @@ const upcomingEvents = [
 ];
 
 const weeklySchedule = [
-  { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Abhishekam", time: "6:00 AM – 7:30 AM" },
+  { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Homam / Havan", time: "5:00 AM – 6:30 AM" },
+  { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Abhishekam", time: "6:30 AM – 8:00 AM" },
+  { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Sarva Darshanam", time: "6:00 AM – 11:00 AM & 5:30 PM – 8:00 PM" },
   { day: "Monday – Sunday", deity: "New Vehicles", special: "Vehicle Pooja", time: "9:00 AM – 11:00 AM" },
   { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Archana Pooja", time: "6:00 PM – 7:00 PM" },
   { day: "Daily", deity: "New Vehicles", special: "Vahana Pooja Details", time: "10:00 AM – 1:00 PM" },
@@ -262,76 +302,60 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ═══════ SERVICES ═══════ */}
-      <section id="services" className="section-padding px-4 sm:px-4 bg-primary/[0.02] relative">
-        <div className="container-custom text-left relative z-10">
-          <p className="text-primary text-sm tracking-[0.4em] uppercase mb-4 font-bold">Our Services</p>
-          <h2 className="text-4xl font-bold text-foreground font-serif">
-            Sacred <span className="gold-shimmer italic">Offerings</span>
-          </h2>
-          <div className="h-1 w-24 bg-primary/40 rounded-full mt-6 mb-4 shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
-          <p className="text-muted-foreground max-w-4xl text-sm font-light leading-relaxed">
-            Experience divine rituals and ceremonies that connect your soul to Lord Ganesha's celestial grace.
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-            {services.map((s, i) => (
-              <div
-                key={i}
-                className="premium-card p-5 flex flex-col items-center text-center group cursor-pointer hover:-translate-y-2"
-              >
-                <div className="w-20 h-20 rounded-full bg-primary/5 flex items-center justify-center text-4xl mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-inner">
-                  {s.icon}
-                </div>
-                <h3 className="text-sm font-bold text-foreground mb-3 font-serif group-hover:text-primary transition-colors">{s.title}</h3>
-                <p className="text-sm text-muted-foreground flex-1 leading-relaxed font-light">{s.desc}</p>
-                <div className="mt-6 pt-6 border-t border-primary/10 w-full">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-primary text-sm font-bold tracking-widest uppercase">Timing</span>
-                    <span className="text-foreground font-semibold text-sm">{s.timing}</span>
-                    <div className="mt-2 text-primary font-black text-sm">{s.price}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ═══════ TIMINGS ═══════ */}
-      <section className="section-padding px-4 sm:px-4 relative overflow-hidden">
+      <section id="services" className="section-padding px-4 sm:px-4 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/oriental-tiles.png')]" />
-        <div className="container-custom grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-10">
-          <div className="order-2 lg:order-1 animate-fade-in opacity-0 [animation-fill-mode:forwards]">
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl group">
-              <img
-                src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086046/DSC_1883_aelmrp.jpg"
-                alt="Temple corridor"
-                className="w-full h-[400px] sm:h-[550px] object-cover transition-transform duration-[5s] group-hover:scale-110"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
-            </div>
-          </div>
-          <div className="order-1 lg:order-2 animate-fade-rise opacity-0 [animation-fill-mode:forwards]">
+        <div className="container-custom relative z-10">
+          {/* Header Block at the top left of the entire section */}
+          <div className="text-left mb-8 animate-fade-rise opacity-0 [animation-fill-mode:forwards]">
             <p className="text-primary text-sm tracking-[0.4em] uppercase mb-4 font-bold">Temple Timings</p>
             <h2 className="text-4xl font-bold text-foreground leading-tight font-serif">
               Plan Your <span className="gold-shimmer italic">Visit</span>
             </h2>
-            <div className="h-1 w-20 bg-primary/40 rounded-full my-4" />
-            <div className="space-y-4">
-              {timings.map((t, i) => (
-                <div
-                  key={i}
-                  className="flex justify-between items-center p-5 rounded-2xl glass border border-white/40 hover:border-primary/20 hover:scale-[1.02] transition-all duration-300 group shadow-sm hover:shadow-lg"
-                >
-                  <span className="text-foreground text-sm font-bold font-serif group-hover:text-primary transition-colors">{t.period}</span>
-                  <div className="flex items-center gap-3">
-                    <div className="h-px w-8 bg-primary/20 group-hover:w-12 transition-all" />
-                    <span className="text-primary text-sm font-black tracking-tight">{t.time}</span>
+            <div className="h-1 w-24 bg-primary/40 rounded-full mt-6 shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+          </div>
+
+          {/* Grid Layout for Image & List */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            {/* Left Column: Image */}
+            <div className="animate-fade-in opacity-0 [animation-fill-mode:forwards]">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl group">
+                <img
+                  src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086046/DSC_1883_aelmrp.jpg"
+                  alt="Temple corridor"
+                  className="w-full h-[400px] sm:h-[550px] object-cover transition-transform duration-[5s] group-hover:scale-110"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
+              </div>
+            </div>
+
+            {/* Right Column: Timings List */}
+            <div className="animate-fade-rise opacity-0 [animation-fill-mode:forwards] text-left">
+              <div className="space-y-4">
+                {timings.map((t, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-col sm:flex-row justify-between sm:items-center p-5 rounded-2xl glass border border-white/40 hover:border-primary/20 hover:scale-[1.02] transition-all duration-300 group shadow-sm hover:shadow-lg gap-2 text-left"
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-foreground text-sm font-bold font-serif group-hover:text-primary transition-colors">{t.period}</span>
+                      {t.periodTe && (
+                        <span className="text-muted-foreground text-xs font-sans mt-1 opacity-85">{t.periodTe}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3 justify-between sm:justify-end w-full sm:w-auto">
+                      <div className="h-px w-8 bg-primary/20 group-hover:w-12 transition-all hidden sm:block" />
+                      <div className="flex flex-col items-start sm:items-end">
+                        <span className="text-primary text-sm font-black tracking-tight">{t.time}</span>
+                        {t.timeTe && (
+                          <span className="text-muted-foreground text-xs mt-1 text-left sm:text-right font-sans opacity-85">{t.timeTe}</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -556,12 +580,11 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
-              { name: "Pandit Vishwanath Sharma", role: "Head Purohit", img: purohit1 },
-              { name: "Sri Ramachandra Sharma", role: "President", img: male1 },
-              { name: "Sri Venkatesh Murthy", role: "Vice President", img: male2 },
-              { name: "Sri Narayana Bhat", role: "Secretary", img: male3 },
+              { name: "D. V. V. Prasad Rao", role: "Assistant Commissioner & Executive Officer", img: prasadRao },
+              { name: "Sri T. R. Cholan", role: "Founder Family Member", img: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087514/DSC_5404_osvkzt.jpg" },
+              { name: "Pandit P. Mohan Swamy", role: "Mukya Archaka", img: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086840/DSC_5466_qteecl.jpg" },
             ].map((m) => (
               <div key={m.name} className="premium-card group hover:-translate-y-3">
                 <div className="relative aspect-[4/5] overflow-hidden">
@@ -569,9 +592,6 @@ const Index = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-4">
                     <span className="text-primary text-sm tracking-[0.3em] font-bold uppercase mb-2">Sacred Service</span>
                     <h4 className="text-white text-sm font-bold font-serif">{m.name}</h4>
-                  </div>
-                  <div className="absolute top-4 right-4 glass px-3 py-1 rounded-full text-sm font-bold text-primary uppercase tracking-widest border border-white/20">
-                    {m.role}
                   </div>
                 </div>
                 <div className="p-4 text-center bg-white">
@@ -581,14 +601,6 @@ const Index = () => {
                 </div>
               </div>
             ))}
-          </div>
-
-          <div className="text-left mt-8 animate-fade-rise opacity-0 [animation-fill-mode:forwards] [animation-delay:0.5s]">
-            <a href="/members" className="group relative inline-flex items-center gap-3 px-5 py-5 rounded-full text-sm font-bold bg-primary text-primary-foreground shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-1 transition-all overflow-hidden">
-              <span className="relative z-10">View All Members</span>
-              <span className="relative z-10 text-sm group-hover:translate-x-1 transition-transform">→</span>
-              <div className="absolute inset-x-0 bottom-0 h-1 bg-white/30 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-            </a>
           </div>
         </div>
       </section>
@@ -643,6 +655,7 @@ const Index = () => {
               {[
                 { icon: "📍", label: "Address", value: "Asilmetta, Visakhapatnam, Andhra Pradesh 530020" },
                 { icon: "📞", label: "General", value: "(+91) 891-2755650 / 2760740" },
+                { icon: "💬", label: "WhatsApp", value: "+91 94910 00712" },
                 { icon: "🆘", label: "Helpline", value: "+91 97044 38668" },
                 { icon: "🕐", label: "Timings", value: "Daily: 6:00 AM – 8:00 PM" },
               ].map((item, i) => (

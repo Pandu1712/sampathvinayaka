@@ -2,13 +2,13 @@ import Layout from "@/components/Layout";
 import templeHero5 from "@/assets/temple-hero-5.jpg";
 
 const allServices = [
-  { icon: "💐", title: "Abhishekam", desc: "Sacred bathing ritual for the deity to seek blessings for health and success.", timing: "6:00 AM – 7:30 AM", price: "₹501" },
+  { icon: "💐", title: "Abhishekam", desc: "Sacred bathing ritual for the deity to seek blessings for health and success.", timing: "6:30 AM – 8:00 AM", price: "₹501" },
   { icon: "🚗", title: "Vehicle Pooja", desc: "Traditional pooja for new vehicles to ensure safety and prosperity.", timing: "9:00 AM – 11:00 AM", price: "₹500 / ₹1000" },
   { icon: "📿", title: "Archana", desc: "Personalized pooja with recitation of sacred names for divine guidance.", timing: "6:00 PM – 7:00 PM", price: "₹101 / ₹251" },
   { icon: "🎊", title: "Special Festival Pooja", desc: "Special rituals performed during auspicious festival days and celebrations.", timing: "7:00 AM – 12:00 PM", price: "Varies" },
   { icon: "🚚", title: "Vahana Pooja Details", desc: "In-depth Vahana pooja for all types of commercial and personal vehicles.", timing: "10:00 AM – 1:00 PM", price: "₹1000+" },
   { icon: "🪔", title: "Daily Pooja", desc: "Morning and evening worship rituals performed by head priests with vedic chanting.", timing: "6:00 AM & 7:00 PM", price: "Free" },
-  { icon: "🎋", title: "Homam / Havan", desc: "Sacred fire ritual for prosperity, health, and spiritual growth.", timing: "By Appointment", price: "₹1,100+" },
+  { icon: "🎋", title: "Homam / Havan", desc: "Sacred fire ritual for prosperity, health, and spiritual growth.", timing: "5:00 AM – 6:30 AM", price: "₹1,001" },
   { icon: "📖", title: "Vedic Classes", desc: "Learn ancient scriptures, shlokas, and spiritual practices for inner peace.", timing: "Sat & Sun 8 AM", price: "Free" },
 ];
 

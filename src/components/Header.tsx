@@ -42,20 +42,16 @@ const Header = () => {
       setScrolled(window.scrollY > 20);
 
       if (!isHome) return;
-      // Scroll-spy: find the section currently in view
-      let minDistance = Infinity;
+      // Scroll-spy: identify the section occupying the active viewport zone
       let bestMatch = "home";
       for (const id of sectionIds) {
         const el = document.getElementById(id);
         if (el) {
           const rect = el.getBoundingClientRect();
-          // Section must be partially visible (its bottom is below the sticky header)
-          if (rect.bottom >= 120) {
-            const distance = Math.abs(rect.top - 150);
-            if (distance < minDistance) {
-              minDistance = distance;
-              bestMatch = id;
-            }
+          // If the section occupies the critical viewing zone of the viewport
+          if (rect.top <= 160 && rect.bottom >= 160) {
+            bestMatch = id;
+            break;
           }
         }
       }
@@ -80,7 +76,7 @@ const Header = () => {
   const navLinks = isHome
     ? [
       { name: "Home", href: "#home" },
-      { name: "History", href: "/history" },
+      { name: "History", href: "#history" },
       { name: "Services", href: "#services" },
       { name: "Gallery", href: "#gallery" },
       { name: "Events", href: "#events" },
@@ -193,10 +189,17 @@ const Header = () => {
           </nav>
 
           {/* CTA Desktop */}
-          <div className="hidden xl:flex items-center gap-3 shrink-0">
+          <div className="hidden xl:flex items-center gap-4 shrink-0">
             <a href="tel:+918912755650" className="hidden 2xl:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
               <Phone size={14} />
               <span>(+91) 891-2755650</span>
+            </a>
+            <div className="hidden 2xl:block w-px h-6 bg-border" />
+            <a href="https://wa.me/919491000712" target="_blank" rel="noopener noreferrer" className="hidden 2xl:flex items-center gap-2 text-sm text-muted-foreground hover:text-green-500 transition-colors">
+              <svg className="w-3.5 h-3.5 fill-current text-green-500" viewBox="0 0 24 24">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.665.989 3.3 1.489 5.358 1.49 5.404 0 9.8-4.386 9.803-9.789.002-2.618-1.01-5.078-2.861-6.93-1.85-1.851-4.31-2.864-6.924-2.865-5.417 0-9.817 4.39-9.82 9.795-.001 2.03.525 4.021 1.524 5.768L2.57 21.13l4.077-1.976zm11.59-5.185c-.303-.151-1.793-.883-2.073-.984-.28-.102-.484-.152-.688.152-.204.304-.79.983-.969 1.186-.179.203-.357.229-.66.077-1.155-.58-1.96-1.015-2.736-2.348-.3-.518.3-.481.857-1.597.09-.18.044-.337-.023-.472-.067-.136-.583-1.406-.8-1.928-.21-.508-.444-.439-.6-.447-.145-.007-.312-.009-.479-.009s-.439.062-.669.312c-.23.25-1.793 1.756-1.793 4.28 0 2.525 1.839 4.968 2.093 5.308.255.34 3.619 5.525 8.764 7.747 1.224.528 2.18.843 2.925 1.079 1.23.39 2.35.334 3.234.202.986-.147 2.073-.847 2.366-1.63.292-.782.292-1.452.204-1.597-.088-.146-.324-.229-.627-.38z"/>
+              </svg>
+              <span>WhatsApp: 9491000712</span>
             </a>
             <div className="hidden 2xl:block w-px h-6 bg-border" />
             {isHome ? (
@@ -328,6 +331,18 @@ const Header = () => {
             <div className="flex flex-col">
               <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Temple Contact</span>
               <span className="text-sm font-medium tracking-wide">(+91) 891-2755650</span>
+            </div>
+          </a>
+
+          <a href="https://wa.me/919491000712" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-white/80 hover:text-green-500 transition-colors group">
+            <div className="w-10 h-10 rounded-xl bg-green-500/10 border border-green-500/25 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <svg className="w-4 h-4 fill-current text-green-500" viewBox="0 0 24 24">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.665.989 3.3 1.489 5.358 1.49 5.404 0 9.8-4.386 9.803-9.789.002-2.618-1.01-5.078-2.861-6.93-1.85-1.851-4.31-2.864-6.924-2.865-5.417 0-9.817 4.39-9.82 9.795-.001 2.03.525 4.021 1.524 5.768L2.57 21.13l4.077-1.976zm11.59-5.185c-.303-.151-1.793-.883-2.073-.984-.28-.102-.484-.152-.688.152-.204.304-.79.983-.969 1.186-.179.203-.357.229-.66.077-1.155-.58-1.96-1.015-2.736-2.348-.3-.518.3-.481.857-1.597.09-.18.044-.337-.023-.472-.067-.136-.583-1.406-.8-1.928-.21-.508-.444-.439-.6-.447-.145-.007-.312-.009-.479-.009s-.439.062-.669.312c-.23.25-1.793 1.756-1.793 4.28 0 2.525 1.839 4.968 2.093 5.308.255.34 3.619 5.525 8.764 7.747 1.224.528 2.18.843 2.925 1.079 1.23.39 2.35.334 3.234.202.986-.147 2.073-.847 2.366-1.63.292-.782.292-1.452.204-1.597-.088-.146-.324-.229-.627-.38z"/>
+              </svg>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[10px] text-green-500 uppercase tracking-widest font-black">WhatsApp Support</span>
+              <span className="text-sm font-medium tracking-wide">(+91) 94910-00712</span>
             </div>
           </a>
 

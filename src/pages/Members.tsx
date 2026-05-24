@@ -1,175 +1,107 @@
 import Layout from "@/components/Layout";
-import purohit1 from "@/assets/purohit-1.jpg";
-import purohit2 from "@/assets/purohit-2.jpg";
-import purohit3 from "@/assets/purohit-3.jpg";
-import purohit4 from "@/assets/purohit-4.jpg";
-import male1 from "@/assets/member-male-1.png";
-import male2 from "@/assets/member-male-2.png";
-import male3 from "@/assets/member-male-3.png";
-import male4 from "@/assets/member-male-4.png";
-import male5 from "@/assets/member-male-5.png";
-import male6 from "@/assets/member-male-6.png";
-import male7 from "@/assets/member-male-7.png";
-import male8 from "@/assets/member-male-8.png";
-import male9 from "@/assets/member-male-9.png";
-import male10 from "@/assets/member-male-10.png";
-import male11 from "@/assets/member-male-11.png";
-import female1 from "@/assets/member-female-1.png";
-import female2 from "@/assets/member-female-2.png";
-import female3 from "@/assets/member-female-3.png";
-import female4 from "@/assets/member-female-4.png";
+import prasadRao from "@/assets/prasad-rao.jpg";
 
-const committeeMembers = [
-  { name: "Sri Ramachandra Sharma", role: "President", desc: "Leading the temple administration for over 15 years with dedication and devotion.", img: male1 },
-  { name: "Sri Venkatesh Murthy", role: "Vice President", desc: "Overseeing temple development projects and community outreach programs.", img: male2 },
-  { name: "Sri Narayana Bhat", role: "Secretary", desc: "Managing temple operations, correspondence, and administrative affairs.", img: male3 },
-  { name: "Sri Ganesh Hegde", role: "Treasurer", desc: "Handling temple finances, donations, and budget planning with transparency.", img: male4 },
-  { name: "Smt. Lakshmi Devi", role: "Women's Wing Head", desc: "Organizing women's spiritual programs, festivals, and cultural events.", img: female1 },
-  { name: "Sri Suresh Acharya", role: "Cultural Secretary", desc: "Coordinating cultural events, music programs, and festival celebrations.", img: male5 },
-];
-
-const purohits = [
-  { name: "Pandit Vishwanath Sharma", role: "Head Purohit", desc: "Chief priest with 30+ years of Vedic expertise. Performs all major temple rituals and ceremonies.", speciality: "Maha Abhishekam, Homam", img: purohit1 },
-  { name: "Pandit Raghunath Bhat", role: "Senior Purohit", desc: "Specialist in Ganapati Atharvashirsha and sacred fire rituals.", speciality: "Archana, Ganapati Homam", img: purohit2 },
-  { name: "Pandit Keshav Joshi", role: "Purohit", desc: "Expert in marriage ceremonies and Navagraha poojas.", speciality: "Vivah, Navagraha Pooja", img: purohit3 },
-  { name: "Pandit Aditya Sharma", role: "Junior Purohit", desc: "Trained in daily rituals, Abhishekam, and devotional services.", speciality: "Daily Pooja, Abhishekam", img: purohit4 },
-];
-
-const trustees = [
-  { name: "Sri Madhav Rao", role: "Chief Trustee", img: male6 },
-  { name: "Sri Prakash Shetty", role: "Managing Trustee", img: male7 },
-  { name: "Sri Dinesh Kumar", role: "Trustee", img: male8 },
-  { name: "Smt. Saraswati Devi", role: "Trustee", img: female2 },
-  { name: "Sri Harish Patel", role: "Trustee", img: male9 },
-];
-
-const volunteers = [
-  { name: "Sri Karthik Reddy", role: "Head Volunteer", img: male10 },
-  { name: "Smt. Anjali Sharma", role: "Festival Coordinator", img: female3 },
-  { name: "Sri Manoj Kumar", role: "Youth Wing Leader", img: male11 },
-  { name: "Smt. Priya Nair", role: "Education Program Lead", img: female4 },
+const membersList = [
+  {
+    name: "D. V. V. Prasad Rao",
+    role: "Assistant Commissioner & Executive Officer",
+    desc: "Overseeing the temple administration, strategic governance, and major spiritual development initiatives in coordination with the Endowments Department.",
+    img: prasadRao,
+    category: "Administration"
+  },
+  {
+    name: "Sri T. R. Cholan",
+    role: "Founder Family Member",
+    desc: "Upholding and preserving the sacred legacy, traditions, and spiritual heritage established by the founding family since the temple's inception in 1962.",
+    img: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087514/DSC_5404_osvkzt.jpg",
+    category: "Founder Family"
+  },
+  {
+    name: "Pandit P. Mohan Swamy",
+    role: "Mukya Archaka",
+    desc: "Chief Priest leading the sacred daily rituals, special alankarams, and performing divine archana, homam, and vehicle poojas for the devotees.",
+    img: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086840/DSC_5466_qteecl.jpg",
+    category: "Spiritual Services"
+  }
 ];
 
 const Members = () => (
   <Layout>
-    <div className="pt-24 sm:pt-28">
-      {/* Hero */}
-      <section className="py-6 sm:py-8 lg:py-20 px-4 sm:px-4 bg-muted/30">
-        <div className="max-w-5xl mx-auto text-center">
-          <p className="text-primary text-sm tracking-[0.2em] uppercase mb-3">🙏 Our Team</p>
-          <h1 className="text-2xl font-bold text-foreground">
-            Temple <span className="text-primary">Members</span>
+    <div className="pt-24 sm:pt-28 min-h-screen bg-gradient-to-b from-background via-amber-50/[0.02] to-background">
+      {/* Hero Section */}
+      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 relative overflow-hidden text-center">
+        <div className="absolute inset-0 bg-primary/[0.01] pointer-events-none" />
+        <div className="max-w-4xl mx-auto relative z-10">
+          <p className="text-primary text-sm tracking-[0.4em] uppercase mb-4 font-black">🙏 Devoted Service</p>
+          <h1 className="text-4xl sm:text-5xl font-bold text-foreground font-serif leading-tight">
+            Temple <span className="gold-shimmer italic">Members</span>
           </h1>
-          <p className="text-muted-foreground mt-4 max-w-2xl mx-auto text-sm leading-relaxed">
-            Meet the devoted individuals who serve Sampath Vinayaka Temple — from our revered purohits to dedicated committee members and volunteers.
+          <div className="h-1 w-24 bg-primary/40 rounded-full mx-auto mt-6 mb-4 shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+          <p className="text-muted-foreground mt-4 max-w-2xl mx-auto text-sm sm:text-base font-light leading-relaxed">
+            Meet the administration, founding family, and spiritual leadership who serve Sri Sampath Vinayagar Temple with utmost devotion.
           </p>
         </div>
       </section>
 
-      {/* Purohits */}
-      <section className="py-14 sm:py-20 px-4 sm:px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-5 sm:mb-14">
-            <p className="text-primary text-sm tracking-[0.2em] uppercase mb-2">🪔 Spiritual Guides</p>
-            <h2 className="text-2xl font-bold text-foreground">Our Purohits</h2>
-            <p className="text-muted-foreground mt-3 max-w-xl mx-auto text-sm ">
-              Learned Vedic scholars who conduct sacred rituals and guide devotees on their spiritual journey.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {purohits.map((p) => (
-              <div key={p.name} className="bg-card rounded-2xl border border-border/60 overflow-hidden hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group">
-                <div className="aspect-square overflow-hidden bg-muted">
-                  <img src={p.img} alt={p.name} loading="lazy" width={512} height={512} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                </div>
-                <div className="p-5">
-                  <span className="text-sm tracking-[0.15em] uppercase text-primary font-medium">{p.role}</span>
-                  <h3 className="text-sm font-bold text-foreground mt-1">{p.name}</h3>
-                  <p className="text-muted-foreground text-sm mt-2 leading-relaxed">{p.desc}</p>
-                  <div className="mt-3 inline-flex px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium tracking-wide">
-                    {p.speciality}
+      {/* Members Grid Section */}
+      <section className="py-8 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {membersList.map((m, idx) => (
+            <div 
+              key={m.name} 
+              className="premium-card group hover:-translate-y-3 transition-all duration-500 flex flex-col justify-between h-full bg-white border border-border/65 rounded-[2rem] overflow-hidden shadow-md hover:shadow-xl relative"
+            >
+              <div>
+                {/* Image Wrap */}
+                <div className="relative aspect-[4/5] overflow-hidden bg-zinc-100">
+                  <img 
+                    src={m.img} 
+                    alt={m.name} 
+                    loading="lazy" 
+                    className="w-full h-full object-cover transition-transform duration-[1500ms] group-hover:scale-105" 
+                  />
+                  {/* Premium gold overlay gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-6">
+                    <span className="text-primary text-xs tracking-[0.3em] font-bold uppercase mb-2">Sri Sampath Vinayaka Temple</span>
+                    <h4 className="text-white text-base font-bold font-serif">{m.name}</h4>
                   </div>
                 </div>
+
+                {/* Metadata & Description */}
+                <div className="p-6 sm:p-8">
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary uppercase tracking-widest border border-primary/20">
+                      {m.category}
+                    </span>
+                  </div>
+                  <span className="text-xs tracking-[0.2em] uppercase text-primary font-black block mb-2">{m.role}</span>
+                  <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors font-serif mb-4 leading-tight">
+                    {m.name}
+                  </h3>
+                  <div className="h-px w-12 bg-primary/20 my-3 group-hover:w-20 transition-all duration-500" />
+                  <p className="text-muted-foreground text-sm font-light leading-relaxed">
+                    {m.desc}
+                  </p>
+                </div>
               </div>
-            ))}
-          </div>
+
+              {/* Card Footer Accent */}
+              <div className="h-1.5 w-full bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-50 group-hover:via-primary transition-all duration-500" />
+            </div>
+          ))}
         </div>
       </section>
 
-      <div className="gold-divider max-w-xs mx-auto" />
-
-      {/* Committee Members */}
-      <section className="py-14 sm:py-20 px-4 sm:px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-5 sm:mb-14">
-            <p className="text-primary text-sm tracking-[0.2em] uppercase mb-2">🏛️ Administration</p>
-            <h2 className="text-2xl font-bold text-foreground">Committee Members</h2>
-            <p className="text-muted-foreground mt-3 max-w-xl mx-auto text-sm ">
-              The dedicated team managing temple operations and driving community initiatives.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {committeeMembers.map((m) => (
-              <div key={m.name} className="bg-card rounded-2xl border border-border/60 p-4 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 flex items-start gap-4">
-                <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-primary/20">
-                  <img src={m.img} alt={m.name} loading="lazy" width={512} height={512} className="w-full h-full object-cover" />
-                </div>
-                <div>
-                  <span className="text-sm tracking-[0.15em] uppercase text-primary font-medium">{m.role}</span>
-                  <h3 className="text-sm font-bold text-foreground mt-0.5">{m.name}</h3>
-                  <p className="text-muted-foreground text-sm mt-1.5 leading-relaxed">{m.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <div className="gold-divider max-w-xs mx-auto" />
-
-      {/* Trustees */}
-      <section className="py-14 sm:py-20 px-4 sm:px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-5 sm:mb-14">
-            <p className="text-primary text-sm tracking-[0.2em] uppercase mb-2">⚖️ Governance</p>
-            <h2 className="text-2xl font-bold text-foreground">Board of Trustees</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {trustees.map((t) => (
-              <div key={t.name} className="bg-card rounded-xl border border-border/60 p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-primary/20">
-                  <img src={t.img} alt={t.name} loading="lazy" width={512} height={512} className="w-full h-full object-cover" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-foreground">{t.name}</h3>
-                  <p className="text-primary text-sm font-medium">{t.role}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <div className="gold-divider max-w-xs mx-auto" />
-
-      {/* Volunteers */}
-      <section className="py-14 sm:py-20 px-4 sm:px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-5 sm:mb-14">
-            <p className="text-primary text-sm tracking-[0.2em] uppercase mb-2">🤝 Seva</p>
-            <h2 className="text-2xl font-bold text-foreground">Volunteers & Coordinators</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {volunteers.map((v) => (
-              <div key={v.name} className="bg-card rounded-xl border border-border/60 p-5 text-center hover:shadow-md transition-shadow">
-                <div className="w-16 h-16 rounded-full overflow-hidden mx-auto mb-3 border-2 border-primary/20">
-                  <img src={v.img} alt={v.name} loading="lazy" width={512} height={512} className="w-full h-full object-cover" />
-                </div>
-                <h3 className="text-sm font-bold text-foreground">{v.name}</h3>
-                <p className="text-primary text-sm font-medium mt-0.5">{v.role}</p>
-              </div>
-            ))}
-          </div>
+      {/* Quote / Seva Message */}
+      <section className="py-12 sm:py-16 px-4 text-center max-w-4xl mx-auto">
+        <div className="p-8 sm:p-10 rounded-[2.5rem] bg-primary/[0.02] border border-primary/10 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
+          <p className="text-primary text-2xl font-serif italic font-bold tracking-wider mb-4">
+            \"Kayena Vacha Manasendriyairva Budhyatmanava Prakriteh Swabhavat\"
+          </p>
+          <p className="text-muted-foreground text-sm max-w-2xl mx-auto font-light leading-relaxed">
+            Serving the divine and the devotees with body, mind, speech, and soul. Every endeavor is dedicated to the ultimate glory of Lord Vinayaka.
+          </p>
         </div>
       </section>
     </div>

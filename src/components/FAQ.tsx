@@ -4,7 +4,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 const faqData = [
   {
     question: "What are the Sampath Vinayaka Temple timings?",
-    answer: "The temple is open daily from 6:00 AM to 8:00 PM. Key rituals include Abhishekam (6:00 AM – 7:30 AM), Vehicle Pooja (9:00 AM – 11:00 AM), and Archana Pooja (6:00 PM – 7:00 PM). During festivals, special poojas are held from 7:00 AM to 12:00 PM.",
+    answer: "The temple is open daily for Sarva Darshanam (General Darshan) from 6:00 AM to 11:00 AM and 5:30 PM to 8:00 PM. Key rituals include Homam (5:00 AM – 6:30 AM), Abhishekam (6:30 AM – 8:00 AM), Vehicle Pooja (9:00 AM – 11:00 AM), and Archana Pooja (6:00 PM – 7:00 PM). During festivals, special festival poojas are held from 7:00 AM to 12:00 PM.",
   },
   {
     question: "How to reach Sampath Vinayaka Temple in Vizag?",

@@ -10,11 +10,13 @@ const upcomingEvents = [
 ];
 
 const weeklySchedule = [
-  { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Abhishekam", time: "6:00 AM – 7:30 AM" },
+  { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Homam / Havan", time: "5:00 AM – 6:30 AM" },
+  { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Abhishekam", time: "6:30 AM – 8:00 AM" },
+  { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Sarva Darshanam", time: "6:00 AM – 11:00 AM & 5:30 PM – 8:00 PM" },
   { day: "Monday – Sunday", deity: "New Vehicles", special: "Vehicle Pooja", time: "9:00 AM – 11:00 AM" },
   { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Archana Pooja", time: "6:00 PM – 7:00 PM" },
   { day: "Daily", deity: "New Vehicles", special: "Vahana Pooja Details", time: "10:00 AM – 1:00 PM" },
-  { day: "During Festivals", deity: "Lord Ganesha", special: "Special Festival Pooja", time: "7:00 AM - 1:00 PM" },
+  { day: "During Festivals", deity: "Lord Ganesha", special: "Special Festival Pooja", time: "7:00 AM – 12:00 PM" },
 ];
 
 const Events = () => {

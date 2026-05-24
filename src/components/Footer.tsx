@@ -37,10 +37,12 @@ const Footer = () => {
           <div>
             <h4 className="text-sm font-bold text-foreground uppercase tracking-[0.2em] mb-6 border-b border-primary/20 pb-2 inline-block">Temple Timings</h4>
             <ul className="space-y-4 text-sm text-muted-foreground">
-              <li className="flex justify-between border-b border-border/50 pb-1"><span>Daily</span> <span className="text-foreground font-medium">6:00 AM – 8:00 PM</span></li>
-              <li className="flex justify-between border-b border-border/50 pb-1"><span>Abhishekam</span> <span className="text-foreground font-medium">6:00 AM</span></li>
-              <li className="flex justify-between border-b border-border/50 pb-1"><span>Vehicle Pooja</span> <span className="text-foreground font-medium">9:00 AM</span></li>
-              <li className="flex justify-between pb-1"><span>Evening Aarti</span> <span className="text-foreground font-medium">6:00 PM</span></li>
+              <li className="flex justify-between border-b border-border/50 pb-1"><span>Darshan (Morning)</span> <span className="text-foreground font-medium text-right">6:00 AM – 11:00 AM</span></li>
+              <li className="flex justify-between border-b border-border/50 pb-1"><span>Darshan (Evening)</span> <span className="text-foreground font-medium text-right">5:30 PM – 8:00 PM</span></li>
+              <li className="flex justify-between border-b border-border/50 pb-1"><span>Homam</span> <span className="text-foreground font-medium text-right">5:00 AM – 6:30 AM</span></li>
+              <li className="flex justify-between border-b border-border/50 pb-1"><span>Abhishekam</span> <span className="text-foreground font-medium text-right">6:30 AM – 8:00 AM</span></li>
+              <li className="flex justify-between border-b border-border/50 pb-1"><span>Vehicle Pooja</span> <span className="text-foreground font-medium text-right">9:00 AM – 11:00 AM</span></li>
+              <li className="flex justify-between pb-1"><span>Evening Aarti</span> <span className="text-foreground font-medium text-right">6:00 PM</span></li>
             </ul>
           </div>
 
