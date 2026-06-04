@@ -3,23 +3,23 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 
 const faqData = [
   {
-    question: "What are the Sampath Vinayaka Temple timings?",
-    answer: "The temple is open daily for Sarva Darshanam (General Darshan) from 6:00 AM to 11:00 AM and 5:30 PM to 8:00 PM. Key rituals include Homam (5:00 AM – 6:30 AM), Abhishekam (6:30 AM – 8:00 AM), Vehicle Pooja (9:00 AM – 11:00 AM), and Archana Pooja (6:00 PM – 7:00 PM). During festivals, special festival poojas are held from 7:00 AM to 12:00 PM.",
+    question: "What are the Sampath Vinayakagar Temple timings?",
+    answer: "The temple is open daily for Sarva Darshanam (General Darshan) from 6:00 AM to 11:00 AM and 5:30 PM to 8:00 PM. Key rituals include Homam (5:00 AM – 6:30 AM), Abhishekam (7:00 AM – 8:30 AM), and Vehicle Pooja (6:30 AM – 10:30 AM & 4:30 PM – 8:00 PM). During Ganesha Navaratri, Special Abhishekam is performed from 7:00 AM to 12:00 PM.",
   },
   {
-    question: "How to reach Sampath Vinayaka Temple in Vizag?",
+    question: "How to reach Sampath Vinayakagar Temple in Vizag?",
     answer: "The temple is located in Asilmetta, Visakhapatnam. You can reach the temple easily by cab, bus, or personal vehicle from all major city areas. It is well-connected to the Vizag Railway Station and Bus Stand.",
   },
   {
-    question: "Is there parking available at Sampath Vinayaka Temple?",
+    question: "Is there parking available at Sampath Vinayakagar Temple?",
     answer: "Yes, visitors can find organized parking spaces near the entrance, making it convenient for cars and two-wheelers alike, especially for those visiting for vehicle poojas.",
   },
   {
-    question: "What is special about Sampath Vinayaka Temple?",
+    question: "What is special about Sampath Vinayakagar Temple?",
     answer: "The temple is known for its serene atmosphere, spiritual rituals, beautiful architecture, and peaceful environment attracting many devotees. It is famous for 'hall ticket blessings' for students and its protective role during the 1971 war.",
   },
   {
-    question: "Are there any festivals celebrated at Sampath Vinayaka Temple?",
+    question: "Are there any festivals celebrated at Sampath Vinayakagar Temple?",
     answer: "Major Ganesh festivals like Vinayaka Chavithi and Ganesh Chaturthi, as well as Navaratri and other special poojas, are celebrated here every year with devotion and large gatherings.",
   },
 ];

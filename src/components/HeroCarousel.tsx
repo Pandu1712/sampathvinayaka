@@ -25,9 +25,9 @@ export default function HeroCarousel() {
       {/* HERO CONTAINER */}
       <div
         className="
-        relative w-full overflow-hidden bg-zinc-950 rounded-2xl
+        relative w-full overflow-hidden bg-white border border-stone-200/60 rounded-[2.5rem]
         h-[280px] sm:h-[400px] md:h-[480px] lg:h-[75vh]
-        shadow-2xl
+        shadow-xl
         "
       >
         {/* Dynamic Blurred Background for depth */}
@@ -43,7 +43,7 @@ export default function HeroCarousel() {
             
             let positionClass = "opacity-0 z-0 scale-75 translate-x-0 pointer-events-none";
             if (diff === 0) {
-              positionClass = "opacity-100 z-30 scale-100 translate-x-0 cursor-default shadow-[0_0_40px_rgba(0,0,0,0.6)]";
+              positionClass = "opacity-100 z-30 scale-100 translate-x-0 cursor-default shadow-[0_20px_50px_rgba(136,19,55,0.18)]";
             } else if (diff === 1) {
               positionClass = "opacity-60 z-20 scale-[0.85] translate-x-[65%] sm:translate-x-[65%] md:translate-x-[60%] cursor-pointer hover:opacity-80";
             } else if (diff === slides.length - 1) {
@@ -61,7 +61,7 @@ export default function HeroCarousel() {
                 <img
                   src={getOptimizedImageUrl(slide.image, 1200)}
                   alt={`Temple Darshan ${index + 1}`}
-                  className="w-full h-full object-cover object-top origin-top rounded-xl sm:rounded-2xl border-2 sm:border-4 border-white/10"
+                  className="w-full h-full object-cover object-top origin-top rounded-xl sm:rounded-2xl border-2 sm:border-4 border-white shadow-md"
                 />
                 
                 {/* Light Glass/Blur Overlay for inactive cards */}
@@ -83,7 +83,7 @@ export default function HeroCarousel() {
               className={`transition-all duration-500 h-1.5 md:h-2 rounded-full
               ${active === index
                   ? "w-10 md:w-16 bg-primary shadow-[0_0_15px_rgba(var(--primary),0.6)]"
-                  : "w-4 md:w-6 bg-white/50 hover:bg-white/80"
+                  : "w-4 md:w-6 bg-stone-300 hover:bg-stone-400"
                 }`}
               aria-label={`Go to slide ${index + 1}`}
             />

@@ -1,13 +1,34 @@
 import { useState } from "react";
-import { CreditCard, Landmark, ClipboardCheck, Heart, MapPin, Sparkles, Utensils, Award } from "lucide-react";
+import { 
+  CreditCard, 
+  Landmark, 
+  ClipboardCheck, 
+  Heart, 
+  MapPin, 
+  Sparkles, 
+  Utensils, 
+  Award, 
+  QrCode, 
+  Download, 
+  Printer, 
+  User, 
+  Phone, 
+  CheckCircle2, 
+  RefreshCw 
+} from "lucide-react";
 import { toast } from "sonner";
+// @ts-ignore
+import html2pdf from "html2pdf.js";
 
 const Donations = () => {
   const [activeTab, setActiveTab] = useState<"prasada" | "anna" | "general">("prasada");
 
   // E-Receipt Form States
   const [isReceiptFormOpen, setIsReceiptFormOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"online" | "manual">("online");
   const [devoteeName, setDevoteeName] = useState("");
+  const [gotram, setGotram] = useState("");
+  const [nakshatram, setNakshatram] = useState("");
   const [phoneOrEmail, setPhoneOrEmail] = useState("");
   const [address, setAddress] = useState("");
   const [amountPaid, setAmountPaid] = useState("");
@@ -18,13 +39,32 @@ const Donations = () => {
   const [generatedReceipt, setGeneratedReceipt] = useState<{
     receiptNo: string;
     name: string;
+    gotram?: string;
+    nakshatram?: string;
     phoneOrEmail: string;
     address: string;
     amount: string;
     purpose: string;
     date: string;
     proofUrl: string;
+    paymentId?: string;
+    isOnline?: boolean;
   } | null>(null);
+
+  const loadRazorpay = () => {
+    return new Promise((resolve) => {
+      if ((window as any).Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -50,10 +90,214 @@ const Donations = () => {
     return str.trim();
   };
 
+  const safeDownloadReceipt = (receiptNoStr: string) => {
+    const element = document.getElementById("printable-receipt");
+    if (!element) {
+      console.error("Receipt element not found for download.");
+      return;
+    }
+
+    const opt = {
+      margin:       10,
+      filename:     `receipt_${receiptNoStr}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    try {
+      const html2pdfFn = typeof html2pdf === 'function' ? html2pdf : (html2pdf as any).default;
+      if (typeof html2pdfFn === 'function') {
+        html2pdfFn().from(element).set(opt).save()
+          .then(() => {
+            toast.success("Receipt downloaded automatically!");
+          })
+          .catch((err) => {
+            console.error("PDF download promise rejected:", err);
+            toast.error("Auto-download failed. Opening print dialog.");
+            handlePrintReceipt();
+          });
+      } else {
+        console.error("html2pdf is not resolved to a function:", html2pdfFn);
+        toast.error("Auto-download not supported in this environment. Opening print dialog.");
+        handlePrintReceipt();
+      }
+    } catch (e) {
+      console.error("Error executing html2pdf:", e);
+      toast.error("Download failed. Opening print dialog.");
+      handlePrintReceipt();
+    }
+  };
+
+  const handleOnlinePayment = async () => {
+    setIsUploading(true);
+    const loaded = await loadRazorpay();
+    if (!loaded) {
+      toast.error("Razorpay SDK failed to load. Please check your internet connection.");
+      setIsUploading(false);
+      return;
+    }
+
+    const today = new Date().toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+    
+    const receiptNo = `SVTT-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+    const contactTrimmed = phoneOrEmail.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const cleanPhone = contactTrimmed.replace(/[-\s()]/g, "");
+    const isEmail = emailRegex.test(contactTrimmed);
+
+    const options = {
+      key: "rzp_test_SwedUUn1KgRMs0",
+      amount: Math.round(Number(amountPaid) * 100), // in paise
+      currency: "INR",
+      name: "Sri Sampath Vinayakagar Temple",
+      description: sevaPurpose || "General Donation",
+      image: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png",
+      handler: function (response: any) {
+        const paymentId = response.razorpay_payment_id;
+        toast.success(`Payment successful! Txn ID: ${paymentId}`);
+
+        const receiptData = {
+          receiptNo,
+          name: devoteeName,
+          gotram: gotram.trim() || undefined,
+          nakshatram: nakshatram.trim() || undefined,
+          phoneOrEmail,
+          address,
+          amount: amountPaid,
+          purpose: sevaPurpose,
+          date: today,
+          proofUrl: "", // no screenshot URL needed
+          paymentId,
+          isOnline: true,
+        };
+
+        setGeneratedReceipt(receiptData);
+        setIsUploading(false);
+        toast.success("Official E-Receipt generated successfully! 🙏");
+
+        // Scroll back to the receipt form section so devotee can see it
+        setTimeout(() => {
+          const element = document.getElementById("receipt-form-section");
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }, 100);
+
+        // Automatically trigger PDF download safely
+        setTimeout(() => {
+          safeDownloadReceipt(receiptNo);
+        }, 800);
+      },
+      prefill: {
+        name: devoteeName,
+        email: isEmail ? contactTrimmed : "",
+        contact: !isEmail ? cleanPhone : "",
+      },
+      notes: {
+        address: address,
+        purpose: sevaPurpose,
+        gotram: gotram,
+        nakshatram: nakshatram,
+      },
+      theme: {
+        color: "#d97706",
+      },
+      modal: {
+        ondismiss: function () {
+          setIsUploading(false);
+          toast.error("Payment checkout closed.");
+          
+          // Scroll back to the receipt form section
+          setTimeout(() => {
+            const element = document.getElementById("receipt-form-section");
+            if (element) {
+              element.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+          }, 100);
+        }
+      }
+    };
+
+    const rzp = new (window as any).Razorpay(options);
+    rzp.open();
+  };
+
+  const handleDownloadReceipt = () => {
+    const element = document.getElementById("printable-receipt");
+    if (!element) {
+      toast.error("Receipt element not found.");
+      return;
+    }
+    
+    const opt = {
+      margin:       10,
+      filename:     `receipt_${generatedReceipt?.receiptNo || 'donation'}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    try {
+      const html2pdfFn = typeof html2pdf === 'function' ? html2pdf : (html2pdf as any).default;
+      if (typeof html2pdfFn === 'function') {
+        toast.info("Preparing PDF receipt for download...");
+        html2pdfFn().from(element).set(opt).save()
+          .then(() => {
+            toast.success("Receipt downloaded successfully!");
+          })
+          .catch((err) => {
+            console.error("PDF download error:", err);
+            toast.error("Failed to download PDF. Please try printing instead.");
+          });
+      } else {
+        console.error("html2pdf is not resolved to a function:", html2pdfFn);
+        toast.error("Download not supported. Opening print dialog instead.");
+        handlePrintReceipt();
+      }
+    } catch (e) {
+      console.error("Error executing html2pdf:", e);
+      toast.error("Download failed. Opening print dialog instead.");
+      handlePrintReceipt();
+    }
+  };
+
+  const handleSponsorSelect = (purposeValue: string, fixedAmount: number) => {
+    // Open receipt form section
+    setIsReceiptFormOpen(true);
+    
+    // Select payment method online by default
+    setPaymentMethod("online");
+
+    // Pre-fill devotee inputs
+    setSevaPurpose(purposeValue);
+    setAmountPaid(fixedAmount.toString());
+
+    // Scroll smoothly to form section
+    setTimeout(() => {
+      const element = document.getElementById("receipt-form-section");
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      
+      // Focus on devotee name field
+      const nameField = document.getElementById("devotee-name-input");
+      if (nameField) {
+        nameField.focus();
+      }
+    }, 250);
+
+    toast.success(`Selected Seva: ${purposeValue} (₹${fixedAmount.toLocaleString('en-IN')}). Please fill in your details below.`);
+  };
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 1. Name Validation
+    // 1. Devotee Name Validation
     const nameTrimmed = devoteeName.trim();
     if (nameTrimmed.length < 3) {
       toast.error("Invalid Name: Devotee name must be at least 3 characters long.");
@@ -90,6 +334,12 @@ const Donations = () => {
     const addressTrimmed = address.trim();
     if (addressTrimmed.length < 10) {
       toast.error("Invalid Address: Please enter a detailed address (minimum 10 characters) for temple records.");
+      return;
+    }
+
+    // If online payment method selected, trigger Razorpay checkout
+    if (paymentMethod === "online") {
+      handleOnlinePayment();
       return;
     }
 
@@ -149,12 +399,15 @@ const Donations = () => {
       setGeneratedReceipt({
         receiptNo,
         name: devoteeName,
+        gotram: gotram.trim() || undefined,
+        nakshatram: nakshatram.trim() || undefined,
         phoneOrEmail,
         address,
         amount: amountPaid,
         purpose: sevaPurpose,
         date: today,
         proofUrl: uploadedUrl,
+        isOnline: false,
       });
 
       setIsUploading(false);
@@ -186,6 +439,15 @@ const Donations = () => {
       return;
     }
 
+    const gotramRow = generatedReceipt?.gotram ? `
+      <tr>
+        <td class="label-td">Gotram / గోత్రం:</td>
+        <td class="value-td">${generatedReceipt.gotram}</td>
+        <td class="label-td">Star / నక్షత్రం:</td>
+        <td class="value-td">${generatedReceipt.nakshatram || 'N/A'}</td>
+      </tr>
+    ` : '';
+
     const receiptHtml = `
       <html>
         <head>
@@ -211,24 +473,27 @@ const Donations = () => {
             .receipt-container {
               max-width: 750px;
               margin: 0 auto;
-              border: 1px solid #e7e5e4;
+              border: 3px double #ca8a04;
               padding: 25px;
               position: relative;
               background-color: #ffffff;
+              background-image: radial-gradient(circle, rgba(202, 138, 4, 0.02) 1px, transparent 1px);
+              background-size: 20px 20px;
             }
             .header-container {
               display: flex;
               align-items: center;
-              border-bottom: 2px solid #002244;
+              border-bottom: 2px solid #d97706;
               padding-bottom: 12px;
               margin-bottom: 15px;
             }
             .logo-img {
-              width: 70px;
-              height: 70px;
+              width: 75px;
+              height: 75px;
               object-fit: contain;
               margin-right: 15px;
               border-radius: 50%;
+              border: 2px solid #ca8a04;
             }
             .header-text {
               flex: 1;
@@ -238,7 +503,7 @@ const Donations = () => {
               font-size: 10px;
               font-weight: 700;
               letter-spacing: 0.15em;
-              color: #4b5563;
+              color: #d97706;
               margin: 0;
               text-transform: uppercase;
             }
@@ -246,7 +511,7 @@ const Donations = () => {
               font-family: 'Playfair Display', serif;
               font-size: 22px;
               font-weight: 700;
-              color: #002244;
+              color: #b45309;
               margin: 4px 0;
               letter-spacing: 0.01em;
             }
@@ -261,13 +526,14 @@ const Donations = () => {
             }
             .title-text {
               display: inline-block;
-              border: 2px solid #002244;
+              border: 2px solid #d97706;
               padding: 5px 15px;
               font-size: 13px;
               font-weight: 700;
               text-transform: uppercase;
               letter-spacing: 0.05em;
-              color: #002244;
+              color: #d97706;
+              background-color: #fffbeb;
             }
             .details-table {
               width: 100%;
@@ -281,16 +547,16 @@ const Donations = () => {
             }
             .label-td {
               font-weight: 600;
-              background-color: #fafaf9;
+              background-color: #fffbeb;
               width: 25%;
-              color: #44403c;
+              color: #b45309;
             }
             .value-td {
               color: #1c1917;
             }
             .amount-box {
               background-color: #fafaf9;
-              border: 1px solid #e7e5e4;
+              border: 1px solid #ca8a04;
               padding: 10px 12px;
               margin: 12px 0;
               display: flex;
@@ -305,7 +571,7 @@ const Donations = () => {
             .amount-val {
               font-size: 16px;
               font-weight: 700;
-              color: #002244;
+              color: #d97706;
             }
             .proof-section {
               margin-top: 15px;
@@ -344,7 +610,7 @@ const Donations = () => {
             }
             .blessing-text {
               font-size: 9px;
-              color: #4b5563;
+              color: #b45309;
               font-style: italic;
               max-width: 60%;
             }
@@ -365,7 +631,7 @@ const Donations = () => {
               <img src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png" class="logo-img" alt="Temple Logo" />
               <div class="header-text">
                 <p class="gov-text">GOVERNMENT OF ANDHRA PRADESH - ENDOWMENTS DEPARTMENT</p>
-                <h1 class="temple-title">SRI SAMPATH VINAYAGAR TEMPLE</h1>
+                <h1 class="temple-title">SRI SAMPATH VINAYAKAGAR TEMPLE</h1>
                 <p class="sub-text">Asilmetta, Visakhapatnam - 530 003. Phone : 0891 - 2760740</p>
                 <p class="sub-text">email : endow-eosampath@gov.in, online: aptemples.ap.gov.in</p>
               </div>
@@ -377,33 +643,42 @@ const Donations = () => {
 
             <table class="details-table">
               <tr>
-                <td class="label-td">Receipt No:</td>
-                <td class="value-td">${generatedReceipt?.receiptNo}</td>
-                <td class="label-td">Date:</td>
+                <td class="label-td">Receipt No / రశీదు సంఖ్య:</td>
+                <td class="value-td" style="font-family: monospace; font-weight: bold; color: #d97706;">${generatedReceipt?.receiptNo}</td>
+                <td class="label-td">Date / తేదీ:</td>
                 <td class="value-td">${generatedReceipt?.date}</td>
               </tr>
               <tr>
-                <td class="label-td">Devotee Name:</td>
+                <td class="label-td">Devotee Name / పేరు:</td>
                 <td class="value-td" colspan="3"><strong>${generatedReceipt?.name}</strong></td>
               </tr>
+              ${gotramRow}
               <tr>
-                <td class="label-td">Contact Details:</td>
+                <td class="label-td">Contact / సంప్రదించండి:</td>
                 <td class="value-td" colspan="3">${generatedReceipt?.phoneOrEmail}</td>
               </tr>
               <tr>
-                <td class="label-td">Address:</td>
+                <td class="label-td">Address / చిరునామా:</td>
                 <td class="value-td" colspan="3">${generatedReceipt?.address}</td>
               </tr>
               <tr>
-                <td class="label-td">Seva Purpose:</td>
-                <td class="value-td" colspan="3">${generatedReceipt?.purpose}</td>
+                <td class="label-td">Seva Purpose / సేవ రకం:</td>
+                <td class="value-td" colspan="3" style="font-weight: 600; color: #b45309;">${generatedReceipt?.purpose}</td>
               </tr>
+              ${
+                generatedReceipt?.isOnline ? `
+                <tr>
+                  <td class="label-td">Payment ID / చెల్లింపు ID:</td>
+                  <td class="value-td" colspan="3"><code style="font-family: monospace; font-size: 11px;">${generatedReceipt?.paymentId}</code> <span style="background-color: #d1fae5; color: #065f46; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 600; margin-left: 8px;">Verified Online</span></td>
+                </tr>
+                ` : ''
+              }
             </table>
 
             <div class="amount-box">
               <div>
-                <span style="font-size: 8px; font-weight: 600; color: #44403c; display: block; text-transform: uppercase; tracking-wider;">Amount in Words</span>
-                <span class="amount-words">${numberToWords(Number(generatedReceipt?.amount))}</span>
+                <span style="font-size: 8px; font-weight: 600; color: #b45309; display: block; text-transform: uppercase;">Amount in Words / అక్షరాల</span>
+                <span class="amount-words" style="color: #1c1917; font-weight: 600;">${numberToWords(Number(generatedReceipt?.amount))}</span>
               </div>
               <div class="amount-val">₹${Number(generatedReceipt?.amount).toLocaleString('en-IN')}.00</div>
             </div>
@@ -419,7 +694,8 @@ const Donations = () => {
 
             <div class="footer-container">
               <div class="blessing-text">
-                May Lord Sri Sampath Vinayagar shower divine blessings, peace, and prosperity upon you.<br>
+                శ్రీ సంపత్ వినాయక స్వామి కృపా కటాక్ష సిద్ధిరస్తు | <br>
+                May Lord Sri Sampath Vinayakagar shower divine blessings, peace, and prosperity upon you and your family.<br>
                 <span style="font-family: sans-serif; font-size: 9px; font-style: normal; color: #16a34a; font-weight: 600; display: block; margin-top: 5px;">✓ Securely processed and verified</span>
               </div>
               <div class="signatory">
@@ -441,15 +717,16 @@ const Donations = () => {
     setTimeout(() => {
       iframe.contentWindow?.focus();
       iframe.contentWindow?.print();
-    }, 100);
+    }, 200);
   };
 
   const bankDetails = {
-    accountName: "SRI SAMPATH VINAYAGAR TEMPLE TRUST",
+    accountName: "SRI SAMPATH VINAYAKAGAR TEMPLE TRUST",
     bankName: "Bank of Baroda",
     accountNumber: "52270100007868",
     ifscCode: "BARB0SIRIPU",
     branch: "Siripuram, Visakhapatnam",
+    upiId: "sampathtemple@baroda"
   };
 
   const copyToClipboard = (text: string, label: string) => {
@@ -458,606 +735,780 @@ const Donations = () => {
   };
 
   return (
-    <section id="donations" className="section-padding bg-primary/5 relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/oriental-tiles.png')]" />
-      
-      <div className="container-custom relative z-10">
-        <div className="text-center mb-12 animate-fade-rise opacity-0 [animation-fill-mode:forwards]">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold uppercase tracking-widest mb-4">
-            <Heart size={16} className="animate-pulse" />
-            Support the Temple
+    <section id="donations" className="section-padding bg-stone-50 relative overflow-hidden">
+      {/* Visual top border line representing gold border */}
+      <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 z-10" />
+
+      {/* Decorative Traditional Patterns */}
+      <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/oriental-tiles.png')]" />
+
+      <div className="container-custom relative z-10 max-w-6xl mx-auto px-4">
+        
+        {/* Authentic Gopuram Heading */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-amber-600/5 border border-amber-600/10 text-amber-600 text-xs font-bold uppercase tracking-wider mb-4">
+            <Heart size={14} className="text-red-500 animate-pulse" />
+            Devotional Offerings & Contributions
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground font-serif leading-tight">
-            Contributions & <span className="gold-shimmer italic">Donations</span>
+          
+          <h2 className="text-4xl md:text-5xl font-black font-serif text-amber-900 leading-tight">
+            Seva & <span className="gold-shimmer italic">Donations</span>
           </h2>
-          <div className="h-1.5 w-24 bg-primary/40 rounded-full mx-auto mt-6 shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
-          <p className="text-muted-foreground mt-8 max-w-2xl mx-auto text-lg font-light leading-relaxed">
-            Your generous contributions help us maintain the temple's sacred traditions, perform daily rituals, and serve the community. Every offering counts towards building a stronger spiritual foundation.
+          
+          <p className="text-xs md:text-sm font-semibold tracking-widest text-amber-700 uppercase mt-2 font-serif">
+            శ్రీ సంపత్ వినాయక స్వామి దేవస్థానం - విరాళములు
+          </p>
+
+          <div className="h-1 w-20 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 rounded-full mx-auto mt-5" />
+          
+          <p className="text-stone-600 mt-6 max-w-2xl mx-auto text-sm md:text-base font-light leading-relaxed">
+            Your sacred contributions sustain daily pujas, prasadam distribution (Annadanam), temple maintenance, and community welfare programs. Select your desired Seva or make a general donation below.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Bank Details Card */}
-          <div className="glass p-8 rounded-[3rem] border border-white/40 shadow-2xl relative overflow-hidden group animate-fade-in opacity-0 [animation-fill-mode:forwards]">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/20 transition-colors duration-700 pointer-events-none" />
-            
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
-                <Landmark size={32} />
-              </div>
-              <h3 className="text-2xl font-bold font-serif">Bank Account Details</h3>
+        {/* STEP 1: CHOOSE OFFERING */}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6 pb-2 border-b border-stone-200">
+            <div className="w-8 h-8 rounded-full bg-amber-600 text-white font-bold flex items-center justify-center text-sm shadow">1</div>
+            <div>
+              <h3 className="text-lg font-bold text-amber-900 font-serif">Select Seva or Offering / సేవ రకమును ఎంచుకోండి</h3>
+              <p className="text-xs text-stone-500">Choose a predefined temple service below to auto-fill the donation details.</p>
             </div>
+          </div>
 
-            <div className="space-y-6">
+          <div className="rounded-3xl border border-stone-200 overflow-hidden shadow-xl bg-white">
+            {/* Tab Header */}
+            <div className="flex flex-wrap border-b border-stone-200 bg-stone-50 p-2 gap-2">
               {[
-                { label: "Account Name", value: bankDetails.accountName, icon: <Landmark size={18} /> },
-                { label: "Bank Name", value: bankDetails.bankName, icon: <CreditCard size={18} /> },
-                { label: "Account Number", value: bankDetails.accountNumber, icon: <ClipboardCheck size={18} />, copyable: true },
-                { label: "IFSC Code", value: bankDetails.ifscCode, icon: <ClipboardCheck size={18} />, copyable: true },
-                { label: "Branch", value: bankDetails.branch, icon: <MapPin size={18} /> },
-                // Dummy MapPin import not needed here as I'm using local icons, but I'll add it if needed.
-                // Wait, I forgot to import MapPin in this file.
-              ].map((item, i) => (
-                <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl bg-white/40 border border-primary/5 hover:border-primary/20 transition-all group/item shadow-sm">
-                  <div className="flex items-center gap-3 mb-2 sm:mb-0">
-                    <span className="text-primary/60">{item.icon}</span>
-                    <span className="text-sm font-bold text-primary/80 uppercase tracking-widest">{item.label}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-foreground font-semibold font-sans">{item.value}</span>
-                    {item.copyable && (
-                      <button 
-                        onClick={() => copyToClipboard(item.value, item.label)}
-                        className="p-2 rounded-lg hover:bg-primary/10 text-primary/40 hover:text-primary transition-colors"
-                        title="Copy to clipboard"
-                      >
-                        <ClipboardCheck size={16} />
-                      </button>
-                    )}
-                  </div>
-                </div>
+                { id: "prasada", label: "Prasada Seva (ప్రసాద సేవ)", icon: <Sparkles size={16} /> },
+                { id: "anna", label: "Anna Prasadam (అన్న ప్రసాదం)", icon: <Utensils size={16} /> },
+                { id: "general", label: "General & Other Sevas (ఇతర సేవలు)", icon: <Award size={16} /> }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex-1 min-w-[150px] py-3.5 px-4 rounded-xl text-xs md:text-sm font-serif font-bold transition-all duration-300 flex items-center justify-center gap-2 border ${
+                    activeTab === tab.id
+                      ? "bg-amber-600 text-white border-amber-600 shadow-md scale-[1.01]"
+                      : "text-stone-600 hover:text-stone-900 hover:bg-stone-100 border-transparent"
+                  }`}
+                >
+                  <span className={activeTab === tab.id ? "text-amber-400" : "text-amber-600"}>
+                    {tab.icon}
+                  </span>
+                  <span>{tab.label}</span>
+                </button>
               ))}
             </div>
 
-            <p className="mt-8 pt-6 border-t border-primary/10 text-xs text-muted-foreground italic text-center">
-              Please include your name and purpose of donation in the transaction remarks. 
-              Contact the temple office or WhatsApp your payment proof to <a href="https://wa.me/919491000712" target="_blank" rel="noopener noreferrer" className="text-green-500 font-bold hover:underline hover:text-green-600 transition-colors inline-flex items-center gap-1">💬 (+91) 94910-00712</a> for a formal receipt.
-            </p>
-          </div>
-
-          {/* Opportunities & Offerings Box */}
-          <div className="space-y-6 animate-fade-in opacity-0 [animation-fill-mode:forwards] [animation-delay:0.3s]">
-            <div className="rounded-[2.5rem] glass-dark border border-white/10 overflow-hidden shadow-2xl relative">
-              {/* Tab Header */}
-              <div className="flex border-b border-white/10 bg-black/20 p-2 gap-1">
-                {[
-                  { id: "prasada", label: "Prasada Seva", labelTe: "ప్రసాద సేవ", icon: <Sparkles size={16} /> },
-                  { id: "anna", label: "Anna Prasadam", labelTe: "అన్న ప్రసాదం", icon: <Utensils size={16} /> },
-                  { id: "general", label: "Other Sevas", labelTe: "ఇతర సేవలు", icon: <Award size={16} /> }
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
-                    className={`flex-1 py-3 px-2 rounded-2xl text-xs sm:text-sm font-serif font-bold transition-all duration-300 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 border ${
-                      activeTab === tab.id
-                        ? "bg-primary text-primary-foreground border-primary/30 shadow-lg shadow-primary/10 scale-[1.02]"
-                        : "text-white/60 hover:text-white hover:bg-white/5 border-transparent"
-                    }`}
-                  >
-                    <span className={activeTab === tab.id ? "text-primary-foreground" : "text-primary/80"}>
-                      {tab.icon}
-                    </span>
-                    <div className="text-center sm:text-left leading-none">
-                      <div className="text-[11px] sm:text-xs tracking-wider uppercase">{tab.label}</div>
-                      <div className="text-[10px] font-sans opacity-70 mt-0.5">{tab.labelTe}</div>
+            {/* Tab Content */}
+            <div className="p-6 md:p-8">
+              {activeTab === "prasada" && (
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
+                    <div>
+                      <h4 className="text-amber-900 text-base font-bold font-serif">Sacred Prasada Offerings</h4>
+                      <p className="text-stone-500 text-xs mt-0.5">Sponsor daily or weekly offerings prepared using pure ingredients.</p>
                     </div>
-                  </button>
-                ))}
-              </div>
-
-              {/* Tab Content */}
-              <div className="p-6 sm:p-8">
-                {activeTab === "prasada" && (
-                  <div className="space-y-4 animate-fade-in">
-                    <div className="flex justify-between items-center mb-2">
-                      <h4 className="text-primary text-lg font-bold font-serif">Prasada Seva (ప్రసాద సేవ)</h4>
-                      <span className="px-3 py-1 rounded-full bg-primary/15 text-primary text-[10px] sm:text-xs font-bold uppercase tracking-wider">Pamphlet Offerings</span>
-                    </div>
-                    <p className="text-white/70 text-xs sm:text-sm font-light leading-relaxed">
-                      Devotees can sponsor sacred prasadam offerings prepared with pure ingredients.
-                    </p>
-
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs sm:text-sm border-collapse">
-                        <thead>
-                          <tr className="border-b border-white/10 text-primary/80 font-bold uppercase tracking-wider text-[10px] sm:text-xs">
-                            <th className="py-2 pb-3">Offering / సేవ</th>
-                            <th className="py-2 pb-3 text-center">Day / రోజు</th>
-                            <th className="py-2 pb-3 text-right">Price / ధర</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5 text-white/80 font-light">
-                          <tr className="hover:bg-white/5 transition-colors">
-                            <td className="py-3">
-                              <span className="font-semibold text-white">Sweet Pongal / Kesari</span>
-                              <div className="text-[11px] text-white/50 font-sans mt-0.5">చక్కెరపొంగలి / కేసరి</div>
-                            </td>
-                            <td className="py-3 text-center">
-                              <span className="px-2 py-0.5 rounded-full bg-white/10 text-white text-[10px] font-bold uppercase">Daily (ప్రతిరోజూ)</span>
-                            </td>
-                            <td className="py-3 text-right font-semibold text-primary">₹1,000</td>
-                          </tr>
-                          <tr className="hover:bg-white/5 transition-colors">
-                            <td className="py-3">
-                              <span className="font-semibold text-white">Sweet Pongal / Kesari (10 Kg Ghee)</span>
-                              <div className="text-[11px] text-white/50 font-sans mt-0.5">10 కేజీల నేతితో చక్కెరపొంగలి / కేసరి</div>
-                            </td>
-                            <td className="py-3 text-center">
-                              <span className="px-2 py-0.5 rounded-full bg-white/10 text-white text-[10px] font-bold uppercase">Daily (ప్రతిరోజూ)</span>
-                            </td>
-                            <td className="py-3 text-right font-semibold text-primary">₹1,800</td>
-                          </tr>
-                          <tr className="hover:bg-white/5 transition-colors">
-                            <td className="py-3">
-                              <span className="font-semibold text-white">Undrallu (10 Kg Ghee)</span>
-                              <div className="text-[11px] text-white/50 font-sans mt-0.5">10 కేజీల నేతితో ఉండ్రాళ్ళు</div>
-                            </td>
-                            <td className="py-3 text-center">
-                              <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase">Wed Only (బుధవారం)</span>
-                            </td>
-                            <td className="py-3 text-right font-semibold text-primary">₹1,000</td>
-                          </tr>
-                          <tr className="hover:bg-white/5 transition-colors">
-                            <td className="py-3">
-                              <span className="font-semibold text-white">Sweet Undrallu (10 Kg Ghee)</span>
-                              <div className="text-[11px] text-white/50 font-sans mt-0.5">10 కేజీల నేతితో తీపి ఉండ్రాళ్ళు</div>
-                            </td>
-                            <td className="py-3 text-center">
-                              <span className="px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 text-[10px] font-bold uppercase">Fri Only (శుక్రవారం)</span>
-                            </td>
-                            <td className="py-3 text-right font-semibold text-primary">₹1,800</td>
-                          </tr>
-                          <tr className="hover:bg-white/5 transition-colors">
-                            <td className="py-3">
-                              <span className="font-semibold text-white">Jalebi (10 Kg Ghee)</span>
-                              <div className="text-[11px] text-white/50 font-sans mt-0.5">10 కేజీల నేతితో జిలేబీలు</div>
-                            </td>
-                            <td className="py-3 text-center">
-                              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold uppercase">Sun Only (ఆదివారం)</span>
-                            </td>
-                            <td className="py-3 text-right font-semibold text-primary">₹1,000</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+                    <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-800 text-[10px] font-bold uppercase tracking-wider border border-amber-500/20">Special Offerings</span>
                   </div>
-                )}
 
-                {activeTab === "anna" && (
-                  <div className="space-y-6 animate-fade-in text-white">
-                    <div className="flex justify-between items-center mb-2">
-                      <h4 className="text-primary text-lg font-bold font-serif">Anna Prasada Vitharana</h4>
-                      <span className="px-3 py-1 rounded-full bg-red-500/20 text-red-300 text-[10px] sm:text-xs font-bold uppercase tracking-wider">అన్న ప్రసాద వితరణ</span>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs sm:text-sm border-collapse">
+                      <thead>
+                        <tr className="border-b border-stone-200 text-stone-500 font-bold uppercase tracking-wider text-[10px]">
+                          <th className="py-3 pb-4">Offering / సేవ</th>
+                          <th className="py-3 pb-4 text-center">Scheduled Day</th>
+                          <th className="py-3 pb-4 text-right">Price / ధర</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-stone-100 text-stone-700">
+                        {[
+                          { name: "Sweet Pongal / Kesari", te: "చక్కెరపొంగలి / కేసరి", day: "Daily (ప్రతిరోజూ)", price: 1000, key: "Sweet Pongal Daily" },
+                          { name: "Sweet Pongal / Kesari (10 Kg Ghee)", te: "10 కేజీల నేతితో చక్కెరపొంగలి", day: "Daily (ప్రతిరోజూ)", price: 1800, key: "Sweet Pongal Ghee 10 Kg" },
+                          { name: "Undrallu (10 Kg Ghee)", te: "10 కేజీల నేతితో ఉండ్రాళ్ళు", day: "Wed Only (బుధవారం)", price: 1000, key: "Undrallu Weds Only" },
+                          { name: "Sweet Undrallu (10 Kg Ghee)", te: "10 కేజీల నేతితో తీపి ఉండ్రాళ్ళు", day: "Fri Only (శుక్రవారం)", price: 1800, key: "Sweet Undrallu Fri Only" },
+                          { name: "Jalebi (10 Kg Ghee)", te: "10 కేజీల నేతితో జిలేబీలు", day: "Sun Only (ఆదివారం)", price: 1000, key: "Jalebi Sun Only" }
+                        ].map((item, i) => (
+                          <tr key={i} className="hover:bg-stone-50/50 transition-colors">
+                            <td className="py-4">
+                              <span className="font-semibold text-stone-900 text-xs sm:text-sm">{item.name}</span>
+                              <div className="text-[11px] text-stone-500 font-sans mt-0.5">{item.te}</div>
+                            </td>
+                            <td className="py-4 text-center">
+                              <span className="px-2 py-1 rounded bg-stone-100 text-stone-600 text-[10px] font-semibold">{item.day}</span>
+                            </td>
+                            <td className="py-4 text-right">
+                              <button
+                                onClick={() => handleSponsorSelect(item.key, item.price)}
+                                className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold text-xs hover:from-amber-600 hover:to-amber-700 active:scale-95 transition-all shadow-sm hover:scale-[1.03]"
+                              >
+                                Sponsor ₹{item.price.toLocaleString('en-IN')}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "anna" && (
+                <div className="space-y-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
+                    <div>
+                      <h4 className="text-amber-900 text-base font-bold font-serif">Anna Prasada Vitharana (అన్నప్రసాద వితరణ)</h4>
+                      <p className="text-stone-500 text-xs mt-0.5">Sponsor free hot meals served daily to thousands of visiting pilgrims.</p>
                     </div>
+                    <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-800 text-[10px] font-bold uppercase tracking-wider border border-amber-500/20">Free Meals</span>
+                  </div>
 
-                    {/* Banner Info */}
-                    <div className="p-5 rounded-2xl bg-gradient-to-r from-red-950/40 to-amber-950/40 border border-red-500/20 shadow-inner">
-                      <div className="flex items-center gap-3 mb-2 text-primary">
-                        <Utensils size={20} />
-                        <span className="font-serif font-bold text-sm tracking-wider">DAILY TIMINGS & VENUE</span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="p-6 rounded-2xl bg-amber-50/70 border border-amber-200">
+                      <div className="flex items-center gap-2 text-amber-600 font-bold text-sm mb-3">
+                        <Utensils size={18} className="text-amber-600" />
+                        <span>DAILY ANNA PRASADAM INFO</span>
                       </div>
-                      <div className="space-y-1 font-light text-xs sm:text-sm">
-                        <div className="flex justify-between border-b border-white/5 pb-2">
-                          <span className="text-white/60">English:</span>
-                          <span className="text-white font-semibold">12:00 PM – 1:30 PM Daily at Temple</span>
-                        </div>
-                        <div className="flex justify-between pt-2">
-                          <span className="text-white/60 font-sans">తెలుగు:</span>
-                          <span className="text-white font-semibold text-right font-sans">ప్రతీ రోజు మధ్యాహ్నం 12:00 నుండి 1:30 వరకు ఆలయం వద్ద</span>
-                        </div>
+                      <p className="text-stone-700 text-xs md:text-sm leading-relaxed font-light mb-4">
+                        Every day, the temple serves nutritious hot meals to pilgrims between <strong>12:30 PM – 1:30 PM</strong>. Your contributions directly fund raw food ingredients, vegetables, and ghee.
+                      </p>
+                      <div className="text-[11px] text-stone-500 font-sans border-t border-amber-200/50 pt-3">
+                        ప్రతి రోజు మధ్యాహ్నం 12:30 నుండి 1:30 వరకు ఆలయం వద్ద భక్తులకు ఉచిత అన్నప్రసాద వితరణ జరుగును.
                       </div>
                     </div>
 
-                    {/* Devotee Instructions */}
-                    <div className="space-y-3 p-5 rounded-2xl bg-white/5 border border-white/5 font-sans">
-                      <h5 className="text-primary text-xs uppercase font-bold tracking-widest flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        Devotee Contributions / భక్తుల విరాళాలు
-                      </h5>
-                      <div className="space-y-3 text-xs leading-relaxed font-light text-white/80">
-                        <div className="border-b border-white/5 pb-3">
-                          <strong className="text-white font-semibold">English:</strong> Devotees wishing to contribute to Annadanam or Free Prasadam Distribution are requested to make their donations at the temple office and obtain a proper receipt.
-                        </div>
-                        <div className="pt-1 font-sans">
-                          <strong className="text-white font-semibold font-sans">తెలుగు:</strong> అన్నదానం, ఉచిత ప్రసాద వితరణ చేయగోరు భక్తులు కార్యాలయంలో విరాళములు చెల్లించి తగు రసీదు పొందవలెను.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === "general" && (
-                  <div className="space-y-4 animate-fade-in text-white">
-                    <div className="flex justify-between items-center mb-2">
-                      <h4 className="text-primary text-lg font-bold font-serif">Other Seva Opportunities</h4>
-                      <span className="px-3 py-1 rounded-full bg-primary/15 text-primary text-[10px] sm:text-xs font-bold uppercase tracking-wider">ఇతర సేవలు</span>
-                    </div>
-                    <p className="text-white/70 text-xs sm:text-sm font-light leading-relaxed">
-                      You can also support the temple's ongoing maintenance, development, and social welfare programs.
-                    </p>
-                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                      {[
-                        { en: "Annadanam (Food Distribution)", te: "అన్నదానం" },
-                        { en: "Temple Renovation", te: "ఆలయ పునర్నిర్మాణం" },
-                        { en: "Education & Vedic Classes", te: "వేద పాఠశాల & విద్య" },
-                        { en: "Daily Pooja & Aarti", te: "నిత్య పూజ & హారతి" },
-                        { en: "Festival Celebrations", te: "పండుగ వేడుకలు" },
-                        { en: "Gaushala Support", te: "గోశాల నిర్వహణ" }
-                      ].map((seva, i) => (
-                        <li key={i} className="flex gap-3 items-start p-3 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/10 transition-colors">
-                          <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0 animate-pulse" />
-                          <div>
-                            <div className="text-xs sm:text-sm font-semibold text-white">{seva.en}</div>
-                            <div className="text-[10px] text-white/50 font-sans mt-0.5">{seva.te}</div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Tax Benefits Card */}
-            <div className="premium-card p-6 flex items-center gap-6">
-              <div className="w-20 h-20 rounded-3xl bg-primary flex items-center justify-center text-4xl text-white shadow-xl shadow-primary/20 shrink-0">
-                🙏
-              </div>
-              <div>
-                <h4 className="text-foreground font-bold font-serif mb-1">Tax Benefits</h4>
-                <p className="text-muted-foreground text-sm font-light">
-                  All donations are eligible for tax exemption under section 80G of the Income Tax Act.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* E-Receipt Request Section */}
-        <div className="mt-16 pt-12 border-t border-primary/10">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl sm:text-3xl font-bold font-serif text-foreground mb-3">
-              Request Official <span className="gold-shimmer italic">E-Receipt</span>
-            </h3>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-6 font-light">
-              Made a bank transfer? Submit your details and payment screenshot below to instantly generate and download your official temple receipt. 
-              For manual support or receipts, feel free to send details via <a href="https://wa.me/919491000712" target="_blank" rel="noopener noreferrer" className="text-green-500 font-bold hover:underline inline-flex items-center gap-1">💬 WhatsApp to (+91) 94910-00712</a>.
-            </p>
-            <button
-              onClick={() => {
-                setIsReceiptFormOpen(!isReceiptFormOpen);
-                setGeneratedReceipt(null);
-              }}
-              className="mt-6 inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-xs sm:text-sm font-bold bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300 border border-primary/20 hover:scale-105 cursor-pointer"
-            >
-              <span>{isReceiptFormOpen ? "Close Form / ఫారమ్‌ను మూసివేయి" : "Open Receipt Form / రసీదు ఫారమ్"}</span>
-              <span>{isReceiptFormOpen ? "▲" : "▼"}</span>
-            </button>
-          </div>
-
-          {isReceiptFormOpen && (
-            <div className="max-w-4xl mx-auto glass p-6 sm:p-10 rounded-[2.5rem] border border-white/20 shadow-2xl relative overflow-hidden animate-fade-rise">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
-
-              {!generatedReceipt ? (
-                <form onSubmit={handleFormSubmit} className="space-y-6 relative z-10">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {/* Name */}
-                    <div className="space-y-2">
-                      <label className="text-xs text-primary font-bold uppercase tracking-widest flex items-center gap-2">
-                        <span className="w-1 h-1 bg-primary rounded-full" />
-                        Devotee Name / భక్తుని పేరు *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={devoteeName}
-                        onChange={(e) => setDevoteeName(e.target.value)}
-                        className="w-full px-5 py-4 rounded-xl bg-white/50 border border-primary/10 text-foreground text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all font-sans"
-                        placeholder="Enter full name"
-                      />
-                    </div>
-
-                    {/* Phone/Email */}
-                    <div className="space-y-2">
-                      <label className="text-xs text-primary font-bold uppercase tracking-widest flex items-center gap-2">
-                        <span className="w-1 h-1 bg-primary rounded-full" />
-                        Phone or Email / ఫోన్ లేదా ఈమెయిల్ *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={phoneOrEmail}
-                        onChange={(e) => setPhoneOrEmail(e.target.value)}
-                        className="w-full px-5 py-4 rounded-xl bg-white/50 border border-primary/10 text-foreground text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all font-sans"
-                        placeholder="Enter phone number or email address"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {/* Amount */}
-                    <div className="space-y-2">
-                      <label className="text-xs text-primary font-bold uppercase tracking-widest flex items-center gap-2">
-                        <span className="w-1 h-1 bg-primary rounded-full" />
-                        Amount Paid (₹) / చెల్లించిన మొత్తం *
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        min="1"
-                        value={amountPaid}
-                        onChange={(e) => setAmountPaid(e.target.value)}
-                        className="w-full px-5 py-4 rounded-xl bg-white/50 border border-primary/10 text-foreground text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all font-sans"
-                        placeholder="Enter donation amount"
-                      />
-                    </div>
-
-                    {/* Purpose of Donation */}
-                    <div className="space-y-2">
-                      <label className="text-xs text-primary font-bold uppercase tracking-widest flex items-center gap-2">
-                        <span className="w-1 h-1 bg-primary rounded-full" />
-                        Purpose of Donation / సేవా రకం *
-                      </label>
-                      <select
-                        value={sevaPurpose}
-                        onChange={(e) => setSevaPurpose(e.target.value)}
-                        className="w-full px-5 py-4 rounded-xl bg-white/50 border border-primary/10 text-foreground text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all font-sans"
-                      >
-                        <option value="General Donation">General Donation (సాధారణ విరాళం)</option>
-                        <option value="Annadanam">Annadanam (అన్నదానం)</option>
-                        <option value="Sweet Pongal Daily">Sweet Pongal Daily (చక్కెరపొంగలి - ₹1,000)</option>
-                        <option value="Sweet Pongal Ghee 10 Kg">Sweet Pongal Ghee 10 Kg (చక్కెరపొంగలి నేతితో - ₹1,800)</option>
-                        <option value="Undrallu Weds Only">Undrallu Weds Only (ఉండ్రాళ్ళు బుధవారం - ₹1,000)</option>
-                        <option value="Sweet Undrallu Fri Only">Sweet Undrallu Fri Only (తీపి ఉండ్రాళ్ళు శుక్రవారం - ₹1,800)</option>
-                        <option value="Jalebi Sun Only">Jalebi Sun Only (ジలేబీలు ఆదివారం - ₹1,000)</option>
-                        <option value="Temple Renovation">Temple Renovation (ఆలయ పునర్నిర్మాణం)</option>
-                        <option value="Gaushala Support">Gaushala Support (గోశాల నిర్వహణ)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Address */}
-                  <div className="space-y-2">
-                    <label className="text-xs text-primary font-bold uppercase tracking-widest flex items-center gap-2">
-                      <span className="w-1 h-1 bg-primary rounded-full" />
-                      Postal Address / నివాస చిరునామా *
-                    </label>
-                    <textarea
-                      required
-                      rows={3}
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      className="w-full px-5 py-4 rounded-xl bg-white/50 border border-primary/10 text-foreground text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all resize-none font-sans"
-                      placeholder="Enter full address for communications"
-                    />
-                  </div>
-
-                  {/* Screenshot File Upload */}
-                  <div className="space-y-2">
-                    <label className="text-xs text-primary font-bold uppercase tracking-widest flex items-center gap-2">
-                      <span className="w-1 h-1 bg-primary rounded-full" />
-                      Payment Proof Screenshot / చెల్లింపు స్క్రీన్ షాట్ *
-                    </label>
-                    <div className="border-2 border-dashed border-primary/20 rounded-2xl p-6 hover:bg-primary/5 transition-all text-center relative group">
-                      <input
-                        type="file"
-                        required
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-15"
-                      />
-                      <div className="space-y-2 pointer-events-none">
-                        <div className="text-3xl">📸</div>
-                        <p className="text-sm text-foreground font-semibold">
-                          {screenshotFile ? screenshotFile.name : "Click or drag your payment screenshot here"}
-                        </p>
-                        <p className="text-xs text-muted-foreground font-light">
-                          Supports PNG, JPG, JPEG up to 5MB
-                        </p>
-                      </div>
-                    </div>
-                    {screenshotPreview && (
-                      <div className="mt-4 flex justify-center">
-                        <div className="relative w-32 h-32 rounded-xl overflow-hidden border border-primary/20 shadow-lg">
-                          <img src={screenshotPreview} alt="Screenshot Preview" className="w-full h-full object-cover" />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setScreenshotFile(null);
-                              setScreenshotPreview("");
-                            }}
-                            className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center shadow hover:bg-red-600 transition-colors z-20 cursor-pointer"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isUploading}
-                    className="group relative w-full py-5 rounded-2xl text-sm font-bold bg-primary text-primary-foreground shadow-xl shadow-primary/30 hover:shadow-primary/40 hover:-translate-y-0.5 active:scale-95 transition-all overflow-hidden flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
-                  >
-                    {isUploading ? (
-                      <>
-                        <span className="w-4 h-4 rounded-full border-2 border-primary-foreground border-t-transparent animate-spin" />
-                        <span>Uploading Proof & Generating Receipt...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Generate & Download E-Receipt / రసీదు పొందండి</span>
-                        <span>🙏</span>
-                      </>
-                    )}
-                    <div className="absolute inset-x-0 bottom-0 h-1 bg-white/30 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                  </button>
-                </form>
-              ) : (
-                /* Beautiful Generated Printable Receipt */
-                <div className="space-y-6 animate-fade-in relative z-10">
-                  {/* Alert */}
-                  <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs sm:text-sm font-light text-center leading-relaxed">
-                    ✨ Your payment proof screenshot has been successfully uploaded to **Cloud Storage** and your official receipt has been generated!
-                  </div>
-
-                  {/* Printable Receipt Frame */}
-                  <div 
-                    id="printable-receipt" 
-                    className="p-6 sm:p-10 rounded-3xl bg-[#fefdfa] text-stone-900 border-4 border-amber-600 shadow-2xl relative font-sans overflow-hidden"
-                  >
-                    {/* Watermark Seal */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none w-72 h-72">
-                      <img src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png" alt="Ganesha Watermark" className="w-full h-full object-contain" />
-                    </div>
-
-                    {/* Official Letterhead Header */}
-                    <div className="text-center border-b-2 border-[#002244] pb-5 relative z-10 flex flex-col sm:flex-row items-center gap-4">
-                      <div className="w-20 h-20 shrink-0 bg-stone-50 p-1.5 rounded-full border border-stone-200 flex items-center justify-center">
-                        <img src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png" alt="Logo" className="w-full h-full object-contain rounded-full" />
-                      </div>
-                      <div className="flex-1 text-center sm:text-left">
-                        <p className="text-[10px] sm:text-xs font-bold text-stone-500 uppercase tracking-widest leading-none">
-                          GOVERNMENT OF ANDHRA PRADESH - ENDOWMENTS DEPARTMENT
-                        </p>
-                        <h4 className="text-xl sm:text-2xl font-black font-serif text-[#002244] uppercase tracking-wide my-1">
-                          SRI SAMPATH VINAYAGAR TEMPLE
-                        </h4>
-                        <p className="text-[10px] sm:text-xs text-stone-600 font-medium">
-                          Asilmetta, Visakhapatnam - 530 003. Phone : 0891 - 2760740
-                        </p>
-                        <p className="text-[9px] sm:text-[10px] text-stone-500 font-light mt-0.5">
-                          email : endow-eosampath@gov.in, online: aptemples.ap.gov.in
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Receipt Title */}
-                    <div className="text-center my-6 relative z-10">
-                      <div className="inline-block border-2 border-[#002244] px-6 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#002244] font-serif bg-stone-50">
-                        Donation Receipt / విరాళ రసీదు
-                      </div>
-                    </div>
-
-                    {/* Details Table */}
-                    <div className="overflow-x-auto relative z-10">
-                      <table className="w-full border-collapse text-stone-800 text-xs sm:text-sm">
-                        <tbody>
-                          <tr>
-                            <td className="p-3 border border-stone-200 font-semibold bg-stone-50/50 text-stone-600 w-1/4">Receipt No:</td>
-                            <td className="p-3 border border-stone-200 text-stone-900 font-mono font-semibold">{generatedReceipt.receiptNo}</td>
-                            <td className="p-3 border border-stone-200 font-semibold bg-stone-50/50 text-stone-600 w-1/4">Date:</td>
-                            <td className="p-3 border border-stone-200 text-stone-900">{generatedReceipt.date}</td>
-                          </tr>
-                          <tr>
-                            <td className="p-3 border border-stone-200 font-semibold bg-stone-50/50 text-stone-600">Devotee Name:</td>
-                            <td className="p-3 border border-stone-200 text-stone-900 font-bold" colSpan={3}>{generatedReceipt.name}</td>
-                          </tr>
-                          <tr>
-                            <td className="p-3 border border-stone-200 font-semibold bg-stone-50/50 text-stone-600">Contact details:</td>
-                            <td className="p-3 border border-stone-200 text-stone-900 font-medium" colSpan={3}>{generatedReceipt.phoneOrEmail}</td>
-                          </tr>
-                          <tr>
-                            <td className="p-3 border border-stone-200 font-semibold bg-stone-50/50 text-stone-600">Address:</td>
-                            <td className="p-3 border border-stone-200 text-stone-800 italic" colSpan={3}>{generatedReceipt.address}</td>
-                          </tr>
-                          <tr>
-                            <td className="p-3 border border-stone-200 font-semibold bg-stone-50/50 text-stone-600">Seva Purpose:</td>
-                            <td className="p-3 border border-stone-200 text-stone-900 font-semibold" colSpan={3}>{generatedReceipt.purpose}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Amount in words & Value */}
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 rounded-xl bg-stone-50 border border-stone-200 mt-4 gap-3 relative z-10">
+                    <div className="p-6 rounded-2xl border border-stone-200 flex flex-col justify-between">
                       <div>
-                        <span className="text-[10px] text-stone-500 font-bold uppercase tracking-wider block">Amount in Words / అక్షరాల</span>
-                        <p className="font-bold text-stone-700 italic mt-0.5 text-xs">
-                          {numberToWords(Number(generatedReceipt.amount))}
+                        <h5 className="font-serif font-bold text-amber-600 text-sm mb-2">Sponsor Food Distribution</h5>
+                        <p className="text-stone-600 text-xs leading-relaxed mb-4">
+                          You can sponsor Annadanam on special occasions like birthdays, marriages, or in memory of loved ones. Select an option to pre-fill.
                         </p>
                       </div>
-                      <div className="text-right shrink-0 bg-[#002244] text-white px-5 py-2.5 rounded-xl border border-stone-800">
-                        <span className="text-[10px] text-stone-300 block uppercase font-bold tracking-wider leading-none">TOTAL RECEIVED</span>
-                        <span className="text-xl sm:text-2xl font-bold font-sans">₹{Number(generatedReceipt.amount).toLocaleString('en-IN')}.00</span>
-                      </div>
-                    </div>
-
-                    {/* Payment Proof Screenshot Section inside Preview Receipt */}
-                    {generatedReceipt.proofUrl && (
-                      <div className="mt-6 border border-stone-200 p-4 bg-stone-50/50 rounded-2xl relative z-10 text-center">
-                        <div className="text-left text-[11px] font-bold text-stone-500 uppercase tracking-wider mb-2 pb-1 border-b border-stone-200">
-                          Payment Proof Screenshot / చెల్లింపు రుజువు
-                        </div>
-                        <img 
-                          src={generatedReceipt.proofUrl} 
-                          alt="Uploaded payment proof" 
-                          className="max-h-56 max-w-full object-contain mx-auto rounded-lg border border-stone-200 shadow-sm" 
-                        />
-                      </div>
-                    )}
-
-                    {/* Receipt Footer */}
-                    <div className="pt-6 border-t border-stone-200 flex flex-col sm:flex-row justify-between items-center text-[10px] sm:text-xs text-stone-500 gap-4 mt-6 relative z-10">
-                      <div className="text-center sm:text-left">
-                        <p className="font-semibold text-emerald-700 flex items-center gap-1">
-                          <span>✓</span> Transaction Status: Successfully Processed (PAID)
-                        </p>
-                        <p className="text-[9px] text-stone-400 mt-0.5">
-                          May Lord Sri Sampath Vinayagar shower divine blessings, peace, and prosperity upon you.
-                        </p>
-                      </div>
-                      <div className="text-center sm:text-right space-y-1">
-                        <div className="h-6 w-24 mx-auto sm:ml-auto opacity-30 flex items-center justify-center font-serif text-[10px] italic border-b border-stone-400">
-                          Sri S. V. T. Trust
-                        </div>
-                        <p className="font-bold text-stone-800 uppercase tracking-widest text-[9px]">Authorized Signatory</p>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { label: "Sponsor 100 Devotees", amount: 1500 },
+                          { label: "Sponsor 250 Devotees", amount: 3500 },
+                          { label: "Sponsor 500 Devotees", amount: 7000 }
+                        ].map((tier, i) => (
+                          <button
+                            key={i}
+                            onClick={() => handleSponsorSelect(`Annadanam - ${tier.label}`, tier.amount)}
+                            className="flex-1 min-w-[120px] px-3 py-2 rounded-xl bg-amber-50 border border-amber-100 hover:border-amber-300 text-amber-900 font-bold text-xs text-center transition-all hover:scale-[1.02]"
+                          >
+                            ₹{tier.amount.toLocaleString('en-IN')}
+                          </button>
+                        ))}
                       </div>
                     </div>
                   </div>
+                </div>
+              )}
 
-                  {/* Actions */}
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button
-                      onClick={handlePrintReceipt}
-                      className="px-6 py-4 rounded-2xl bg-primary text-primary-foreground font-bold shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5 active:scale-95 transition-all text-sm flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      <span>Download Receipt (PDF) / ప్రింట్ చేయండి</span>
-                      <span>⬇️</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        setGeneratedReceipt(null);
-                        setDevoteeName("");
-                        setPhoneOrEmail("");
-                        setAddress("");
-                        setAmountPaid("");
-                        setScreenshotFile(null);
-                        setScreenshotPreview("");
-                      }}
-                      className="px-6 py-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold border border-white/20 hover:-translate-y-0.5 active:scale-95 transition-all text-sm flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      <span>Submit Another Payment / కొత్త రసీదు</span>
-                      <span>🔄</span>
-                    </button>
+              {activeTab === "general" && (
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="text-amber-900 text-base font-bold font-serif">Other Devotional Opportunities</h4>
+                    <p className="text-stone-500 text-xs mt-0.5">Directly support maintenance, cows welfare (Gaushala), or daily pooja rituals.</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {[
+                      { title: "Gaushala (Cows Protection)", desc: "Maintain the temple cows, providing fodder, shelter, and medical care.", key: "Gaushala Support", defaultAmt: 1000 },
+                      { title: "Temple Renovation", desc: "Contribute to the ongoing development and preservation of temple architecture.", key: "Temple Renovation", defaultAmt: 2500 },
+                      { title: "Daily Pooja & Aarti", desc: "Sponsor traditional floral decorations, oil lamps, and materials for daily rituals.", key: "Daily Pooja & Aarti", defaultAmt: 500 },
+                      { title: "Vedic Education classes", desc: "Support teachers and students studying the sacred Vedas and scriptures.", key: "Education & Vedic Classes", defaultAmt: 1500 },
+                      { title: "Festival Celebrations", desc: "Support major celebrations like Vinayaka Chavithi, Dussehra, and Pujas.", key: "Festival Celebrations", defaultAmt: 2000 },
+                      { title: "General Donation Fund", desc: "A general contribution utilized where the temple administration needs it most.", key: "General Donation", defaultAmt: 1000 }
+                    ].map((seva, i) => (
+                      <div key={i} className="p-5 rounded-2xl border border-stone-200 hover:border-amber-300 hover:bg-amber-50/10 transition-all flex flex-col justify-between">
+                        <div>
+                          <h5 className="font-serif font-bold text-stone-900 text-sm mb-1">{seva.title}</h5>
+                          <p className="text-stone-500 text-[11px] leading-relaxed mb-4">{seva.desc}</p>
+                        </div>
+                        <button
+                          onClick={() => handleSponsorSelect(seva.key, seva.defaultAmt)}
+                          className="w-full py-2 rounded-xl bg-stone-100 hover:bg-amber-600 text-stone-700 hover:text-white font-bold text-xs transition-colors"
+                        >
+                          Select Seva (₹{seva.defaultAmt})
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
             </div>
-          )}
+          </div>
         </div>
+
+        {/* STEP 2 & 3: FORM AND CHECKOUT */}
+        <div className="text-center mb-8">
+          <button
+            onClick={() => {
+              setIsReceiptFormOpen(!isReceiptFormOpen);
+              setGeneratedReceipt(null);
+            }}
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-sm font-bold bg-amber-600 hover:bg-amber-900 text-white shadow-xl shadow-amber-600/10 hover:shadow-amber-600/20 transition-all duration-300 cursor-pointer"
+          >
+            <span>{isReceiptFormOpen ? "Close Donation Form / ఫారమ్‌ను మూసివేయి" : "Open Donation & Receipt Form / విరాళ ఫారమ్"}</span>
+            <span>{isReceiptFormOpen ? "▲" : "▼"}</span>
+          </button>
+        </div>
+
+        {isReceiptFormOpen && (
+          <div id="receipt-form-section" className="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-[2.5rem] border border-stone-200 shadow-2xl relative overflow-hidden animate-fade-rise">
+            {/* Elegant Golden Corner Accent */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
+
+            {!generatedReceipt ? (
+              <form onSubmit={handleFormSubmit} className="space-y-8 relative z-10">
+                
+                {/* Step Heading */}
+                <div className="flex items-center gap-3 pb-3 border-b border-stone-100">
+                  <div className="w-8 h-8 rounded-full bg-amber-600 text-white font-bold flex items-center justify-center text-sm shadow">2</div>
+                  <div>
+                    <h3 className="text-lg font-bold text-amber-900 font-serif">Devotee & Sankalpam Details / భక్తుని వివరాలు</h3>
+                    <p className="text-xs text-stone-500">Provide details for performing special prayers in the temple and printing your receipt.</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Name */}
+                  <div className="space-y-1 md:col-span-1">
+                    <label className="text-xs text-stone-600 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                      <User size={13} className="text-amber-600" />
+                      Devotee Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      id="devotee-name-input"
+                      value={devoteeName}
+                      onChange={(e) => setDevoteeName(e.target.value)}
+                      className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                      placeholder="e.g. Ramesh Kumar"
+                    />
+                  </div>
+
+                  {/* Gotram */}
+                  <div className="space-y-1">
+                    <label className="text-xs text-stone-600 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                      <Sparkles size={13} className="text-amber-600" />
+                      Gotram / గోత్రం (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={gotram}
+                      onChange={(e) => setGotram(e.target.value)}
+                      className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                      placeholder="e.g. Siva Gotram"
+                    />
+                  </div>
+
+                  {/* Star/Nakshatram */}
+                  <div className="space-y-1">
+                    <label className="text-xs text-stone-600 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                      <Award size={13} className="text-amber-600" />
+                      Star / నక్షత్రం (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={nakshatram}
+                      onChange={(e) => setNakshatram(e.target.value)}
+                      className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                      placeholder="e.g. Rohini"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Phone/Email */}
+                  <div className="space-y-1 md:col-span-1">
+                    <label className="text-xs text-stone-600 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                      <Phone size={13} className="text-amber-600" />
+                      Phone or Email *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={phoneOrEmail}
+                      onChange={(e) => setPhoneOrEmail(e.target.value)}
+                      className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                      placeholder="Phone no. or Email ID"
+                    />
+                  </div>
+
+                  {/* Contribution Amount */}
+                  <div className="space-y-1">
+                    <label className="text-xs text-stone-600 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                      <CreditCard size={13} className="text-amber-600" />
+                      Donation Amount (₹) *
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={amountPaid}
+                      onChange={(e) => setAmountPaid(e.target.value)}
+                      className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all font-bold text-amber-600"
+                      placeholder="Enter amount"
+                    />
+                  </div>
+
+                  {/* Seva Purpose */}
+                  <div className="space-y-1">
+                    <label className="text-xs text-stone-600 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                      <Sparkles size={13} className="text-amber-600" />
+                      Seva / Purpose *
+                    </label>
+                    <select
+                      value={sevaPurpose}
+                      onChange={(e) => setSevaPurpose(e.target.value)}
+                      className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                    >
+                      <option value="General Donation">General Donation (సాధారణ విరాళం)</option>
+                      <option value="Annadanam">Annadanam (అన్నదానం)</option>
+                      <option value="Sweet Pongal Daily">Sweet Pongal Daily (చక్కెరపొంగలి - ₹1,000)</option>
+                      <option value="Sweet Pongal Ghee 10 Kg">Sweet Pongal Ghee 10 Kg (చక్కెరపొంగలి నేతితో - ₹1,800)</option>
+                      <option value="Undrallu Weds Only">Undrallu Weds Only (ఉండ్రాళ్ళు బుధవారం - ₹1,000)</option>
+                      <option value="Sweet Undrallu Fri Only">Sweet Undrallu Fri Only (తీపి ఉండ్రాళ్ళు శుక్రవారం - ₹1,800)</option>
+                      <option value="Jalebi Sun Only">Jalebi Sun Only (జిలేబీలు - ₹1,000)</option>
+                      <option value="Temple Renovation">Temple Renovation (ఆలయ పునర్నిర్మాణం)</option>
+                      <option value="Gaushala Support">Gaushala Support (గోశాల నిర్వహణ)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Address */}
+                <div className="space-y-1">
+                  <label className="text-xs text-stone-600 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <MapPin size={13} className="text-amber-600" />
+                    Postal Address *
+                  </label>
+                  <textarea
+                    required
+                    rows={2}
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all resize-none"
+                    placeholder="Enter full address for Devasthanam records"
+                  />
+                </div>
+
+                {/* STEP 3: CHOOSE PAYMENT METHOD */}
+                <div className="space-y-6 pt-2">
+                  <div className="flex items-center gap-3 pb-3 border-b border-stone-100">
+                    <div className="w-8 h-8 rounded-full bg-amber-600 text-white font-bold flex items-center justify-center text-sm shadow">3</div>
+                    <div>
+                      <h3 className="text-lg font-bold text-amber-900 font-serif">Payment Method / చెల్లింపు విధానం</h3>
+                      <p className="text-xs text-stone-500">Choose how you wish to transfer your sacred contribution.</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Online Gateway Card Option */}
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("online")}
+                      className={`p-6 rounded-2xl border text-left transition-all ${
+                        paymentMethod === "online"
+                          ? "bg-amber-600/5 border-amber-600 shadow-md ring-2 ring-amber-600/10"
+                          : "border-stone-200 bg-white hover:bg-stone-50"
+                      }`}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className={`p-3 rounded-xl ${paymentMethod === "online" ? "bg-amber-600 text-white" : "bg-stone-100 text-stone-600"}`}>
+                          <CreditCard size={20} />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-bold text-stone-900 text-sm flex items-center justify-between">
+                            <span>💳 Pay Instantly Online</span>
+                            {paymentMethod === "online" && <span className="text-xs font-bold text-amber-600 uppercase">Selected</span>}
+                          </h4>
+                          <p className="text-stone-500 text-xs mt-1 leading-relaxed">
+                            Pay securely using UPI, PhonePe, GPay, Credit/Debit Card, or Netbanking. Automatic instant receipt download.
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Bank Transfer Card Option */}
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("manual")}
+                      className={`p-6 rounded-2xl border text-left transition-all ${
+                        paymentMethod === "manual"
+                          ? "bg-amber-600/5 border-amber-600 shadow-md ring-2 ring-amber-600/10"
+                          : "border-stone-200 bg-white hover:bg-stone-50"
+                      }`}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className={`p-3 rounded-xl ${paymentMethod === "manual" ? "bg-amber-600 text-white" : "bg-stone-100 text-stone-600"}`}>
+                          <Landmark size={20} />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-bold text-stone-900 text-sm flex items-center justify-between">
+                            <span>🏛️ Bank Transfer / QR Scan</span>
+                            {paymentMethod === "manual" && <span className="text-xs font-bold text-amber-600 uppercase">Selected</span>}
+                          </h4>
+                          <p className="text-stone-500 text-xs mt-1 leading-relaxed">
+                            Transfer directly to the temple's official bank account or scan the UPI QR code. Requires screenshot upload.
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* Conditionally Display Payment Instructions */}
+                  {paymentMethod === "online" ? (
+                    /* Online Payment Alert Box specifically explaining Test Mode simulation */
+                    <div className="p-5 rounded-2xl bg-amber-50 border border-amber-200 text-stone-700 text-xs sm:text-sm font-sans space-y-3 shadow-inner relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full blur-xl pointer-events-none" />
+                      <div className="flex items-center gap-2 text-amber-600 font-bold text-sm">
+                        <span>⚠️</span>
+                        <span>Razorpay Test Mode Active / టెస్ట్ మోడ్ యాక్టివ్‌గా ఉంది</span>
+                      </div>
+                      <p className="leading-relaxed">
+                        Since this application is using **Razorpay Test Keys**, it cannot process real money or send real push notifications to physical UPI apps (like your phone's PhonePe or GPay).
+                      </p>
+                      <p className="leading-relaxed font-semibold text-amber-900">
+                        How to complete test payment and get your receipt:
+                      </p>
+                      <ul className="list-decimal pl-5 space-y-1 text-stone-600">
+                        <li>
+                          Click the <strong className="text-amber-600">Proceed to Pay</strong> button at the bottom of the form.
+                        </li>
+                        <li>
+                          Inside the Razorpay popup window, select <strong className="text-stone-900">Netbanking</strong> (choose SBI, HDFC, or any bank).
+                        </li>
+                        <li>
+                          Click <strong className="text-stone-900">Pay</strong>. A test banking simulation tab will open in your browser.
+                        </li>
+                        <li>
+                          Click the green <strong className="text-emerald-600 font-bold">Success</strong> button.
+                        </li>
+                        <li>
+                          <strong>Alternative (UPI VPA):</strong> Select <strong>UPI</strong> &rarr; select <strong>UPI ID/VPA</strong> &rarr; enter <code className="bg-stone-200/60 px-1.5 py-0.5 rounded font-mono text-stone-800">success@razorpay</code> &rarr; click <strong>Pay</strong>.
+                        </li>
+                      </ul>
+                      <p className="text-[11px] text-amber-700 font-bold italic pt-1 border-t border-amber-200">
+                        Once simulated successfully, the browser will automatically generate and download your E-Receipt.
+                      </p>
+                    </div>
+                  ) : (
+                    /* Bank Details and UPI QR Code Uploader */
+                    <div className="p-6 rounded-2xl bg-stone-50 border border-stone-200 space-y-6">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        
+                        {/* Account Details */}
+                        <div className="space-y-4">
+                          <h4 className="font-serif font-bold text-amber-600 text-sm">Devasthanam Bank Account</h4>
+                          <div className="space-y-2 text-xs">
+                            {[
+                              { label: "Account Name", value: bankDetails.accountName },
+                              { label: "Bank Name", value: bankDetails.bankName },
+                              { label: "Account Number", value: bankDetails.accountNumber, copy: true },
+                              { label: "IFSC Code", value: bankDetails.ifscCode, copy: true },
+                              { label: "Branch", value: bankDetails.branch }
+                            ].map((detail, idx) => (
+                              <div key={idx} className="flex justify-between items-center p-2.5 rounded-lg bg-white border border-stone-200">
+                                <div>
+                                  <span className="text-[10px] uppercase font-bold text-stone-400 block">{detail.label}</span>
+                                  <span className="text-stone-900 font-semibold">{detail.value}</span>
+                                </div>
+                                {detail.copy && (
+                                  <button
+                                    type="button"
+                                    onClick={() => copyToClipboard(detail.value, detail.label)}
+                                    className="p-1.5 rounded-md hover:bg-stone-100 text-stone-400 hover:text-stone-700 transition-colors"
+                                    title={`Copy ${detail.label}`}
+                                  >
+                                    <ClipboardCheck size={14} />
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* UPI QR Scan Code */}
+                        <div className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-stone-200 text-center">
+                          <h4 className="font-serif font-bold text-amber-600 text-sm mb-2">Scan & Pay via UPI QR</h4>
+                          
+                          <div className="p-3 border-2 border-dashed border-amber-500 rounded-2xl bg-white shadow-inner mb-3">
+                            <QrCode size={120} className="text-stone-900" />
+                          </div>
+
+                          <div className="text-xs mb-2">
+                            <span className="text-stone-400 block text-[9px] uppercase font-bold">Temple UPI ID</span>
+                            <span className="text-stone-900 font-mono font-bold flex items-center gap-1.5 justify-center">
+                              {bankDetails.upiId}
+                              <button
+                                type="button"
+                                onClick={() => copyToClipboard(bankDetails.upiId, "UPI ID")}
+                                className="p-1 rounded hover:bg-stone-100 text-stone-400 hover:text-stone-700"
+                              >
+                                <ClipboardCheck size={12} />
+                              </button>
+                            </span>
+                          </div>
+
+                          <span className="text-[10px] text-stone-400">
+                            Scan with PhonePe, GPay, Paytm, BHIM or any banking app
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Screenshot Uploader */}
+                      <div className="space-y-2 border-t border-stone-200 pt-5">
+                        <label className="text-xs text-stone-600 font-bold uppercase tracking-wider block">
+                          Upload Payment Screenshot / రశీదు అప్‌లోడ్ చేయండి *
+                        </label>
+                        
+                        <div className="border-2 border-dashed border-stone-300 rounded-xl p-5 hover:bg-stone-100/50 transition-all text-center relative group">
+                          <input
+                            type="file"
+                            required={paymentMethod === "manual"}
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                          />
+                          <div className="space-y-1 pointer-events-none text-stone-500">
+                            <div className="text-2xl">📷</div>
+                            <p className="text-xs font-semibold text-stone-700">
+                              {screenshotFile ? screenshotFile.name : "Click to select or drag screenshot here"}
+                            </p>
+                            <p className="text-[10px] text-stone-400 font-light">
+                              Supports JPG, PNG, WEBP (Max 5MB)
+                            </p>
+                          </div>
+                        </div>
+
+                        {screenshotPreview && (
+                          <div className="flex justify-center mt-3">
+                            <div className="relative w-28 h-28 rounded-lg overflow-hidden border border-stone-200 shadow-md">
+                              <img src={screenshotPreview} alt="Upload Preview" className="w-full h-full object-cover" />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setScreenshotFile(null);
+                                  setScreenshotPreview("");
+                                }}
+                                className="absolute top-1 right-1 w-5 h-5 rounded-full bg-amber-600 text-white text-xs font-bold flex items-center justify-center shadow hover:bg-red-500"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Submit button */}
+                <button
+                  type="submit"
+                  disabled={isUploading}
+                  className="w-full py-4.5 rounded-2xl font-serif text-sm font-bold bg-amber-600 text-white shadow-xl shadow-amber-600/20 hover:bg-amber-900 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none hover:scale-[1.01]"
+                >
+                  {isUploading ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                      <span>{paymentMethod === "online" ? "Opening Razorpay Secure Gateway..." : "Uploading Screenshot & Generating E-Receipt..."}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>
+                        {paymentMethod === "online" 
+                          ? `Proceed to Pay ₹${amountPaid ? Number(amountPaid).toLocaleString('en-IN') : '0'} & Get E-Receipt` 
+                          : "Generate & Download Official E-Receipt"}
+                      </span>
+                      <span>🙏</span>
+                    </>
+                  )}
+                </button>
+              </form>
+            ) : (
+              /* PREVIEW RECEIPT FOR DEVOTEES */
+              <div className="space-y-8 animate-fade-in relative z-10">
+                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm text-center font-semibold">
+                  {generatedReceipt.isOnline 
+                    ? "✨ Online payment successful! Your official Devasthanam E-Receipt has been generated."
+                    : "✨ Screenshot uploaded successfully! Your Devasthanam E-Receipt has been generated."}
+                </div>
+
+                {/* Authentic Devasthanam Receipt Graphic */}
+                <div 
+                  id="printable-receipt" 
+                  className="p-6 sm:p-10 rounded-2xl bg-[#fdfbf7] text-stone-900 border-4 border-double border-amber-600 shadow-xl relative font-sans overflow-hidden"
+                  style={{ backgroundImage: "radial-gradient(circle, rgba(202, 138, 4, 0.01) 1px, transparent 1px)", backgroundSize: "15px 15px" }}
+                >
+                  {/* Watermark Seal */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none w-64 h-64">
+                    <img src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png" alt="Ganesha Watermark" className="w-full h-full object-contain" />
+                  </div>
+
+                  {/* Header */}
+                  <div className="text-center border-b-2 border-amber-600 pb-5 relative z-10 flex flex-col sm:flex-row items-center gap-4">
+                    <div className="w-16 h-16 shrink-0 bg-stone-50 p-1 rounded-full border border-amber-400 flex items-center justify-center">
+                      <img src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png" alt="Logo" className="w-full h-full object-contain rounded-full" />
+                    </div>
+                    <div className="flex-1 text-center sm:text-left">
+                      <p className="text-[10px] font-bold text-amber-600 uppercase tracking-widest leading-none">
+                        GOVERNMENT OF ANDHRA PRADESH - ENDOWMENTS DEPARTMENT
+                      </p>
+                      <h4 className="text-xl sm:text-2xl font-bold font-serif text-amber-900 uppercase tracking-wide my-1">
+                        SRI SAMPATH VINAYAKAGAR TEMPLE
+                      </h4>
+                      <p className="text-[10px] text-stone-600 font-medium">
+                        Asilmetta, Visakhapatnam - 530 003. Phone : 0891 - 2760740
+                      </p>
+                      <p className="text-[9px] text-stone-500 font-light">
+                        email : endow-eosampath@gov.in, online: aptemples.ap.gov.in
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <div className="text-center my-6 relative z-10">
+                    <div className="inline-block border-2 border-amber-600 px-5 py-1.5 text-xs font-bold uppercase tracking-wider text-[#d97706] font-serif bg-amber-50/50">
+                      Donation Receipt / విరాళ రసీదు
+                    </div>
+                  </div>
+
+                  {/* Table */}
+                  <div className="overflow-x-auto relative z-10">
+                    <table className="w-full border-collapse text-stone-800 text-xs sm:text-sm">
+                      <tbody>
+                        <tr>
+                          <td className="p-3 border border-stone-200 font-semibold bg-amber-50/30 text-amber-600 w-1/4">Receipt No:</td>
+                          <td className="p-3 border border-stone-200 text-stone-900 font-mono font-bold">{generatedReceipt.receiptNo}</td>
+                          <td className="p-3 border border-stone-200 font-semibold bg-amber-50/30 text-amber-600 w-1/4">Date:</td>
+                          <td className="p-3 border border-stone-200 text-stone-900">{generatedReceipt.date}</td>
+                        </tr>
+                        <tr>
+                          <td className="p-3 border border-stone-200 font-semibold bg-amber-50/30 text-amber-600">Devotee Name:</td>
+                          <td className="p-3 border border-stone-200 text-stone-900 font-bold" colSpan={3}>{generatedReceipt.name}</td>
+                        </tr>
+                        {generatedReceipt.gotram && (
+                          <tr>
+                            <td className="p-3 border border-stone-200 font-semibold bg-amber-50/30 text-amber-600">Gotram / గోత్రం:</td>
+                            <td className="p-3 border border-stone-200 text-stone-900 font-semibold">{generatedReceipt.gotram}</td>
+                            <td className="p-3 border border-stone-200 font-semibold bg-amber-50/30 text-amber-600">Star / నక్షత్రం:</td>
+                            <td className="p-3 border border-stone-200 text-stone-900 font-semibold">{generatedReceipt.nakshatram || "N/A"}</td>
+                          </tr>
+                        )}
+                        <tr>
+                          <td className="p-3 border border-stone-200 font-semibold bg-amber-50/30 text-amber-600">Contact details:</td>
+                          <td className="p-3 border border-stone-200 text-stone-900 font-medium" colSpan={3}>{generatedReceipt.phoneOrEmail}</td>
+                        </tr>
+                        <tr>
+                          <td className="p-3 border border-stone-200 font-semibold bg-amber-50/30 text-amber-600">Address:</td>
+                          <td className="p-3 border border-stone-200 text-stone-800 italic" colSpan={3}>{generatedReceipt.address}</td>
+                        </tr>
+                        <tr>
+                          <td className="p-3 border border-stone-200 font-semibold bg-amber-50/30 text-amber-600">Seva Purpose:</td>
+                          <td className="p-3 border border-stone-200 text-amber-900 font-bold" colSpan={3}>{generatedReceipt.purpose}</td>
+                        </tr>
+                        {generatedReceipt.isOnline && (
+                          <tr>
+                            <td className="p-3 border border-stone-200 font-semibold bg-amber-50/30 text-amber-600">Payment ID:</td>
+                            <td className="p-3 border border-stone-200 text-stone-900 font-mono font-semibold" colSpan={3}>
+                              {generatedReceipt.paymentId} <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-100 text-emerald-800">Verified Online</span>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Amount Block */}
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 rounded-xl bg-amber-50/40 border border-amber-200 mt-4 gap-3 relative z-10">
+                    <div>
+                      <span className="text-[10px] text-amber-600 font-bold uppercase tracking-wider block">Amount in Words / అక్షరాల</span>
+                      <p className="font-bold text-stone-700 italic mt-0.5 text-xs">
+                        {numberToWords(Number(generatedReceipt.amount))}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0 bg-amber-600 text-white px-5 py-2.5 rounded-xl border border-amber-900 shadow-md">
+                      <span className="text-[10px] text-amber-300 block uppercase font-bold tracking-wider leading-none">TOTAL RECEIVED</span>
+                      <span className="text-xl sm:text-2xl font-bold font-sans">₹{Number(generatedReceipt.amount).toLocaleString('en-IN')}.00</span>
+                    </div>
+                  </div>
+
+                  {/* Manual Proof Section */}
+                  {generatedReceipt.proofUrl && (
+                    <div className="mt-6 border border-stone-200 p-4 bg-stone-50/50 rounded-2xl relative z-10 text-center">
+                      <div className="text-left text-[11px] font-bold text-stone-500 uppercase tracking-wider mb-2 pb-1 border-b border-stone-200">
+                        Payment Proof Screenshot / చెల్లింపు రుజువు
+                      </div>
+                      <img 
+                        src={generatedReceipt.proofUrl} 
+                        alt="Uploaded payment proof" 
+                        className="max-h-56 max-w-full object-contain mx-auto rounded-lg border border-stone-200 shadow-sm" 
+                      />
+                    </div>
+                  )}
+
+                  {/* Blessing Footer */}
+                  <div className="pt-6 border-t border-stone-200 flex flex-col sm:flex-row justify-between items-center text-[10px] sm:text-xs text-stone-500 gap-4 mt-6 relative z-10">
+                    <div className="text-center sm:text-left">
+                      <p className="font-semibold text-emerald-700 flex items-center gap-1">
+                        <CheckCircle2 size={13} />
+                        <span>Transaction Status: Successfully Processed (PAID)</span>
+                      </p>
+                      <p className="text-[9px] text-amber-600 font-semibold font-serif mt-1">
+                        శ్రీ సంపత్ వినాయక స్వామి కృపా కటాక్ష సిద్ధిరస్తు | May Lord Sri Sampath Vinayakagar shower divine blessings.
+                      </p>
+                    </div>
+                    <div className="text-center sm:text-right space-y-1">
+                      <div className="h-6 w-24 mx-auto sm:ml-auto opacity-30 flex items-center justify-center font-serif text-[10px] italic border-b border-stone-400">
+                        Sri S. V. T. Trust
+                      </div>
+                      <p className="font-bold text-stone-800 uppercase tracking-widest text-[9px]">Authorized Signatory</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button
+                    onClick={handleDownloadReceipt}
+                    className="px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-serif font-bold shadow-xl shadow-amber-500/20 hover:shadow-amber-500/30 transition-all text-sm flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02]"
+                  >
+                    <Download size={16} />
+                    <span>Download PDF / డౌన్‌లోడ్ PDF</span>
+                  </button>
+                  <button
+                    onClick={handlePrintReceipt}
+                    className="px-6 py-3.5 rounded-2xl bg-amber-600 hover:bg-amber-900 text-white font-serif font-bold transition-all text-sm flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02]"
+                  >
+                    <Printer size={16} />
+                    <span>Print Receipt / ప్రింట్ చేయండి</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setGeneratedReceipt(null);
+                      setDevoteeName("");
+                      setGotram("");
+                      setNakshatram("");
+                      setPhoneOrEmail("");
+                      setAddress("");
+                      setAmountPaid("");
+                      setScreenshotFile(null);
+                      setScreenshotPreview("");
+                    }}
+                    className="px-6 py-3.5 rounded-2xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold transition-all text-sm flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02]"
+                  >
+                    <RefreshCw size={16} />
+                    <span>New Donation / కొత్త రసీదు</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

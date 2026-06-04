@@ -74,7 +74,7 @@
   }
   
   .glass-dark {
-    @apply bg-[#2A2315]/60 backdrop-blur-md border border-primary/10 shadow-xl;
+    @apply bg-[#1C1917]/60 backdrop-blur-md border border-primary/10 shadow-xl;
   }
 
   .premium-card {

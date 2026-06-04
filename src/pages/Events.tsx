@@ -2,21 +2,20 @@ import Layout from "@/components/Layout";
 const ganeshaImage = "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png";
 
 const upcomingEvents = [
-  { date: "Sep 14", month: "2026", title: "Vinayaka Chavithi", time: "All Day", desc: "The grandest festival of the year! Celebrated with exquisite decorations, special poojas, and community prayers for prosperity.", type: "Festival" },
-  { date: "Oct 11", month: "2026", title: "Ganesha Navaratri", time: "5:00 AM – 10:00 PM", desc: "Nine nights of traditional rituals, music, and festive spiritual practices highlighting various forms of Ganesha.", type: "Festival" },
-  { date: "Sep 04", month: "2027", title: "Vinayaka Chavithi", time: "All Day & Night", desc: "Witness grand decorations and special poojas that attract thousands of devotees from across the city.", type: "Festival" },
-  { date: "Sep 30", month: "2027", title: "Ganesha Navaratri", time: "5:00 AM – 10:00 PM", desc: "Nine nights of sacred celebrations and community spiritual gatherings.", type: "Festival" },
-  { date: "Ongoing", month: "Daily", title: "Hall Ticket Blessings", time: "6:00 AM – 8:00 PM", desc: "Special guidance and blessings for students during exam seasons before their important tests.", type: "Devotion" },
+  { date: "Jan 01", month: "2026", title: "New Year's Day", time: "6:00 AM – 8:00 PM", desc: "Start the new year with divine blessings. Special prayers, archana, and aarti performed throughout the day.", type: "Auspicious" },
+  { date: "Jan 14", month: "2026", title: "Makar Sankranti", time: "5:00 AM – 9:00 PM", desc: "Auspicious harvest festival celebrated with special abhishekam for Lord Ganesha and distribution of sweet pongal prasadam.", type: "Festival" },
+  { date: "Mar 19", month: "2026", title: "Ugadi (Telugu New Year)", time: "5:00 AM – 10:00 PM", desc: "Welcoming the Telugu New Year with Panchanga Sravanam (recitation of the new almanac) and distribution of traditional Ugadi Pacchadi.", type: "Festival" },
+  { date: "Sep 14", month: "2026", title: "Vinayaka Chavithi", time: "All Day & Night", desc: "The grandest festival of the temple! Magnificent floral decorations, special Maha Abhishekam, continuous Pujas, and cultural events.", type: "Festival" },
+  { date: "Oct 20", month: "2026", title: "Vijayadashami", time: "5:00 AM – 10:00 PM", desc: "Celebrating the victory of good over evil. Special Shami Pooja and Ganesha blessings for success in new ventures.", type: "Festival" },
+  { date: "Nov 08", month: "2026", title: "Diwali", time: "5:30 AM – 9:30 PM", desc: "Festival of Lights celebrated with 1008 oil lamps (Deepalankarana) surrounding the temple and special evening Lakshmi-Ganapathi pooja.", type: "Festival" },
 ];
 
 const weeklySchedule = [
   { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Homam / Havan", time: "5:00 AM – 6:30 AM" },
-  { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Abhishekam", time: "6:30 AM – 8:00 AM" },
+  { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Abhishekam", time: "7:00 AM – 8:30 AM" },
   { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Sarva Darshanam", time: "6:00 AM – 11:00 AM & 5:30 PM – 8:00 PM" },
-  { day: "Monday – Sunday", deity: "New Vehicles", special: "Vehicle Pooja", time: "9:00 AM – 11:00 AM" },
-  { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Archana Pooja", time: "6:00 PM – 7:00 PM" },
-  { day: "Daily", deity: "New Vehicles", special: "Vahana Pooja Details", time: "10:00 AM – 1:00 PM" },
-  { day: "During Festivals", deity: "Lord Ganesha", special: "Special Festival Pooja", time: "7:00 AM – 12:00 PM" },
+  { day: "Monday – Sunday", deity: "New Vehicles", special: "Vehicle Pooja", time: "6:30 AM – 10:30 AM & 4:30 PM – 8:00 PM" },
+  { day: "During Ganesha Navaratri", deity: "Lord Ganesha", special: "Special Abhishekam", time: "7:00 AM – 12:00 PM" },
 ];
 
 const Events = () => {
@@ -49,7 +48,7 @@ const Events = () => {
           <div className="text-left mb-8 animate-fade-rise opacity-0 [animation-fill-mode:forwards]">
             <p className="text-primary text-sm tracking-[0.4em] uppercase mb-4 font-bold">Divine Celebrations</p>
             <h2 className="text-4xl font-bold text-foreground font-serif">
-              Upcoming <span className="gold-shimmer italic">Events</span>
+              Temple <span className="gold-shimmer italic">Events</span>
             </h2>
             <div className="h-1 w-24 bg-primary/40 rounded-full mt-6 shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
           </div>

@@ -39,7 +39,7 @@ const Members = () => (
           </h1>
           <div className="h-1 w-24 bg-primary/40 rounded-full mx-auto mt-6 mb-4 shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
           <p className="text-muted-foreground mt-4 max-w-2xl mx-auto text-sm sm:text-base font-light leading-relaxed">
-            Meet the administration, founding family, and spiritual leadership who serve Sri Sampath Vinayagar Temple with utmost devotion.
+            Meet the administration, founding family, and spiritual leadership who serve Sri Sampath Vinayakagar Temple with utmost devotion.
           </p>
         </div>
       </section>
@@ -63,7 +63,7 @@ const Members = () => (
                   />
                   {/* Premium gold overlay gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-6">
-                    <span className="text-primary text-xs tracking-[0.3em] font-bold uppercase mb-2">Sri Sampath Vinayaka Temple</span>
+                    <span className="text-primary text-xs tracking-[0.3em] font-bold uppercase mb-2">Sri Sampath Vinayakagar Temple</span>
                     <h4 className="text-white text-base font-bold font-serif">{m.name}</h4>
                   </div>
                 </div>

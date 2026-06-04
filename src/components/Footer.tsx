@@ -8,12 +8,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {/* Temple Info */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <h3 className="text-2xl font-bold text-primary mb-6 font-serif">Sampath Vinayaka</h3>
+            <h3 className="text-2xl font-bold text-primary mb-6 font-serif">Sampath Vinayakagar</h3>
             <p className="text-muted-foreground text-sm leading-loose max-w-sm">
               A sacred abode of Lord Ganesha — the remover of obstacles. Serving devotees with divine blessings and spiritual guidance for generations.
             </p>
           </div>
-
           {/* Quick Links */}
           <div>
             <h4 className="text-sm font-bold text-foreground uppercase tracking-[0.2em] mb-6 border-b border-primary/20 pb-2 inline-block">Quick Links</h4>
@@ -40,8 +39,8 @@ const Footer = () => {
               <li className="flex justify-between border-b border-border/50 pb-1"><span>Darshan (Morning)</span> <span className="text-foreground font-medium text-right">6:00 AM – 11:00 AM</span></li>
               <li className="flex justify-between border-b border-border/50 pb-1"><span>Darshan (Evening)</span> <span className="text-foreground font-medium text-right">5:30 PM – 8:00 PM</span></li>
               <li className="flex justify-between border-b border-border/50 pb-1"><span>Homam</span> <span className="text-foreground font-medium text-right">5:00 AM – 6:30 AM</span></li>
-              <li className="flex justify-between border-b border-border/50 pb-1"><span>Abhishekam</span> <span className="text-foreground font-medium text-right">6:30 AM – 8:00 AM</span></li>
-              <li className="flex justify-between border-b border-border/50 pb-1"><span>Vehicle Pooja</span> <span className="text-foreground font-medium text-right">9:00 AM – 11:00 AM</span></li>
+              <li className="flex justify-between border-b border-border/50 pb-1"><span>Abhishekam</span> <span className="text-foreground font-medium text-right">7:00 AM – 8:30 AM</span></li>
+              <li className="flex justify-between border-b border-border/50 pb-1"><span>Vehicle Pooja</span> <span className="text-foreground font-medium text-right">6:30 AM – 10:30 AM & 4:30 PM – 8:00 PM</span></li>
               <li className="flex justify-between pb-1"><span>Evening Aarti</span> <span className="text-foreground font-medium text-right">6:00 PM</span></li>
             </ul>
           </div>
@@ -70,7 +69,7 @@ const Footer = () => {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 opacity-80">
           <p className="text-sm text-muted-foreground order-2 sm:order-1">
-            © 2026 Sampath Vinayaka Temple. All rights reserved.
+            © 2026 Sampath Vinayakagar Temple. All rights reserved.
           </p>
           <div className="flex items-center gap-4 text-sm font-serif italic text-primary order-1 sm:order-2">
             <div className="h-px w-8 bg-primary/30" />

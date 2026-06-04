@@ -12,12 +12,12 @@ const History = () => {
     subtitle: "A Divine Legacy of Faith and Protection",
     paragraphs: [
       "The temple is located in the compound of M/s. S.G. Sambandan & Co., Asilmetta and it was constructed by Late. S.G. Sambandan, Late T.S. Selvaganesan and Late T.S. Rajeswaran with their funds in the year 1962 for their worship and as well as their family members. During the course of time, Jalaries (local fishermen) used to offer prayers and perform Deeparadhana every day before going to the market for their daily business. Five years later the Paramacharya of Kanchi His Holiness Sri Chandrasekharendra Saraswathi reconsecrated the shrine by placing \"Ganapathi Yantram\" with his own hands.",
-      "Sri Sampat Vinayagar Temple came into prominence from 1971 when Admiral Krishnan, Eastern Naval Commander, broke 1001 coconuts before the Lord for saving Vizag from the Pakistani attack when its submarine Ghazi sank off the coast. Here, most of the new vehicles come to perform vehicle pooja in front of the presiding deity. Presently it is organized by Sri T.S. Rajeswaran, Founder Trustee, Sri T.R. Cholan and Sri T.S. Chezhian as founder family members.",
-      "Sri Sampath Vinayagar temple has become one of the most famous temples in Visakhapatnam city attracting daily a number of devotees. Sri Sampath Vinayagar is a powerful deity in Visakhapatnam. There is a staunch belief among the devotees that their sins are washed off and desires fulfilled by offering prayers to the Deity. Sri Sampath Vinayagar Temple has constructed with its funds Sri Vijaya Vinayagar Temple in the compound of Old Age Home at Gandigundam Village.",
+      "Sri Sampath Vinayakagar Temple came into prominence from 1971 when Admiral Krishnan, Eastern Naval Commander, broke 1001 coconuts before the Lord for saving Vizag from the Pakistani attack when its submarine Ghazi sank off the coast. Here, most of the new vehicles come to perform vehicle pooja in front of the presiding deity. Presently it is organized by Sri T.S. Rajeswaran, Founder Trustee, Sri T.R. Cholan and Sri T.S. Chezhian as founder family members.",
+      "Sri Sampath Vinayakagar Temple has become one of the most famous temples in Visakhapatnam city attracting daily a number of devotees. Sri Sampath Vinayakagar is a powerful deity in Visakhapatnam. There is a staunch belief among the devotees that their sins are washed off and desires fulfilled by offering prayers to the Deity. Sri Sampath Vinayakagar Temple has constructed with its funds Sri Vijaya Vinayagar Temple in the compound of Old Age Home at Gandigundam Village.",
       "The temple has also donated a sum of Rs. 1.20 Crores to Sri Sitaramachandra Swamy Temple, Ambicabagh for construction of Rajagophuram and Prakaram.",
       "The temple is located very near, almost walking distance from the R.T.C. Complex and about 2 kms. from the Visakhapatnam railway station. Public conveyance is available to reach this temple from every nook and corner of Visakhapatnam city. Thus it is easily reachable and accessible to all devotees."
     ],
-    reachTitle: "How to Reach Sri Sampath Vinayagar Temple",
+    reachTitle: "How to Reach Sri Sampath Vinayakagar Temple",
     reach: [
       { type: "RTC Complex", value: "Walkable distance / 1/2 km", icon: <MapPin className="text-primary" size={20} /> },
       { type: "Railway Station", value: "2 kms away", icon: <Train className="text-primary" size={20} /> },
@@ -51,12 +51,12 @@ const History = () => {
     subtitle: "श्रद्धा और सुरक्षा की एक दिव्य विरासत",
     paragraphs: [
       "यह मंदिर असीलमेट्टा में मेसर्स एस.जी. सम्बन्धन एंड कंपनी के परिसर में स्थित है। इसका निर्माण स्वर्गीय एस.जी. सम्बन्धन, स्वर्गीय टी.एस. सेल्वागणेशन और स्वर्गीय टी.एस. राजेश्वरन द्वारा 1962 में उनके और उनके परिवार के सदस्यों की पूजा-अर्चना के लिए अपने स्वयं के धन से कराया गया था। समय बीतने के साथ, स्थानीय मछुआरे (जलारी) अपने दैनिक व्यवसाय के लिए बाजार जाने से पहले हर दिन यहाँ प्रार्थना करते थे और दीपाराधना करते थे। पांच साल बाद, कांची के पीठाधिपति परम पावन श्री चन्द्रशेखरेन्द्र सरस्वती ने अपने कर-कमलों से 'गणपति यंत्र' की स्थापना करके मंदिर की पुनर्प्रतिष्ठा की थी।",
-      "श्री संपत विनायगर मंदिर 1971 से अत्यधिक प्रमुखता में आया जब पूर्वी नौसेना कमान के एडमिरल कृष्णन ने पाकिस्तानी नौसैनिक हमले से विशाखापत्तनम को सुरक्षित बचाने के लिए भगवान के सामने 1001 नारियल तोड़े, जब पाकिस्तानी पनडुब्बी गाजी तट के पास डूब गई थी। यहाँ अधिकांश नए वाहन पीठासीन देवता के सामने वाहन पूजा करने के लिए आते हैं। वर्तमान में इसका संचालन संस्थापक ट्रस्टी श्री टी.एस. राजेश्वरन, संस्थापक परिवार के सदस्य श्री टी.आर. चोलन और श्री टी.एस. चेझियान द्वारा किया जाता है।",
-      "श्री संपत विनायगर मंदिर विशाखापत्तनम शहर के सबसे प्रसिद्ध मंदिरों में से एक बन गया है, जो दैनिक रूप से बड़ी संख्या में भक्तों को आकर्षित करता है। श्री संपत विनायगर विशाखापत्तनम में एक अत्यंत शक्तिशाली देवता हैं। भक्तों में यह दृढ़ विश्वास है कि भगवान की पूजा करने से उनके पाप धुल जाते हैं और मनोकामनाएं पूरी होती हैं। श्री संपत विनायगर मंदिर ने अपने स्वयं के धन से गंदीगुंडम गांव में ओल्ड एज होम के परिसर में श्री विजय विनायगर मंदिर का निर्माण कराया है।",
+      "श्री संपत विनायकगर मंदिर 1971 से अत्यधिक प्रमुखता में आया जब पूर्वी नौसेना कमान के एडमिरल कृष्णन ने पाकिस्तानी नौसैनिक हमले से विशाखापत्तनम को सुरक्षित बचाने के लिए भगवान के सामने 1001 नारियल तोड़े, जब पाकिस्तानी पनडुब्बी गाजी तट के पास डूब गई थी। यहाँ अधिकांश नए वाहन पीठासीन देवता के सामने वाहन पूजा करने के लिए आते हैं। वर्तमान में इसका संचालन संस्थापक ट्रस्टी श्री टी.एस. राजेश्वरन, संस्थापक परिवार के सदस्य श्री टी.आर. चोलन और श्री टी.एस. चेझियान द्वारा किया जाता है।",
+      "श्री संपत विनायकगर मंदिर विशाखापत्तनम शहर के सबसे प्रसिद्ध मंदिरों में से एक बन गया है, जो दैनिक रूप से बड़ी संख्या में भक्तों को आकर्षित करता है। श्री संपत विनायकगर विशाखापत्तनम में एक अत्यंत शक्तिशाली देवता हैं। भक्तों में यह दृढ़ विश्वास है कि भगवान की पूजा करने से उनके पाप धुल जाते हैं और मनोकामनाएं पूरी होती हैं। श्री संपत विनायकगर मंदिर ने अपने स्वयं के धन से गंदीगुंडम गांव में ओल्ड एज होम के परिसर में श्री विजय विनायगर मंदिर का निर्माण कराया है।",
       "मंदिर ने राजगोपुरम और प्राकार के निर्माण के लिए अम्बिकाबाग स्थित श्री सीतारामचंद्र स्वामी मंदिर को 1.20 करोड़ रुपये की राशि भी दान में दी है।",
       "यह मंदिर आर.टी.सी. कॉम्प्लेक्स से बहुत पास, लगभग पैदल दूरी पर स्थित है और विशाखापत्तनम रेलवे स्टेशन से लगभग 2 किमी दूर है। विशाखापत्तनम शहर के हर कोने से इस मंदिर तक पहुँचने के लिए सार्वजनिक वाहन आसानी से उपलब्ध हैं। इस प्रकार यह सभी भक्तों के लिए आसानी से सुलभ और पहुँच योग्य है।"
     ],
-    reachTitle: "श्री संपत विनायगर मंदिर कैसे पहुँचें",
+    reachTitle: "श्री संपत विनायकगर मंदिर कैसे पहुँचें",
     reach: [
       { type: "आर.टी.सी. कॉम्प्लेक्स से", value: "पैदल दूरी (1/2 किमी)", icon: <MapPin className="text-primary" size={20} /> },
       { type: "रेलवे स्टेशन से", value: "2 किमी दूर", icon: <Train className="text-primary" size={20} /> },
@@ -76,7 +76,7 @@ const History = () => {
   return (
     <Layout>
       {/* Hero Header */}
-      <section className="relative h-[45vh] sm:h-[50vh] flex items-center justify-center overflow-hidden bg-[#251804] border-b border-primary/20">
+      <section className="relative h-[45vh] sm:h-[50vh] flex items-center justify-center overflow-hidden bg-[#1C1917] border-b border-primary/20">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsla(38,72%,50%,0.15)_0,transparent_70%)] pointer-events-none" />
         
         {/* Soft Background Image Overlay */}
@@ -84,10 +84,10 @@ const History = () => {
           className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-overlay" 
           style={{ backgroundImage: `url(${getOptimizedImageUrl("https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087507/IMG_5684_xxnzl6.jpg", 400)})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#251804]/50 via-transparent to-[#120B02]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1C1917]/50 via-transparent to-[#000000]" />
 
         <div className="relative z-10 text-center px-4 max-w-4xl animate-fade-rise">
-          <p className="text-primary text-xs sm:text-sm tracking-[0.4em] uppercase mb-4 font-black drop-shadow-md">🙏 Sri Sampath Vinayakar</p>
+          <p className="text-primary text-xs sm:text-sm tracking-[0.4em] uppercase mb-4 font-black drop-shadow-md">🙏 Sri Sampath Vinayakagar</p>
           <h1 className="text-4xl sm:text-6xl font-bold font-serif text-white tracking-wide">
             {lang === "en" ? "Temple History" : lang === "te" ? "ఆలయ చరిత్ర" : "मंदिर का इतिहास"}
           </h1>
@@ -104,7 +104,7 @@ const History = () => {
           
           {/* Elegant Language Selector Panel */}
           <div className="flex justify-end mb-8 sm:mb-12">
-            <div className="bg-gradient-to-b from-[#2E200C] to-[#120B02] p-1.5 rounded-2xl border border-primary/35 shadow-xl flex items-center gap-1">
+            <div className="bg-gradient-to-b from-[#1C1917] to-[#000000] p-1.5 rounded-2xl border border-primary/35 shadow-xl flex items-center gap-1">
               <div className="p-2 text-primary flex items-center justify-center shrink-0">
                 <Languages size={18} className="animate-pulse" />
               </div>
@@ -164,7 +164,7 @@ const History = () => {
               
               <div className="text-center mt-6">
                 <h3 className="font-serif text-lg font-bold text-foreground tracking-wide">
-                  {lang === "en" ? "Sri Sampath Vinayagar" : "శ్రీ సంపత్ వినాయగర్"}
+                  {lang === "en" ? "Sri Sampath Vinayakagar" : "శ్రీ సంపత్ వినాయగర్"}
                 </h3>
                 <p className="text-primary text-xs uppercase tracking-[0.2em] font-bold mt-1">
                   {lang === "en" ? "Presiding Deity" : "ప్రధాన అర్చనా మూర్తి"}
@@ -210,7 +210,7 @@ const History = () => {
               {current.reach.map((r, i) => (
                 <div 
                   key={i} 
-                  className="bg-[#2E200C]/[0.02] border border-primary/15 hover:border-primary/40 p-6 rounded-2xl flex items-center gap-4 transition-all duration-300 group hover:-translate-y-1 shadow-sm hover:shadow-md"
+                  className="bg-[#1C1917]/[0.02] border border-primary/15 hover:border-primary/40 p-6 rounded-2xl flex items-center gap-4 transition-all duration-300 group hover:-translate-y-1 shadow-sm hover:shadow-md"
                 >
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
                     {r.icon}
@@ -226,7 +226,7 @@ const History = () => {
 
           {/* Spiritual Blessing Card / Traditional Footer */}
           <div className="mt-16 text-center">
-            <div className="inline-block relative px-8 py-6 rounded-2xl bg-gradient-to-b from-[#2E200C] to-[#120B02] border-2 border-primary/45 shadow-xl">
+            <div className="inline-block relative px-8 py-6 rounded-2xl bg-gradient-to-b from-[#1C1917] to-[#000000] border-2 border-primary/45 shadow-xl">
               {/* Ornate corners */}
               <div className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-primary/60 rounded-tl" />
               <div className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-primary/60 rounded-tr" />

@@ -91,7 +91,7 @@ const BackgroundMusic = () => {
 
       <button
         onClick={toggleMusic}
-        className={`group relative flex items-center justify-center w-14 h-14 rounded-full shadow-2xl transition-all duration-500 transform hover:scale-110 ${isPlaying
+        className={`group relative flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl transition-all duration-500 transform hover:scale-110 ${isPlaying
             ? 'bg-[#FFF9EA] text-primary ring-4 ring-primary/20 border border-primary/30'
             : 'bg-white/80 backdrop-blur text-muted-foreground border border-gray-200 ring-4 ring-transparent hover:ring-primary/10'
           }`}
@@ -103,9 +103,9 @@ const BackgroundMusic = () => {
         )}
 
         {isPlaying ? (
-          <Volume2 size={28} className="relative z-10" />
+          <Volume2 className="w-6 h-6 md:w-7 md:h-7 relative z-10" />
         ) : (
-          <VolumeX size={28} className="relative z-10" />
+          <VolumeX className="w-6 h-6 md:w-7 md:h-7 relative z-10" />
         )}
 
         {/* Floating music note icons when playing */}

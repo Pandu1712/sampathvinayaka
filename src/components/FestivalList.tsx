@@ -83,7 +83,7 @@ const FestivalList = () => {
           </div>
 
           <p className="text-muted-foreground max-w-2xl mx-auto text-sm font-light">
-             Explore the upcoming auspicious days and major celebrations for {activeYear} at Sampath Vinayaka Temple.
+             Explore the upcoming auspicious days and major celebrations for {activeYear} at Sampath Vinayakagar Temple.
           </p>
           <div className="h-1.5 w-24 bg-gradient-to-r from-transparent via-primary/40 to-transparent mx-auto mt-6" />
         </div>

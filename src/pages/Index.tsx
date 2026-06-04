@@ -6,7 +6,6 @@ import HeroCarousel from "@/components/HeroCarousel";
 import Ashtothram from "@/components/Ashtothram";
 import Donations from "@/components/Donations";
 import Panchangam from "@/components/Panchangam";
-import FestivalList from "@/components/FestivalList";
 const ganeshaImage = "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png";
 import purohit1 from "@/assets/purohit-1.jpg";
 import male1 from "@/assets/member-male-1.png";
@@ -19,8 +18,7 @@ import prasadRao from "@/assets/prasad-rao.jpg";
 const services = [
   { icon: "🪔", title: "Daily Pooja", desc: "Morning and evening worship rituals performed by temple priests", timing: "6:00 AM & 7:00 PM", price: "Free" },
   { icon: "🔔", title: "Maha Aarti", desc: "Grand evening aarti ceremony with 108 lamps and devotional music", timing: "7:00 PM Daily", price: "Free" },
-  { icon: "📿", title: "Archana", desc: "Personalized pooja with recitation of 108 or 1008 sacred names", timing: "On Request", price: "₹101 / ₹251" },
-  { icon: "💐", title: "Abhishekam", desc: "Sacred bathing ritual of the deity with milk, honey, and holy water", timing: "6:30 AM – 8:00 AM Daily", price: "₹501" },
+  { icon: "💐", title: "Abhishekam", desc: "Sacred bathing ritual of the deity with milk, honey, and holy water", timing: "7:00 AM – 8:30 AM Daily", price: "₹501" },
   { icon: "🎋", title: "Homam / Havan", desc: "Sacred fire ritual for prosperity, health, and spiritual growth", timing: "5:00 AM – 6:30 AM Daily", price: "₹1,001" },
   { icon: "🙏", title: "Special Darshan", desc: "VIP darshan with direct access to the sanctum sanctorum", timing: "All Day", price: "₹201" },
   { icon: "🎊", title: "Marriage Ceremony", desc: "Traditional temple wedding conducted by temple priests", timing: "Muhurtam Days", price: "₹5,001" },
@@ -37,8 +35,8 @@ const timings = [
   { 
     period: "Abhishekam Ritual", 
     periodTe: "అభిషేకము టైమింగ్స్",
-    time: "6:30 AM – 8:00 AM Daily", 
-    timeTe: "ఉదయం 6:30 నుండి 8:00 వరకు మాత్రమే" 
+    time: "7:00 AM – 8:30 AM Daily", 
+    timeTe: "ఉదయం 7:00 నుండి 8:30 వరకు మాత్రమే" 
   },
   { 
     period: "Homam / Havan", 
@@ -49,26 +47,14 @@ const timings = [
   { 
     period: "Vehicle Pooja", 
     periodTe: "వాహన పూజ",
-    time: "9:00 AM – 11:00 AM", 
-    timeTe: "ఉదయం 9:00 నుండి 11:00 వరకు" 
+    time: "6:30 AM – 10:30 AM & 4:30 PM – 8:00 PM", 
+    timeTe: "ఉదయం 6:30 నుండి 10:30 వరకు & సాయంత్రం 4:30 నుండి 8:00 వరకు" 
   },
   { 
-    period: "Archana Pooja", 
-    periodTe: "అర్చన పూజ",
-    time: "6:00 PM – 7:00 PM", 
-    timeTe: "సాయంత్రం 6:00 నుండి 7:00 వరకు" 
-  },
-  { 
-    period: "Special Festival Pooja", 
-    periodTe: "ప్రత్యేక పండుగ పూజలు",
+    period: "Special Abhishekam (Ganesha Navaratri Days Only)", 
+    periodTe: "ప్రత్యేక అభిషేకం (గణేష్ నవరాత్రి రోజులలో మాత్రమే)",
     time: "7:00 AM – 12:00 PM", 
     timeTe: "ఉదయం 7:00 నుండి 12:00 వరకు" 
-  },
-  { 
-    period: "Vahana Pooja Details", 
-    periodTe: "వాహన పూజ వివరాలు",
-    time: "10:00 AM – 1:00 PM", 
-    timeTe: "ఉదయం 10:00 నుండి మధ్యాహ్నం 1:00 వరకు" 
   },
 ];
 
@@ -105,21 +91,20 @@ const galleryImages = [
 ];
 
 const upcomingEvents = [
-  { date: "Apr 14", month: "2026", title: "Vishu / Tamil New Year", time: "5:00 AM – 10:00 PM", desc: "Grand celebration with special Ganapathi pooja, cultural programs, and prasadam distribution.", type: "Festival" },
-  { date: "May 12", month: "2026", title: "Akshaya Tritiya", time: "5:30 AM – 8:00 PM", desc: "Auspicious day for new beginnings. Special Lakshmi-Ganapathi pooja and gold offering ceremony.", type: "Auspicious" },
-  { date: "Jun 15", month: "2026", title: "Maha Ganapathi Homam", time: "6:00 AM – 2:00 PM", desc: "Grand fire ritual for Lord Ganesha with 1008 chants for prosperity and obstacle removal.", type: "Homam" },
-  { date: "Aug 27", month: "2026 ", title: "Vinayaka Chaturthi", time: "All Day & Night", desc: "Grand celebration of Lord Ganesha's birth with elaborate decorations, special abhishekam, and cultural programs.", type: "Festival" },
-  { date: "Sep 22", month: "2026", title: "Navaratri Begins", time: "5:00 AM – 10:00 PM", desc: "Nine nights of worship with daily special alankaram and cultural events at the temple.", type: "Festival" },
+  { date: "Jan 01", month: "2026", title: "New Year's Day", time: "6:00 AM – 8:00 PM", desc: "Start the new year with divine blessings. Special prayers, archana, and aarti performed throughout the day.", type: "Auspicious" },
+  { date: "Jan 14", month: "2026", title: "Makar Sankranti", time: "5:00 AM – 9:00 PM", desc: "Auspicious harvest festival celebrated with special abhishekam for Lord Ganesha and distribution of sweet pongal prasadam.", type: "Festival" },
+  { date: "Mar 19", month: "2026", title: "Ugadi (Telugu New Year)", time: "5:00 AM – 10:00 PM", desc: "Welcoming the Telugu New Year with Panchanga Sravanam (recitation of the new almanac) and distribution of traditional Ugadi Pacchadi.", type: "Festival" },
+  { date: "Sep 14", month: "2026", title: "Vinayaka Chavithi", time: "All Day & Night", desc: "The grandest festival of the temple! Magnificent floral decorations, special Maha Abhishekam, continuous Pujas, and cultural events.", type: "Festival" },
+  { date: "Oct 20", month: "2026", title: "Vijayadashami", time: "5:00 AM – 10:00 PM", desc: "Celebrating the victory of good over evil. Special Shami Pooja and Ganesha blessings for success in new ventures.", type: "Festival" },
+  { date: "Nov 08", month: "2026", title: "Diwali", time: "5:30 AM – 9:30 PM", desc: "Festival of Lights celebrated with 1008 oil lamps (Deepalankarana) surrounding the temple and special evening Lakshmi-Ganapathi pooja.", type: "Festival" },
 ];
 
 const weeklySchedule = [
   { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Homam / Havan", time: "5:00 AM – 6:30 AM" },
-  { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Abhishekam", time: "6:30 AM – 8:00 AM" },
+  { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Abhishekam", time: "7:00 AM – 8:30 AM" },
   { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Sarva Darshanam", time: "6:00 AM – 11:00 AM & 5:30 PM – 8:00 PM" },
-  { day: "Monday – Sunday", deity: "New Vehicles", special: "Vehicle Pooja", time: "9:00 AM – 11:00 AM" },
-  { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Archana Pooja", time: "6:00 PM – 7:00 PM" },
-  { day: "Daily", deity: "New Vehicles", special: "Vahana Pooja Details", time: "10:00 AM – 1:00 PM" },
-  { day: "During Festivals", deity: "Lord Ganesha", special: "Special Festival Pooja", time: "7:00 AM – 12:00 PM" },
+  { day: "Monday – Sunday", deity: "New Vehicles", special: "Vehicle Pooja", time: "6:30 AM – 10:30 AM & 4:30 PM – 8:00 PM" },
+  { day: "During Ganesha Navaratri", deity: "Lord Ganesha", special: "Special Abhishekam", time: "7:00 AM – 12:00 PM" },
 ];
 
 const aboutImages = [
@@ -219,7 +204,7 @@ const Index = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80" />
                 <div className="absolute bottom-6 left-6 p-4 glass-dark rounded-2xl border border-white/10 shadow-2xl animate-fade-rise flex flex-col gap-1 z-20">
                   <span className="text-primary text-2xl animate-bounce w-fit">🙏</span>
-                  <span className="text-white font-serif font-bold tracking-wider text-sm leading-tight">Sri Sampath<br />Vinayaka</span>
+                  <span className="text-white font-serif font-bold tracking-wider text-sm leading-tight">Sri Sampath<br />Vinayakagar</span>
                 </div>
               </div>
             </div>
@@ -246,7 +231,7 @@ const Index = () => {
             </div>
 
             {/* Premium Small Bilingual Toggle */}
-            <div className="bg-gradient-to-b from-[#2E200C] to-[#120B02] p-1 rounded-xl border border-primary/35 shadow-lg flex items-center gap-1 w-fit">
+            <div className="bg-gradient-to-b from-[#1C1917] to-[#000000] p-1 rounded-xl border border-primary/35 shadow-lg flex items-center gap-1 w-fit">
               <button
                 onClick={() => setTimelineLang("en")}
                 className={`px-3 py-1.5 rounded-lg text-xs font-serif font-black tracking-widest transition-all duration-300 ${
@@ -468,7 +453,7 @@ const Index = () => {
           <div className="text-left mb-8 animate-fade-rise opacity-0 [animation-fill-mode:forwards]">
             <p className="text-primary text-sm tracking-[0.4em] uppercase mb-4 font-bold">Sacred Calendar</p>
             <h2 className="text-4xl font-bold text-foreground font-serif">
-              Upcoming <span className="gold-shimmer italic">Events</span>
+              Temple <span className="gold-shimmer italic">Events</span>
             </h2>
             <div className="h-1 w-24 bg-primary/40 rounded-full mt-6 shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
           </div>
@@ -609,9 +594,7 @@ const Index = () => {
       {/* ═══════ ASHTOTHRAM ═══════ */}
       <Ashtothram />
 
-      {/* ═══════ PANCHANGAM & FESTIVALS ═══════ */}
       <Panchangam />
-      <FestivalList />
 
       {/* ═══════ DONATIONS ═══════ */}
       <Donations />

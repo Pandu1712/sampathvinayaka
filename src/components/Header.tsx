@@ -136,11 +136,11 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-4 flex-shrink-0 group">
             <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white flex items-center justify-center border-2 border-primary/30 shadow-[0_0_20px_rgba(var(--primary),0.2)] group-hover:border-primary/50 transition-all duration-500 overflow-hidden">
-              <img src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png" alt="Sampath Vinayaka" className="w-[90%] h-[90%] object-contain relative z-10 group-hover:scale-110 transition-transform duration-700" />
+              <img src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png" alt="Sampath Vinayakagar" className="w-[90%] h-[90%] object-contain relative z-10 group-hover:scale-110 transition-transform duration-700" />
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-bold tracking-tight text-foreground leading-tight font-serif italic text-shadow-sm">
-                Sampath Vinayaka
+                Sampath Vinayakagar
               </span>
               <div className="flex items-center gap-2">
                 <div className="h-px w-4 bg-primary/40" />
@@ -244,7 +244,7 @@ const Header = () => {
 
       {/* Sliding Drawer Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 w-[290px] sm:w-[320px] bg-gradient-to-b from-[#2E200C] via-[#1E1408] to-[#120B02] border-r border-primary/45 z-[60] xl:hidden flex flex-col justify-between p-6 transition-transform duration-300 ease-in-out transform ${
+        className={`fixed inset-y-0 left-0 w-[290px] sm:w-[320px] bg-gradient-to-b from-[#1C1917] via-[#0C0A09] to-[#000000] border-r border-primary/45 z-[60] xl:hidden flex flex-col justify-between p-6 transition-transform duration-300 ease-in-out transform ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         } shadow-2xl`}
       >
@@ -263,7 +263,7 @@ const Header = () => {
                 />
               </div>
               <div className="flex flex-col">
-                <span className="font-serif font-black text-sm text-primary tracking-wider leading-none">Sampath Vinayaka</span>
+                <span className="font-serif font-black text-sm text-primary tracking-wider leading-none">Sampath Vinayakagar</span>
                 <div className="flex items-center gap-1 mt-1">
                   <div className="h-px w-2 bg-primary/40" />
                   <span className="text-[9px] uppercase tracking-[0.25em] text-muted-foreground font-bold">Temple</span>
