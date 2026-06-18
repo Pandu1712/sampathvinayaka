@@ -11,7 +11,7 @@ const ScrollToTop = () => {
         const id = hash.replace("#", "");
         const el = document.getElementById(id);
         if (el) {
-          const headerHeight = window.innerWidth >= 640 ? 112 : 96;
+          const headerHeight = window.innerWidth >= 640 ? 144 : 128;
           const elementPosition = el.getBoundingClientRect().top + window.scrollY;
           const offsetPosition = elementPosition - headerHeight - 16;
           
