@@ -151,7 +151,7 @@ const Donations = () => {
     const isEmail = emailRegex.test(contactTrimmed);
 
     const options = {
-      key: "rzp_live_T30Dl118t0oCDZ",
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_live_T30Dl118t0oCDZ",
       amount: Math.round(Number(amountPaid) * 100), // in paise
       currency: "INR",
       name: "Sri Sampath Vinayakagar Temple",
