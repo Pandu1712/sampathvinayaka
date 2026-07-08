@@ -266,21 +266,21 @@ const Index = () => {
           </div>
           <div className="relative border-l-2 border-primary/20 ml-4 sm:ml-8 space-y-6 sm:space-y-8">
             {(timelineLang === "en" ? milestonesEn : timelineLang === "te" ? milestonesTe : milestonesHi).map((m, i) => (
-              <div key={i} className="relative pl-8 sm:pl-16 group animate-fade-rise opacity-0 [animation-fill-mode:forwards]" style={{ animationDelay: `${i * 150}ms` }}>
+              <div key={i} className="relative pl-6 sm:pl-16 group animate-fade-rise opacity-0 [animation-fill-mode:forwards]" style={{ animationDelay: `${i * 150}ms` }}>
                 {/* Dot */}
-                <div className="absolute left-0 top-6 -translate-x-[17px] w-8 h-8 rounded-full bg-background border-[4px] border-primary/20 flex items-center justify-center group-hover:border-primary transition-all duration-500 shadow-xl group-hover:scale-110">
-                  <div className="w-2.5 h-2.5 rounded-full bg-primary group-hover:scale-[1.3] transition-transform duration-500" />
+                <div className="absolute left-0 top-6 -translate-x-[13px] sm:-translate-x-[17px] w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-background border-[3px] sm:border-[4px] border-primary/20 flex items-center justify-center group-hover:border-primary transition-all duration-500 shadow-xl group-hover:scale-110">
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-primary group-hover:scale-[1.3] transition-transform duration-500" />
                 </div>
 
                 {/* Content Card */}
-                <div className="glass p-5 sm:p-5 rounded-[2.5rem] border border-white/40 shadow-xl group-hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-500 relative overflow-hidden backdrop-blur-md">
+                <div className="glass p-4 sm:p-6 rounded-3xl sm:rounded-[2.5rem] border border-white/40 shadow-xl group-hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-500 relative overflow-hidden backdrop-blur-md">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/10 transition-colors duration-700 pointer-events-none" />
 
-                  <div className="inline-flex px-5 py-2 rounded-full bg-primary/10 text-primary text-sm font-black tracking-widest uppercase mb-6 border border-primary/20 shadow-inner">
+                  <div className="inline-flex px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-black tracking-widest uppercase mb-4 sm:mb-6 border border-primary/20 shadow-inner">
                     {m.year}
                   </div>
-                  <h4 className="text-2xl font-bold text-foreground mb-4 font-serif group-hover:text-primary transition-colors duration-500">{m.title}</h4>
-                  <p className="text-muted-foreground text-sm leading-relaxed font-light">{m.desc}</p>
+                  <h4 className="text-xl sm:text-2xl font-bold text-foreground mb-3 sm:mb-4 font-serif group-hover:text-primary transition-colors duration-500">{m.title}</h4>
+                  <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed font-light">{m.desc}</p>
                 </div>
               </div>
             ))}
@@ -464,7 +464,7 @@ const Index = () => {
             {upcomingEvents.map((e, i) => (
               <div
                 key={i}
-                className="relative glass overflow-hidden flex flex-col md:flex-row gap-4 p-5 sm:p-5 rounded-[2.5rem] items-center md:items-stretch group cursor-pointer border border-white/40 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 backdrop-blur-md animate-fade-rise opacity-0 [animation-fill-mode:forwards]"
+                className="relative glass overflow-hidden flex flex-col md:flex-row gap-4 p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] items-center md:items-stretch group cursor-pointer border border-white/40 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 backdrop-blur-md animate-fade-rise opacity-0 [animation-fill-mode:forwards]"
                 style={{ animationDelay: `${i * 150}ms` }}
               >
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/15 transition-colors duration-700 pointer-events-none" />

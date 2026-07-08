@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <footer className="bg-card/50 border-t border-primary/10 relative overflow-hidden backdrop-blur-sm">
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/mandala.png')]" />
-      <div className="max-w-7xl mx-auto px-4 sm:px-4 py-8 sm:py-20 relative z-10">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-20 relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {/* Temple Info */}
           <div className="sm:col-span-2 lg:col-span-1">

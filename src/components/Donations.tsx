@@ -14,14 +14,15 @@ import {
   User, 
   Phone, 
   CheckCircle2, 
-  RefreshCw 
+  RefreshCw,
+  Lock
 } from "lucide-react";
 import { toast } from "sonner";
 // @ts-ignore
 import html2pdf from "html2pdf.js";
 
 const Donations = () => {
-  const [activeTab, setActiveTab] = useState<"prasada" | "anna" | "general">("prasada");
+  const [activeTab, setActiveTab] = useState<"prasada" | "anna">("prasada");
 
   // E-Receipt Form States
   const [isReceiptFormOpen, setIsReceiptFormOpen] = useState(false);
@@ -151,7 +152,7 @@ const Donations = () => {
     const isEmail = emailRegex.test(contactTrimmed);
 
     const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_live_T30Dl118t0oCDZ",
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_live_T5mLmd5srlk0IP",
       amount: Math.round(Number(amountPaid) * 100), // in paise
       currency: "INR",
       name: "Sri Sampath Vinayakagar Temple",
@@ -266,7 +267,7 @@ const Donations = () => {
     }
   };
 
-  const handleSponsorSelect = (purposeValue: string, fixedAmount: number) => {
+  const handleSponsorSelect = (purposeValue: string, fixedAmount: number | null) => {
     // Open receipt form section
     setIsReceiptFormOpen(true);
     
@@ -275,7 +276,7 @@ const Donations = () => {
 
     // Pre-fill devotee inputs
     setSevaPurpose(purposeValue);
-    setAmountPaid(fixedAmount.toString());
+    setAmountPaid(fixedAmount !== null ? fixedAmount.toString() : "");
 
     // Scroll smoothly to form section
     setTimeout(() => {
@@ -284,14 +285,25 @@ const Donations = () => {
         element.scrollIntoView({ behavior: "smooth", block: "start" });
       }
       
-      // Focus on devotee name field
-      const nameField = document.getElementById("devotee-name-input");
-      if (nameField) {
-        nameField.focus();
+      // Focus on field
+      if (fixedAmount === null) {
+        const amountField = document.getElementById("donation-amount-input");
+        if (amountField) {
+          amountField.focus();
+        }
+      } else {
+        const nameField = document.getElementById("devotee-name-input");
+        if (nameField) {
+          nameField.focus();
+        }
       }
     }, 250);
 
-    toast.success(`Selected Seva: ${purposeValue} (₹${fixedAmount.toLocaleString('en-IN')}). Please fill in your details below.`);
+    if (fixedAmount !== null) {
+      toast.success(`Selected Seva: ${purposeValue} (₹${fixedAmount.toLocaleString('en-IN')}). Please fill in your details below.`);
+    } else {
+      toast.success(`Selected Seva: ${purposeValue}. Please enter your contribution amount and fill in details below.`);
+    }
   };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -742,7 +754,7 @@ const Donations = () => {
       {/* Decorative Traditional Patterns */}
       <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/oriental-tiles.png')]" />
 
-      <div className="container-custom relative z-10 max-w-6xl mx-auto px-4">
+      <div className="container-custom relative z-10">
         
         {/* Authentic Gopuram Heading */}
         <div className="text-center mb-16">
@@ -781,8 +793,7 @@ const Donations = () => {
             <div className="flex flex-wrap border-b border-stone-200 bg-stone-50 p-2 gap-2">
               {[
                 { id: "prasada", label: "Prasada Seva (ప్రసాద సేవ)", icon: <Sparkles size={16} /> },
-                { id: "anna", label: "Anna Prasadam (అన్న ప్రసాదం)", icon: <Utensils size={16} /> },
-                { id: "general", label: "General & Other Sevas (ఇతర సేవలు)", icon: <Award size={16} /> }
+                { id: "anna", label: "Anna Prasadam (అన్న ప్రసాదం)", icon: <Utensils size={16} /> }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -825,10 +836,9 @@ const Donations = () => {
                       <tbody className="divide-y divide-stone-100 text-stone-700">
                         {[
                           { name: "Sweet Pongal / Kesari", te: "చక్కెరపొంగలి / కేసరి", day: "Daily (ప్రతిరోజూ)", price: 1000, key: "Sweet Pongal Daily" },
-                          { name: "Sweet Pongal / Kesari (10 Kg Ghee)", te: "10 కేజీల నేతితో చక్కెరపొంగలి", day: "Daily (ప్రతిరోజూ)", price: 1800, key: "Sweet Pongal Ghee 10 Kg" },
-                          { name: "Undrallu (10 Kg Ghee)", te: "10 కేజీల నేతితో ఉండ్రాళ్ళు", day: "Wed Only (బుధవారం)", price: 1000, key: "Undrallu Weds Only" },
-                          { name: "Sweet Undrallu (10 Kg Ghee)", te: "10 కేజీల నేతితో తీపి ఉండ్రాళ్ళు", day: "Fri Only (శుక్రవారం)", price: 1800, key: "Sweet Undrallu Fri Only" },
-                          { name: "Jalebi (10 Kg Ghee)", te: "10 కేజీల నేతితో జిలేబీలు", day: "Sun Only (ఆదివారం)", price: 1000, key: "Jalebi Sun Only" }
+                          { name: "Sweet Pongal / Kesari (10 Kg)", te: "10 కేజీల చక్కెరపొంగలి", day: "Daily (ప్రతిరోజూ)", price: 1800, key: "Sweet Pongal 10 Kg" },
+                          { name: "Undrallu (10 Kg)", te: "10 కేజీల ఉండ్రాళ్ళు", day: "Wed Only (బుధవారం)", price: 1000, key: "Undrallu 10 Kg" },
+                          { name: "Sweet Undrallu (10 Kg)", te: "10 కేజీల తీపి ఉండ్రాళ్ళు", day: "Fri Only (శుక్రవారం)", price: 1800, key: "Sweet Undrallu 10 Kg" }
                         ].map((item, i) => (
                           <tr key={i} className="hover:bg-stone-50/50 transition-colors">
                             <td className="py-4">
@@ -894,46 +904,19 @@ const Donations = () => {
                           <button
                             key={i}
                             onClick={() => handleSponsorSelect(`Annadanam - ${tier.label}`, tier.amount)}
-                            className="flex-1 min-w-[120px] px-3 py-2 rounded-xl bg-amber-50 border border-amber-100 hover:border-amber-300 text-amber-900 font-bold text-xs text-center transition-all hover:scale-[1.02]"
+                            className="flex-1 min-w-[110px] px-3 py-2.5 rounded-xl bg-amber-50 border border-amber-100 hover:border-amber-300 text-amber-900 font-bold text-xs text-center transition-all hover:scale-[1.02]"
                           >
                             ₹{tier.amount.toLocaleString('en-IN')}
                           </button>
                         ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === "general" && (
-                <div className="space-y-6">
-                  <div>
-                    <h4 className="text-amber-900 text-base font-bold font-serif">Other Devotional Opportunities</h4>
-                    <p className="text-stone-500 text-xs mt-0.5">Directly support maintenance, cows welfare (Gaushala), or daily pooja rituals.</p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {[
-                      { title: "Gaushala (Cows Protection)", desc: "Maintain the temple cows, providing fodder, shelter, and medical care.", key: "Gaushala Support", defaultAmt: 1000 },
-                      { title: "Temple Renovation", desc: "Contribute to the ongoing development and preservation of temple architecture.", key: "Temple Renovation", defaultAmt: 2500 },
-                      { title: "Daily Pooja & Aarti", desc: "Sponsor traditional floral decorations, oil lamps, and materials for daily rituals.", key: "Daily Pooja & Aarti", defaultAmt: 500 },
-                      { title: "Vedic Education classes", desc: "Support teachers and students studying the sacred Vedas and scriptures.", key: "Education & Vedic Classes", defaultAmt: 1500 },
-                      { title: "Festival Celebrations", desc: "Support major celebrations like Vinayaka Chavithi, Dussehra, and Pujas.", key: "Festival Celebrations", defaultAmt: 2000 },
-                      { title: "General Donation Fund", desc: "A general contribution utilized where the temple administration needs it most.", key: "General Donation", defaultAmt: 1000 }
-                    ].map((seva, i) => (
-                      <div key={i} className="p-5 rounded-2xl border border-stone-200 hover:border-amber-300 hover:bg-amber-50/10 transition-all flex flex-col justify-between">
-                        <div>
-                          <h5 className="font-serif font-bold text-stone-900 text-sm mb-1">{seva.title}</h5>
-                          <p className="text-stone-500 text-[11px] leading-relaxed mb-4">{seva.desc}</p>
-                        </div>
                         <button
-                          onClick={() => handleSponsorSelect(seva.key, seva.defaultAmt)}
-                          className="w-full py-2 rounded-xl bg-stone-100 hover:bg-amber-600 text-stone-700 hover:text-white font-bold text-xs transition-colors"
+                          onClick={() => handleSponsorSelect("Annadanam", null)}
+                          className="flex-1 min-w-[110px] px-3 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 border border-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold text-xs text-center transition-all hover:scale-[1.02]"
                         >
-                          Select Seva (₹{seva.defaultAmt})
+                          Custom Amount
                         </button>
                       </div>
-                    ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -956,7 +939,7 @@ const Donations = () => {
         </div>
 
         {isReceiptFormOpen && (
-          <div id="receipt-form-section" className="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-[2.5rem] border border-stone-200 shadow-2xl relative overflow-hidden animate-fade-rise">
+          <div id="receipt-form-section" className="max-w-4xl mx-auto bg-white p-4 sm:p-10 rounded-3xl sm:rounded-[2.5rem] border border-stone-200 shadow-2xl relative overflow-hidden animate-fade-rise">
             {/* Elegant Golden Corner Accent */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
 
@@ -1045,6 +1028,7 @@ const Donations = () => {
                       Donation Amount (₹) *
                     </label>
                     <input
+                      id="donation-amount-input"
                       type="number"
                       required
                       min="1"
@@ -1069,12 +1053,9 @@ const Donations = () => {
                       <option value="General Donation">General Donation (సాధారణ విరాళం)</option>
                       <option value="Annadanam">Annadanam (అన్నదానం)</option>
                       <option value="Sweet Pongal Daily">Sweet Pongal Daily (చక్కెరపొంగలి - ₹1,000)</option>
-                      <option value="Sweet Pongal Ghee 10 Kg">Sweet Pongal Ghee 10 Kg (చక్కెరపొంగలి నేతితో - ₹1,800)</option>
-                      <option value="Undrallu Weds Only">Undrallu Weds Only (ఉండ్రాళ్ళు బుధవారం - ₹1,000)</option>
-                      <option value="Sweet Undrallu Fri Only">Sweet Undrallu Fri Only (తీపి ఉండ్రాళ్ళు శుక్రవారం - ₹1,800)</option>
-                      <option value="Jalebi Sun Only">Jalebi Sun Only (జిలేబీలు - ₹1,000)</option>
-                      <option value="Temple Renovation">Temple Renovation (ఆలయ పునర్నిర్మాణం)</option>
-                      <option value="Gaushala Support">Gaushala Support (గోశాల నిర్వహణ)</option>
+                      <option value="Sweet Pongal 10 Kg">Sweet Pongal 10 Kg (10 కేజీల చక్కెరపొంగలి - ₹1,800)</option>
+                      <option value="Undrallu 10 Kg">Undrallu 10 Kg (10 కేజీల ఉండ్రాళ్ళు బుధవారం - ₹1,000)</option>
+                      <option value="Sweet Undrallu 10 Kg">Sweet Undrallu 10 Kg (10 కేజీల తీపి ఉండ్రాళ్ళు శుక్రవారం - ₹1,800)</option>
                     </select>
                   </div>
                 </div>
@@ -1307,27 +1288,43 @@ const Donations = () => {
                 </div>
 
                 {/* Submit button */}
-                <button
-                  type="submit"
-                  disabled={isUploading}
-                  className="w-full py-4.5 rounded-2xl font-serif text-sm font-bold bg-amber-600 text-white shadow-xl shadow-amber-600/20 hover:bg-amber-900 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none hover:scale-[1.01]"
-                >
-                  {isUploading ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin text-white" />
-                      <span>{paymentMethod === "online" ? "Opening Razorpay Secure Gateway..." : "Uploading Screenshot & Generating E-Receipt..."}</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>
-                        {paymentMethod === "online" 
-                          ? `Proceed to Pay ₹${amountPaid ? Number(amountPaid).toLocaleString('en-IN') : '0'} & Get E-Receipt` 
-                          : "Generate & Download Official E-Receipt"}
-                      </span>
-                      <span>🙏</span>
-                    </>
-                  )}
-                </button>
+                <div className="flex justify-center pt-4">
+                  <button
+                    type="submit"
+                    disabled={isUploading}
+                    className="w-full sm:w-auto sm:min-w-[420px] px-8 py-4 rounded-full font-sans bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-700 hover:to-amber-800 text-white shadow-[0_10px_30px_rgba(217,119,6,0.3)] hover:shadow-[0_15px_35px_rgba(217,119,6,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+                  >
+                    {isUploading ? (
+                      <>
+                        <RefreshCw className="w-5 h-5 animate-spin text-white shrink-0" />
+                        <span className="text-xs sm:text-sm font-bold tracking-wide">
+                          {paymentMethod === "online" ? "Opening Razorpay Secure Gateway..." : "Uploading Screenshot & Generating E-Receipt..."}
+                        </span>
+                      </>
+                    ) : (
+                      <div className="flex items-center gap-2.5">
+                        <Lock size={16} className="text-amber-200 shrink-0" />
+                        <div className="flex flex-col items-center justify-center text-center">
+                          <span className="text-[9px] sm:text-[10px] opacity-90 uppercase tracking-widest font-extrabold text-amber-200 leading-none">
+                            {paymentMethod === "online" ? "Secure Payment Gateway" : "Devasthanam E-Service"}
+                          </span>
+                          <span className="text-xs sm:text-sm font-extrabold tracking-wide mt-1 flex items-center gap-1.5 justify-center flex-wrap leading-tight">
+                            {paymentMethod === "online" ? (
+                              <>
+                                <span className="whitespace-nowrap">Proceed to Pay ₹{amountPaid ? Number(amountPaid).toLocaleString('en-IN') : '0'}</span>
+                                <span className="opacity-40 text-xs hidden sm:inline">|</span>
+                                <span className="text-amber-100 whitespace-nowrap">Get E-Receipt</span>
+                              </>
+                            ) : (
+                              <span className="whitespace-nowrap">Generate & Download E-Receipt</span>
+                            )}
+                            <span className="text-base leading-none">🙏</span>
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </button>
+                </div>
               </form>
             ) : (
               /* PREVIEW RECEIPT FOR DEVOTEES */

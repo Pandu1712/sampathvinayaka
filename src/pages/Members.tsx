@@ -95,7 +95,7 @@ const Members = () => (
 
       {/* Quote / Seva Message */}
       <section className="py-12 sm:py-16 px-4 text-center max-w-4xl mx-auto">
-        <div className="p-8 sm:p-10 rounded-[2.5rem] bg-primary/[0.02] border border-primary/10 relative overflow-hidden">
+        <div className="p-5 sm:p-10 rounded-3xl sm:rounded-[2.5rem] bg-primary/[0.02] border border-primary/10 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
           <p className="text-primary text-2xl font-serif italic font-bold tracking-wider mb-4">
             \"Kayena Vacha Manasendriyairva Budhyatmanava Prakriteh Swabhavat\"

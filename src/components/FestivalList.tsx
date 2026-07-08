@@ -88,7 +88,7 @@ const FestivalList = () => {
           <div className="h-1.5 w-24 bg-gradient-to-r from-transparent via-primary/40 to-transparent mx-auto mt-6" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-[1440px] mx-auto">
           {currentFestivals.map((m, idx) => (
             <div key={idx} className="glass rounded-[2rem] p-6 border border-primary/10 hover:border-primary/30 transition-all duration-500 hover:-translate-y-2 group">
               <div className="flex items-center gap-3 mb-6 pb-4 border-b border-primary/5">

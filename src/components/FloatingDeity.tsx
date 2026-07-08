@@ -6,7 +6,7 @@ const FloatingDeity = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-6 left-6 z-[100] animate-float group cursor-pointer mobile-menu-hideable" onClick={() => setIsVisible(false)} title="Divine Blessings (Click to hide)">
+    <div className="hidden md:block fixed bottom-10 left-8 z-[100] animate-float group cursor-pointer mobile-menu-hideable" onClick={() => setIsVisible(false)} title="Divine Blessings (Click to hide)">
       <div className="relative">
         {/* Glow effect */}
         <div className="absolute inset-0 bg-primary/20 rounded-full blur-[20px] group-hover:bg-primary/40 transition-all duration-700 animate-pulse" />

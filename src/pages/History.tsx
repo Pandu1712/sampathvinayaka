@@ -100,7 +100,7 @@ const History = () => {
         {/* Sacred Traditional Ornament Pattern Background */}
         <div className="absolute inset-0 opacity-[0.015] bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
 
-        <div className="container-custom max-w-6xl relative z-10">
+        <div className="container-custom relative z-10">
           
           {/* Elegant Language Selector Panel */}
           <div className="flex justify-end mb-8 sm:mb-12">

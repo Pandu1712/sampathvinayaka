@@ -21,11 +21,11 @@ export default function HeroCarousel() {
   }, []);
 
   return (
-    <section id="home" className="mt-4 sm:mt-6 lg:mt-8 max-w-7xl mx-auto px-2 sm:px-4">
+    <section id="home" className="mt-4 sm:mt-6 lg:mt-8 max-w-[1440px] mx-auto px-2 sm:px-6 lg:px-8">
       {/* HERO CONTAINER */}
       <div
         className="
-        relative w-full overflow-hidden bg-white border border-stone-200/60 rounded-[2.5rem]
+        relative w-full overflow-hidden bg-white border border-stone-200/60 rounded-3xl sm:rounded-[2.5rem]
         h-[280px] sm:h-[400px] md:h-[480px] lg:h-[75vh]
         shadow-xl
         "

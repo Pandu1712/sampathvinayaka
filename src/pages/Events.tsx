@@ -59,7 +59,7 @@ const Events = () => {
             {upcomingEvents.map((e, i) => (
               <div 
                 key={i} 
-                className="relative glass overflow-hidden flex flex-col md:flex-row gap-4 p-5 sm:p-5 rounded-[2.5rem] items-center md:items-stretch group cursor-pointer border border-white/40 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 backdrop-blur-md animate-fade-rise opacity-0 [animation-fill-mode:forwards]"
+                className="relative glass overflow-hidden flex flex-col md:flex-row gap-4 p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] items-center md:items-stretch group cursor-pointer border border-white/40 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 backdrop-blur-md animate-fade-rise opacity-0 [animation-fill-mode:forwards]"
                 style={{ animationDelay: `${i * 150}ms` }}
               >
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/15 transition-colors duration-700 pointer-events-none" />
@@ -106,7 +106,7 @@ const Events = () => {
             <div className="h-1 w-24 bg-primary/40 rounded-full mt-6 shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
           </div>
 
-          <div className="glass rounded-[2.5rem] overflow-hidden border border-white/40 shadow-2xl">
+          <div className="glass rounded-3xl sm:rounded-[2.5rem] overflow-hidden border border-white/40 shadow-2xl">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>

@@ -25,7 +25,7 @@ const Contact = () => {
 
       {/* Contact Content */}
       <section className="py-20 lg:py-28 px-4">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Info */}
           <div>
             <p className="text-primary text-sm tracking-[0.2em] uppercase mb-3">Reach Us</p>
@@ -112,7 +112,7 @@ const Contact = () => {
       </section>
       {/* How to Reach */}
       <section className="py-20 lg:py-28 px-4 bg-card border-y border-border">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-[1440px] mx-auto">
           <div className="text-center mb-8">
             <p className="text-primary text-sm tracking-[0.2em] uppercase mb-3">Travel Info</p>
             <h2 className="text-2xl font-bold text-foreground">
@@ -138,7 +138,7 @@ const Contact = () => {
 
       {/* Accommodations */}
       <section className="py-20 lg:py-28 px-4">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-[1440px] mx-auto">
           <div className="text-center mb-8">
             <p className="text-secondary text-sm tracking-[0.2em] uppercase mb-3 text-primary font-semibold">Stay Near Us</p>
             <h2 className="text-2xl font-bold text-foreground">

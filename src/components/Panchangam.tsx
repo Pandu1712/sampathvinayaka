@@ -285,7 +285,7 @@ const Panchangam = () => {
  
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {/* Main Display */}
-          <div className="lg:col-span-2 glass rounded-[2.5rem] p-8 sm:p-12 border border-white/40 shadow-2xl relative overflow-hidden group">
+          <div className="lg:col-span-2 glass rounded-3xl sm:rounded-[2.5rem] p-5 sm:p-12 border border-white/40 shadow-2xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
               <Sun className="w-32 h-32 text-primary animate-spin-slow" />
             </div>
@@ -375,7 +375,7 @@ const Panchangam = () => {
           </div>
  
           {/* Timings Highlight */}
-          <div className="glass rounded-[2.5rem] p-8 border border-white/40 shadow-xl flex flex-col justify-between">
+          <div className="glass rounded-3xl sm:rounded-[2.5rem] p-5 sm:p-8 border border-white/40 shadow-xl flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
