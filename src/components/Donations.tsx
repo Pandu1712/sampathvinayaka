@@ -1142,38 +1142,17 @@ const Donations = () => {
 
                   {/* Conditionally Display Payment Instructions */}
                   {paymentMethod === "online" ? (
-                    /* Online Payment Alert Box specifically explaining Test Mode simulation */
-                    <div className="p-5 rounded-2xl bg-amber-50 border border-amber-200 text-stone-700 text-xs sm:text-sm font-sans space-y-3 shadow-inner relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full blur-xl pointer-events-none" />
-                      <div className="flex items-center gap-2 text-amber-600 font-bold text-sm">
-                        <span>⚠️</span>
-                        <span>Razorpay Test Mode Active / టెస్ట్ మోడ్ యాక్టివ్‌గా ఉంది</span>
+                    <div className="p-5 rounded-2xl bg-emerald-50/60 border border-emerald-100 text-stone-700 text-xs sm:text-sm font-sans space-y-2.5 shadow-sm relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
+                      <div className="flex items-center gap-2 text-emerald-700 font-bold text-sm">
+                        <Lock size={15} className="text-emerald-600 shrink-0" />
+                        <span>Secure Online Payment / సురక్షిత ఆన్‌లైన్ చెల్లింపు</span>
                       </div>
-                      <p className="leading-relaxed">
-                        Since this application is using **Razorpay Test Keys**, it cannot process real money or send real push notifications to physical UPI apps (like your phone's PhonePe or GPay).
+                      <p className="leading-relaxed text-stone-600">
+                        Your transaction is processed securely through **Razorpay**. You can pay using Credit/Debit Cards, Netbanking, UPI, or Wallets.
                       </p>
-                      <p className="leading-relaxed font-semibold text-amber-900">
-                        How to complete test payment and get your receipt:
-                      </p>
-                      <ul className="list-decimal pl-5 space-y-1 text-stone-600">
-                        <li>
-                          Click the <strong className="text-amber-600">Proceed to Pay</strong> button at the bottom of the form.
-                        </li>
-                        <li>
-                          Inside the Razorpay popup window, select <strong className="text-stone-900">Netbanking</strong> (choose SBI, HDFC, or any bank).
-                        </li>
-                        <li>
-                          Click <strong className="text-stone-900">Pay</strong>. A test banking simulation tab will open in your browser.
-                        </li>
-                        <li>
-                          Click the green <strong className="text-emerald-600 font-bold">Success</strong> button.
-                        </li>
-                        <li>
-                          <strong>Alternative (UPI VPA):</strong> Select <strong>UPI</strong> &rarr; select <strong>UPI ID/VPA</strong> &rarr; enter <code className="bg-stone-200/60 px-1.5 py-0.5 rounded font-mono text-stone-800">success@razorpay</code> &rarr; click <strong>Pay</strong>.
-                        </li>
-                      </ul>
-                      <p className="text-[11px] text-amber-700 font-bold italic pt-1 border-t border-amber-200">
-                        Once simulated successfully, the browser will automatically generate and download your E-Receipt.
+                      <p className="text-[11px] text-emerald-700 font-bold italic pt-1 border-t border-emerald-100">
+                        Upon successful payment, your official Devasthanam E-Receipt will be generated and downloaded automatically.
                       </p>
                     </div>
                   ) : (
