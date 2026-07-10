@@ -56,6 +56,12 @@ const timings = [
     time: "7:00 AM – 12:00 PM", 
     timeTe: "ఉదయం 7:00 నుండి 12:00 వరకు" 
   },
+  { 
+    period: "Sankatahara Chaturthi Pooja", 
+    periodTe: "సంకటహర చతుర్థి పూజ",
+    time: "Monthly Auspicious Days", 
+    timeTe: "Aug 02 (Sun), Aug 31 (Mon), Sep 29 (Tue), Oct 29 (Thu), Nov 27 (Fri), Dec 27 (Sun)" 
+  },
 ];
 
 const milestonesEn = [
@@ -121,6 +127,8 @@ const Index = () => {
   const [aboutImageIndex, setAboutImageIndex] = useState(0);
   const [homeLightboxIndex, setHomeLightboxIndex] = useState<number | null>(null);
   const [timelineLang, setTimelineLang] = useState<"en" | "te" | "hi">("en");
+  const [noteLang, setNoteLang] = useState<"en" | "te" | "hi">("te");
+  const [sevaLang, setSevaLang] = useState<"en" | "te" | "hi">("te");
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -342,6 +350,193 @@ const Index = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+
+          {/* Sevas Details Section */}
+          <div className="mt-16 text-left">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-primary/10 pb-4 mb-8 gap-4">
+              <div>
+                <h3 className="text-2xl font-bold text-foreground font-serif">
+                  {sevaLang === "en" ? "Special Seva Bookings" : sevaLang === "te" ? "ప్రత్యేక సేవల వివరములు" : "विशेष सेवा बुकिंग विवरण"}
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {sevaLang === "en" 
+                    ? "Available for booking in the evening (5:30 PM – 8:00 PM Only)" 
+                    : sevaLang === "te" 
+                      ? "సాయంత్రం గం. 5:30 నుండి గం. 8:00 వరకు మాత్రమే బుక్ చేసుకొనవచ్చును" 
+                      : "केवल शाम 5:30 बजे से रात 8:00 बजे तक ही बुक किया जा सकता है"}
+                </p>
+              </div>
+
+              {/* Special Sevas Language Toggle Button */}
+              <div className="bg-gradient-to-b from-[#1C1917] to-[#000000] p-1 rounded-xl border border-primary/35 shadow-lg flex items-center gap-1 w-fit self-start sm:self-center">
+                <button
+                  type="button"
+                  onClick={() => setSevaLang("en")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-serif font-black tracking-widest transition-all duration-300 ${
+                    sevaLang === "en"
+                      ? "bg-primary text-primary-foreground shadow-sm scale-102"
+                      : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSevaLang("te")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-serif font-black tracking-widest transition-all duration-300 ${
+                    sevaLang === "te"
+                      ? "bg-primary text-primary-foreground shadow-sm scale-102"
+                      : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  తెలుగు
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSevaLang("hi")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-serif font-black tracking-widest transition-all duration-300 ${
+                    sevaLang === "hi"
+                      ? "bg-primary text-primary-foreground shadow-sm scale-102"
+                      : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  हिन्दी
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Seva 1: Saswatha Abhishekam */}
+              <div className="p-6 rounded-2xl glass border border-white/40 hover:border-primary/20 hover:scale-[1.01] transition-all duration-300 shadow-sm hover:shadow-lg flex flex-col justify-between gap-4 animate-fade-rise">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-start gap-2">
+                    <h4 className="text-primary font-bold text-base font-serif">
+                      {sevaLang === "en" 
+                        ? "Saswatha Abhisheka Seva (Lifetime Abhishekam)" 
+                        : sevaLang === "te" 
+                          ? "శాశ్వత అభిషేక సేవ" 
+                          : "शाश्वत अभिषेक सेवा"}
+                    </h4>
+                    <span className="text-lg font-black text-foreground shrink-0">
+                      {sevaLang === "en" ? "₹5,000" : sevaLang === "te" ? "రూ. 5,000/-" : "₹5,000"}
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground text-xs leading-relaxed font-sans font-light">
+                    {sevaLang === "en" 
+                      ? "Pooja performed every year on a date chosen by the devotee with their Gotra & Namam." 
+                      : sevaLang === "te" 
+                        ? "ప్రతి ఏడు భక్తులు కోరిన రోజున వారి గోత్ర నామములతో జరిపించు పూజ." 
+                        : "श्रद्धालुओं की इच्छानुसार हर वर्ष उनकी चुनी हुई तिथि पर उनके गोत्र और नाम के साथ की जाने वाली पूजा।"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Seva 2: Ganesha Navaratri Abhishekam */}
+              <div className="p-6 rounded-2xl glass border border-white/40 hover:border-primary/20 hover:scale-[1.01] transition-all duration-300 shadow-sm hover:shadow-lg flex flex-col justify-between gap-4 animate-fade-rise">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-start gap-2">
+                    <h4 className="text-primary font-bold text-base font-serif">
+                      {sevaLang === "en" 
+                        ? "Ganesha Navaratri Abhishekam" 
+                        : sevaLang === "te" 
+                          ? "గణపతి నవరాత్రుల అభిషేకం" 
+                          : "गणपति नवरात्रि अभिषेक"}
+                    </h4>
+                    <span className="text-lg font-black text-foreground shrink-0">
+                      {sevaLang === "en" ? "₹2,500" : sevaLang === "te" ? "రూ. 2,500/-" : "₹2,500"}
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground text-xs leading-relaxed font-sans font-light">
+                    {sevaLang === "en" 
+                      ? "Pooja performed on one of the 9 days of Ganesha Navaratri with the devotee's Gotra & Namam." 
+                      : sevaLang === "te" 
+                        ? "గణపతి నవరాత్రుల 9 రోజులలో ఒక రోజు భక్తుల గోత్ర నామములతో జరిపించు పూజ." 
+                        : "गणेश नवरात्रि के 9 दिनों में से किसी एक दिन श्रद्धालुओं के गोत्र और नाम के साथ की जाने वाली पूजा।"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Important Note for Homam & Abhishekam */}
+          <div className="mt-12 p-6 md:p-8 rounded-3xl border border-primary/20 bg-primary/[0.02] backdrop-blur-sm relative overflow-hidden animate-fade-rise">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-primary/10">
+              <div className="flex items-start gap-4">
+                <div className="text-3xl shrink-0">🔔</div>
+                <div className="text-left">
+                  <h4 className="text-primary font-bold text-base font-serif uppercase tracking-wider">
+                    {noteLang === "en" ? "Important Note" : noteLang === "te" ? "ముఖ్య గమనిక" : "महत्वपूर्ण सूचना"}
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {noteLang === "en" 
+                      ? "Homam & Abhishekam Guidelines" 
+                      : noteLang === "te" 
+                        ? "హోమం & అభిషేకం నియమావళి" 
+                        : "हवन और अभिषेक के नियम"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Language Toggle Button */}
+              <div className="bg-gradient-to-b from-[#1C1917] to-[#000000] p-1 rounded-xl border border-primary/35 shadow-lg flex items-center gap-1 w-fit self-start sm:self-center">
+                <button
+                  type="button"
+                  onClick={() => setNoteLang("en")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-serif font-black tracking-widest transition-all duration-300 ${
+                    noteLang === "en"
+                      ? "bg-primary text-primary-foreground shadow-sm scale-102"
+                      : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNoteLang("te")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-serif font-black tracking-widest transition-all duration-300 ${
+                    noteLang === "te"
+                      ? "bg-primary text-primary-foreground shadow-sm scale-102"
+                      : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  తెలుగు
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNoteLang("hi")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-serif font-black tracking-widest transition-all duration-300 ${
+                    noteLang === "hi"
+                      ? "bg-primary text-primary-foreground shadow-sm scale-102"
+                      : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  हिन्दी
+                </button>
+              </div>
+            </div>
+
+            {/* Note Content */}
+            <div className="text-left">
+              {noteLang === "te" && (
+                <p className="text-foreground text-sm sm:text-base leading-relaxed font-sans font-light animate-fade-in">
+                  ఆలయంలో ప్రతిరోజూ హోమం మరియు అభిషేకం జరుగును. <strong>ఈ పూజలకు ఎటువంటి రుసుము (చార్జీలు) లేదు.</strong> ఈ కార్యక్రమాలలో పాల్గొనదలచిన భక్తులు 10 రోజుల ముందే ఆలయాన్ని సందర్శించి, సాయంత్రం 5:30 నుండి 7:00 గంటల మధ్య అర్చకుల వద్ద రిజిస్టర్ చేసుకోవాలి. కావలసిన పూజా సామాగ్రి జాబితాను తీసుకొని, ఆ సామగ్రిని మీరు బుక్ చేసుకున్న తేదీకి ముందు రోజు సాయంత్రం 6:00 గంటల కల్లా ఆలయానికి సమర్పించవలసి ఉంటుంది.
+                </p>
+              )}
+
+              {noteLang === "en" && (
+                <p className="text-foreground text-sm sm:text-base leading-relaxed font-sans font-light animate-fade-in">
+                  Daily Homam and Abhishekam are performed. <strong>There are no charges or fees for these poojas.</strong> If you wish to participate in these rituals, please visit the temple 10 days in advance to register with the priests between 5:30 PM and 7:00 PM. Kindly collect the required pooja materials list, purchase the items, and submit them at the temple by 6:00 PM on the evening before your booked date.
+                </p>
+              )}
+
+              {noteLang === "hi" && (
+                <p className="text-foreground text-sm sm:text-base leading-relaxed font-sans font-light animate-fade-in">
+                  मंदिर में प्रतिदिन हवन और अभिषेक किया जाता है। <strong>इन पूजाओं के लिए कोई शुल्क नहीं है।</strong> यदि आप इन अनुष्ठानों में भाग लेना चाहते हैं, तो कृपया 10 दिन पहले मंदिर आकर शाम 5:30 से 7:00 बजे के बीच पुजारियों के पास अपना पंजीकरण कराएं। आवश्यक पूजा सामग्री की सूची प्राप्त करें, सामग्री खरीदें और अपने बुक किए गए दिन से एक दिन पहले शाम 6:00 बजे तक मंदिर में जमा कर दें।
+                </p>
+              )}
             </div>
           </div>
         </div>

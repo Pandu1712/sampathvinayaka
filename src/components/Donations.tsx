@@ -91,6 +91,32 @@ const Donations = () => {
     return str.trim();
   };
 
+  const getSevaDisplayName = (purpose: string): string => {
+    switch (purpose) {
+      case "General Donation":
+        return "General Donation / సాధారణ విరాళం";
+      case "Annadanam":
+        return "Annadanam / అన్నదానం";
+      case "Pulihora Daily":
+      case "Sweet Pongal Daily":
+        return "Pulihora / పులిహోర";
+      case "Sweet Pongal 10 Kg":
+        return "Sweet Pongal / Kesari (10 Kg) / 10 కేజీల చక్కెరపొంగలి";
+      case "Undrallu Daily":
+        return "Undrallu / ఉండ్రాళ్ళు";
+      case "Undrallu 10 Kg":
+        return "Undrallu (10 Kg) / 10 కేజీల ఉండ్రాళ్ళు";
+      case "Sweet Undrallu 10 Kg":
+        return "Sweet Undrallu (10 Kg) / 10 కేజీల తీపి ఉండ్రాళ్ళు";
+      default:
+        if (purpose.startsWith("Annadanam - ")) {
+          const tier = purpose.replace("Annadanam - ", "");
+          return `Annadanam - ${tier} / అన్నప్రసాద వితరణ`;
+        }
+        return purpose;
+    }
+  };
+
   const safeDownloadReceipt = (receiptNoStr: string) => {
     const element = document.getElementById("printable-receipt");
     if (!element) {
@@ -156,7 +182,7 @@ const Donations = () => {
       amount: Math.round(Number(amountPaid) * 100), // in paise
       currency: "INR",
       name: "Sri Sampath Vinayakagar Temple",
-      description: sevaPurpose || "General Donation",
+      description: getSevaDisplayName(sevaPurpose) || "General Donation",
       image: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png",
       handler: function (response: any) {
         const paymentId = response.razorpay_payment_id;
@@ -170,7 +196,7 @@ const Donations = () => {
           phoneOrEmail,
           address,
           amount: amountPaid,
-          purpose: sevaPurpose,
+          purpose: getSevaDisplayName(sevaPurpose),
           date: today,
           proofUrl: "", // no screenshot URL needed
           paymentId,
@@ -201,7 +227,7 @@ const Donations = () => {
       },
       notes: {
         address: address,
-        purpose: sevaPurpose,
+        purpose: getSevaDisplayName(sevaPurpose),
         gotram: gotram,
         nakshatram: nakshatram,
       },
@@ -416,7 +442,7 @@ const Donations = () => {
         phoneOrEmail,
         address,
         amount: amountPaid,
-        purpose: sevaPurpose,
+        purpose: getSevaDisplayName(sevaPurpose),
         date: today,
         proofUrl: uploadedUrl,
         isOnline: false,
@@ -835,8 +861,9 @@ const Donations = () => {
                       </thead>
                       <tbody className="divide-y divide-stone-100 text-stone-700">
                         {[
-                          { name: "Sweet Pongal / Kesari", te: "చక్కెరపొంగలి / కేసరి", day: "Daily (ప్రతిరోజూ)", price: 1000, key: "Sweet Pongal Daily" },
+                          { name: "Pulihora", te: "పులిహోర", day: "Daily (ప్రతిరోజూ)", price: 1000, key: "Pulihora Daily" },
                           { name: "Sweet Pongal / Kesari (10 Kg)", te: "10 కేజీల చక్కెరపొంగలి", day: "Daily (ప్రతిరోజూ)", price: 1800, key: "Sweet Pongal 10 Kg" },
+                          { name: "Undrallu", te: "ఉండ్రాళ్ళు", day: "Daily (ప్రతిరోజూ)", price: 1000, key: "Undrallu Daily" },
                           { name: "Undrallu (10 Kg)", te: "10 కేజీల ఉండ్రాళ్ళు", day: "Wed Only (బుధవారం)", price: 1000, key: "Undrallu 10 Kg" },
                           { name: "Sweet Undrallu (10 Kg)", te: "10 కేజీల తీపి ఉండ్రాళ్ళు", day: "Fri Only (శుక్రవారం)", price: 1800, key: "Sweet Undrallu 10 Kg" }
                         ].map((item, i) => (
@@ -1052,8 +1079,9 @@ const Donations = () => {
                     >
                       <option value="General Donation">General Donation (సాధారణ విరాళం)</option>
                       <option value="Annadanam">Annadanam (అన్నదానం)</option>
-                      <option value="Sweet Pongal Daily">Sweet Pongal Daily (చక్కెరపొంగలి - ₹1,000)</option>
+                      <option value="Pulihora Daily">Pulihora (పులిహోర - ₹1,000)</option>
                       <option value="Sweet Pongal 10 Kg">Sweet Pongal 10 Kg (10 కేజీల చక్కెరపొంగలి - ₹1,800)</option>
+                      <option value="Undrallu Daily">Undrallu (ఉండ్రాళ్ళు - ₹1,000)</option>
                       <option value="Undrallu 10 Kg">Undrallu 10 Kg (10 కేజీల ఉండ్రాళ్ళు బుధవారం - ₹1,000)</option>
                       <option value="Sweet Undrallu 10 Kg">Sweet Undrallu 10 Kg (10 కేజీల తీపి ఉండ్రాళ్ళు శుక్రవారం - ₹1,800)</option>
                     </select>
