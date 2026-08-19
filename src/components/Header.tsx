@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Phone, Flower2, Sparkles, MapPin, Home, BookOpen, Image, Calendar as CalendarIcon, Users, Heart, Clock } from "lucide-react";
+import vinayakaLogo from "@/assets/vinayaka-logo.png";
 
 
 const sectionIds = ["home", "history", "services", "gallery", "events", "members", "panchangam", "donations", "contact"];
@@ -179,7 +180,7 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-4 flex-shrink-0 group">
             <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white flex items-center justify-center border-2 border-primary/30 shadow-[0_0_20px_rgba(var(--primary),0.2)] group-hover:border-primary/50 transition-all duration-500 overflow-hidden">
-              <img src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png" alt="Sampath Vinayakagar" className="w-[90%] h-[90%] object-contain relative z-10 group-hover:scale-110 transition-transform duration-700" />
+              <img src={vinayakaLogo} alt="Sampath Vinayakagar" className="w-full h-full object-cover rounded-full relative z-10 group-hover:scale-110 transition-transform duration-700" />
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-bold tracking-tight text-foreground leading-tight font-serif italic text-shadow-sm">
@@ -305,9 +306,9 @@ const Header = () => {
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center border border-primary/30 overflow-hidden shrink-0">
                 <img 
-                  src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png" 
+                  src={vinayakaLogo} 
                   alt="Logo" 
-                  className="w-[90%] h-[90%] object-contain" 
+                  className="w-full h-full object-cover rounded-full" 
                 />
               </div>
               <div className="flex flex-col">

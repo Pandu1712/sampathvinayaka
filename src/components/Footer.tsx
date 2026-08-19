@@ -40,7 +40,7 @@ const Footer = () => {
               <li className="flex justify-between border-b border-border/50 pb-1"><span>Darshan (Evening)</span> <span className="text-foreground font-medium text-right">5:30 PM – 8:00 PM</span></li>
               <li className="flex justify-between border-b border-border/50 pb-1"><span>Homam</span> <span className="text-foreground font-medium text-right">5:00 AM – 6:30 AM</span></li>
               <li className="flex justify-between border-b border-border/50 pb-1"><span>Abhishekam</span> <span className="text-foreground font-medium text-right">7:00 AM – 8:30 AM</span></li>
-              <li className="flex justify-between border-b border-border/50 pb-1"><span>Vehicle Pooja</span> <span className="text-foreground font-medium text-right">6:30 AM – 10:30 AM & 4:30 PM – 8:00 PM</span></li>
+              <li className="flex justify-between border-b border-border/50 pb-1"><span>Vehicle Pooja</span> <span className="text-foreground font-medium text-right">6:00 AM – 11:00 AM & 5:30 PM – 8:00 PM</span></li>
               <li className="flex justify-between pb-1"><span>Evening Aarti</span> <span className="text-foreground font-medium text-right">6:00 PM</span></li>
             </ul>
           </div>

@@ -6,7 +6,7 @@ import HeroCarousel from "@/components/HeroCarousel";
 import Ashtothram from "@/components/Ashtothram";
 import Donations from "@/components/Donations";
 import Panchangam from "@/components/Panchangam";
-const ganeshaImage = "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png";
+import ganeshaImage from "@/assets/vinayaka-logo.png";
 import purohit1 from "@/assets/purohit-1.jpg";
 import male1 from "@/assets/member-male-1.png";
 import male2 from "@/assets/member-male-2.png";
@@ -47,8 +47,8 @@ const timings = [
   { 
     period: "Vehicle Pooja", 
     periodTe: "వాహన పూజ",
-    time: "6:30 AM – 10:30 AM & 4:30 PM – 8:00 PM", 
-    timeTe: "ఉదయం 6:30 నుండి 10:30 వరకు & సాయంత్రం 4:30 నుండి 8:00 వరకు" 
+    time: "6:00 AM – 11:00 AM & 5:30 PM – 8:00 PM", 
+    timeTe: "ఉదయం 6:00 నుండి 11:00 వరకు & సాయంత్రం 5:30 నుండి 8:00 వరకు" 
   },
   { 
     period: "Special Abhishekam (Ganesha Navaratri Days Only)", 
@@ -59,7 +59,7 @@ const timings = [
   { 
     period: "Sankatahara Chaturthi Pooja", 
     periodTe: "సంకటహర చతుర్థి పూజ",
-    time: "Monthly Auspicious Days", 
+    time: "6:30 PM – 7:30 PM (Monthly Auspicious Days)", 
     timeTe: "Aug 02 (Sun), Aug 31 (Mon), Sep 29 (Tue), Oct 29 (Thu), Nov 27 (Fri), Dec 27 (Sun)" 
   },
 ];
@@ -97,19 +97,17 @@ const galleryImages = [
 ];
 
 const upcomingEvents = [
-  { date: "Jan 01", month: "2026", title: "New Year's Day", time: "6:00 AM – 8:00 PM", desc: "Start the new year with divine blessings. Special prayers, archana, and aarti performed throughout the day.", type: "Auspicious" },
-  { date: "Jan 14", month: "2026", title: "Makar Sankranti", time: "5:00 AM – 9:00 PM", desc: "Auspicious harvest festival celebrated with special abhishekam for Lord Ganesha and distribution of sweet pongal prasadam.", type: "Festival" },
-  { date: "Mar 19", month: "2026", title: "Ugadi (Telugu New Year)", time: "5:00 AM – 10:00 PM", desc: "Welcoming the Telugu New Year with Panchanga Sravanam (recitation of the new almanac) and distribution of traditional Ugadi Pacchadi.", type: "Festival" },
+  { date: "Jan 01", month: "2026", title: "New Year's Day", time: "6:00 AM – 1:00 PM & 5:00 PM – 9:00 PM", desc: "Start the new year with divine blessings. Special prayers, archana, and aarti performed throughout the day.", type: "Auspicious" },
+  { date: "Mar 19", month: "2026", title: "Ugadi (Telugu New Year)", time: "6:00 AM – 1:00 PM & 5:00 PM – 9:00 PM", desc: "Welcoming the Telugu New Year with Panchanga Sravanam (recitation of the new almanac) and distribution of traditional Ugadi Pacchadi.", type: "Festival" },
   { date: "Sep 14", month: "2026", title: "Vinayaka Chavithi", time: "All Day & Night", desc: "The grandest festival of the temple! Magnificent floral decorations, special Maha Abhishekam, continuous Pujas, and cultural events.", type: "Festival" },
-  { date: "Oct 20", month: "2026", title: "Vijayadashami", time: "5:00 AM – 10:00 PM", desc: "Celebrating the victory of good over evil. Special Shami Pooja and Ganesha blessings for success in new ventures.", type: "Festival" },
-  { date: "Nov 08", month: "2026", title: "Diwali", time: "5:30 AM – 9:30 PM", desc: "Festival of Lights celebrated with 1008 oil lamps (Deepalankarana) surrounding the temple and special evening Lakshmi-Ganapathi pooja.", type: "Festival" },
+  { date: "Oct 20", month: "2026", title: "Vijayadashami", time: "5:00 AM – 1:00 PM & 5:00 PM – 11:00 PM", desc: "Celebrating the victory of good over evil. Special Shami Pooja, grand Vehicle Pooja (Vahana Pooja), and Ganesha blessings for success in new ventures.", type: "Festival" },
 ];
 
 const weeklySchedule = [
   { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Homam / Havan", time: "5:00 AM – 6:30 AM" },
   { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Abhishekam", time: "7:00 AM – 8:30 AM" },
   { day: "Monday – Sunday", deity: "Lord Ganesha", special: "Sarva Darshanam", time: "6:00 AM – 11:00 AM & 5:30 PM – 8:00 PM" },
-  { day: "Monday – Sunday", deity: "New Vehicles", special: "Vehicle Pooja", time: "6:30 AM – 10:30 AM & 4:30 PM – 8:00 PM" },
+  { day: "Monday – Sunday", deity: "New Vehicles", special: "Vehicle Pooja", time: "6:00 AM – 11:00 AM & 5:30 PM – 8:00 PM" },
   { day: "During Ganesha Navaratri", deity: "Lord Ganesha", special: "Special Abhishekam", time: "7:00 AM – 12:00 PM" },
 ];
 
@@ -129,6 +127,19 @@ const Index = () => {
   const [timelineLang, setTimelineLang] = useState<"en" | "te" | "hi">("en");
   const [noteLang, setNoteLang] = useState<"en" | "te" | "hi">("te");
   const [sevaLang, setSevaLang] = useState<"en" | "te" | "hi">("te");
+  const [preselectedSeva, setPreselectedSeva] = useState<string | null>(null);
+  const [preselectedAmount, setPreselectedAmount] = useState<number | null>(null);
+
+  const handleSevaBook = (sevaName: string, amount: number) => {
+    setPreselectedSeva(sevaName);
+    setPreselectedAmount(amount);
+    
+    // Scroll smoothly to donations section
+    const element = document.getElementById("donations");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -425,12 +436,19 @@ const Index = () => {
                   </div>
                   <p className="text-muted-foreground text-xs leading-relaxed font-sans font-light">
                     {sevaLang === "en" 
-                      ? "Pooja performed every year on a date chosen by the devotee with their Gotra & Namam." 
+                      ? "Pooja performed every year on a date chosen by the devotee with their Gotra & Namam (For 10 Years)." 
                       : sevaLang === "te" 
-                        ? "ప్రతి ఏడు భక్తులు కోరిన రోజున వారి గోత్ర నామములతో జరిపించు పూజ." 
-                        : "श्रद्धालुओं की इच्छानुसार हर वर्ष उनकी चुनी हुई तिथि पर उनके गोत्र और नाम के साथ की जाने वाली पूजा।"}
+                        ? "10 సంవత్సరముల పాటు భక్తులు కోరిన రోజున వారి గోత్ర నామములతో జరిపించు పూజ." 
+                        : "10 वर्षों के लिए श्रद्धालुओं की इच्छानुसार हर वर्ष उनकी चुनी हुई तिथि पर उनके गोत्र और नाम के साथ की जाने वाली पूजा।"}
                   </p>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => handleSevaBook("Saswatha Abhisheka Seva", 5000)}
+                  className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-serif font-black tracking-widest text-xs hover:from-amber-600 hover:to-amber-700 active:scale-95 transition-all shadow-sm hover:scale-[1.03]"
+                >
+                  {sevaLang === "en" ? "Pay Amount / Book Seva" : sevaLang === "te" ? "విరాళం చెల్లించండి / బుక్ చేయండి" : "भुगतान करें / बुक सेवा"}
+                </button>
               </div>
 
               {/* Seva 2: Ganesha Navaratri Abhishekam */}
@@ -452,10 +470,17 @@ const Index = () => {
                     {sevaLang === "en" 
                       ? "Pooja performed on one of the 9 days of Ganesha Navaratri with the devotee's Gotra & Namam." 
                       : sevaLang === "te" 
-                        ? "గణపతి నవరాత్రుల 9 రోజులలో ఒక రోజు భక్తుల గోత్ర నామములతో జరిపించు పూజ." 
+                        ? "గणపతి నవరాత్రుల 9 రోజులలో ఒక రోజు భక్తుల గోత్ర నామములతో జరిపించు పూజ." 
                         : "गणेश नवरात्रि के 9 दिनों में से किसी एक दिन श्रद्धालुओं के गोत्र और नाम के साथ की जाने वाली पूजा।"}
                   </p>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => handleSevaBook("Ganesha Navaratri Abhishekam", 2500)}
+                  className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-serif font-black tracking-widest text-xs hover:from-amber-600 hover:to-amber-700 active:scale-95 transition-all shadow-sm hover:scale-[1.03]"
+                >
+                  {sevaLang === "en" ? "Pay Amount / Book Seva" : sevaLang === "te" ? "విరాళం చెల్లించండి / బుక్ చేయండి" : "भुगतान करें / बुक सेवा"}
+                </button>
               </div>
             </div>
           </div>
@@ -792,7 +817,14 @@ const Index = () => {
       <Panchangam />
 
       {/* ═══════ DONATIONS ═══════ */}
-      <Donations />
+      <Donations 
+        preselectedSeva={preselectedSeva} 
+        preselectedAmount={preselectedAmount} 
+        clearPreselect={() => {
+          setPreselectedSeva(null);
+          setPreselectedAmount(null);
+        }}
+      />
 
       {/* ═══════ CTA ═══════ */}
       <section className="section-padding px-4 sm:px-4 relative overflow-hidden">

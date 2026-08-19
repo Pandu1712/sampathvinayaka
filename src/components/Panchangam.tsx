@@ -1,13 +1,414 @@
 import React, { useState, useEffect } from 'react';
 import { Sun, Moon, Info, Calendar as CalendarIcon } from 'lucide-react';
 
+// Translation & Almanac constants
+const tithiNamesEn = [
+  'Prathama', 'Dwitiya', 'Tritiya', 'Chaturthi', 'Panchami', 
+  'Shashti', 'Saptami', 'Ashtami', 'Navami', 'Dashami', 
+  'Ekadashi', 'Dwadashi', 'Trayodashi', 'Chaturdashi', 'Pournami',
+  'Prathama', 'Dwitiya', 'Tritiya', 'Chaturthi', 'Panchami', 
+  'Shashti', 'Saptami', 'Ashtami', 'Navami', 'Dashami', 
+  'Ekadashi', 'Dwadashi', 'Trayodashi', 'Chaturdashi', 'Amavasya'
+];
+
+const tithiNamesTe = [
+  'పాడ్యమి', 'విదియ', 'తదియ', 'చవితి', 'పంచమి', 
+  'షష్ఠి', 'సప్తమి', 'అష్టమి', 'నవమి', 'దశమి', 
+  'ఏకాదశి', 'ద్వాదశి', 'త్రయోదశి', 'చతుర్దశి', 'పౌర్ణమి',
+  'పాడ్యమి', 'విదియ', 'తదియ', 'చవితి', 'పంచమి', 
+  'షష్ఠి', 'సప్తమి', 'అష్టమి', 'నవమి', 'దశమి', 
+  'ఏకాదశి', 'ద్వాదశి', 'త్రయోదశి', 'చతుర్దశి', 'అమావాస్య'
+];
+
+const nakshatraNamesEn = [
+  'Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira', 'Ardra', 
+  'Punarvasu', 'Pushya', 'Ashlesha', 'Magha', 'Poorva Phalguni', 'Uttara Phalguni', 
+  'Hasta', 'Chitra', 'Swati', 'Vishakha', 'Anuradha', 'Jyeshta', 'Mula', 
+  'Poorvashadha', 'Uttarashadha', 'Shravana', 'Dhanishta', 'Shatabhisha', 
+  'Poorvabhadra', 'Uttarabhadra', 'Revati'
+];
+
+const nakshatraNamesTe = [
+  'అశ్విని', 'భరణి', 'కృత్తిక', 'రోహిణి', 'మృగశిర', 'ఆరుద్ర', 
+  'పునర్వసు', 'పుష్యమి', 'ఆశ్లేష', 'మఖ', 'పూర్వఫల్గుణి', 'ఉత్తరఫల్గుణి', 
+  'హస్త', 'చిత్త', 'స్వాతి', 'విశాఖ', 'అనూరాధ', 'జ్యేష్ఠ', 'మూల', 
+  'పూర్వాషాఢ', 'ఉత్తరాషాఢ', 'శ్రవణం', 'ధనిష్ఠ', 'శతభిషం', 
+  'పూర్వాభాద్ర', 'ఉత్తరాభాద్ర', 'రేవతి'
+];
+
+const yogaNamesEn = [
+  'Vishkumbha', 'Preeti', 'Ayushman', 'Saubhagya', 'Shobhana', 'Atiganda',
+  'Sukarma', 'Dhriti', 'Shoola', 'Ganda', 'Vriddhi', 'Dhruva', 'Vyaghati',
+  'Harshana', 'Vajra', 'Siddhi', 'Vyatipata', 'Variyan', 'Parigha', 'Shiva',
+  'Siddha', 'Sadhya', 'Shubha', 'Shukla', 'Brahma', 'Indra', 'Vaidhriti'
+];
+
+const yogaNamesTe = [
+  'విష్కంభం', 'ప్రీతి', 'ఆయుష్మాన్', 'సౌభాగ్యం', 'శోభనం', 'అతిగండం',
+  'సుకర్మ', 'ధృతి', 'శూలం', 'గండం', 'వృద్ధి', 'ధ్రువం', 'వ్యాఘాతం',
+  'హర్షణం', 'వజ్రం', 'సిద్ధి', 'వ్యతీపాతం', 'వరియాన్', 'పరిఘం', 'శివం',
+  'సిద్ధం', 'సాధ్యం', 'శుభం', 'శుక్లం', 'బ్రహ్మం', 'ఐంద్రం', 'వైధృతి'
+];
+
+const karanaNamesEn = [
+  'Bava', 'Balava', 'Kaulava', 'Taitila', 'Gara', 'Vanija', 'Vishti',
+  'Shakuni', 'Chatushpada', 'Naga', 'Kintughna'
+];
+
+const karanaNamesTe = [
+  'బవ', 'బాలవ', 'కౌలవ', 'తైతుల', 'గరజ', 'వణిజ', 'విష్టి',
+  'శకుని', 'చతుష్పాద', 'నాగ', 'కింస్తుఘ్నం'
+];
+
+const masamNamesEn = [
+  'Vaishakha Masam', 'Jyeshtha Masam', 'Ashadha Masam', 'Shravana Masam', 
+  'Bhadrapada Masam', 'Ashvin Masam', 'Kartika Masam', 'Margashira Masam', 
+  'Pushya Masam', 'Magha Masam', 'Phalguna Masam', 'Chaitra Masam'
+];
+
+const masamNamesTe = [
+  'వైశాఖ మాసం', 'జ్యేష్ఠ మాసం', 'ఆషాఢ మాసం', 'శ్రావణ మాసం', 
+  'భాద్రపద మాసం', 'ఆశ్వయుజ మాసం', 'కార్తీక మాసం', 'మార్గశిర మాసం', 
+  'పుష్య మాసం', 'మాఘ మాసం', 'ఫాల్గుణ మాసం', 'చైత్ర మాసం'
+];
+
+const samvatsaramNamesEn = [
+  "Prabhava", "Vibhava", "Shukla", "Pramodoota", "Prajapatya", "Angirasa", "Shrimukha", "Bhava", "Yuva", "Dhatri",
+  "Eeshvara", "Bahudhanya", "Pramathi", "Vikrama", "Vrusha", "Chitrabhanu", "Subhanu", "Tarana", "Parthiva", "Vyaya",
+  "Sarvajittu", "Sarvadhari", "Virodhi", "Vikruti", "Khara", "Nandana", "Vijaya", "Jaya", "Manmatha", "Durmukhi",
+  "Hevalambi", "Vilambi", "Vikari", "Sharvari", "Plava", "Shubhakrutu", "Shobhakrutu", "Krodhi", "Vishvavasu", "Parabhava",
+  "Plavanga", "Kilaka", "Saumya", "Sadharana", "Virodhikrutu", "Paridhavi", "Pramadicha", "Ananda", "Rakshasa", "Anala",
+  "Pingala", "Kalayukti", "Siddharthi", "Raudri", "Durmati", "Dundubhi", "Rudhirodgari", "Raktakshi", "Krodhana", "Akshaya"
+];
+
+const samvatsaramNamesTe = [
+  "ప్రభవ", "విభవ", "శుక్ల", "ప్రమోదూత", "ప్రజాపత్య", "ఆంగీరస", "శ్రీముఖ", "భావ", "యువ", "ధాత",
+  "ఈశ్వర", "బహుధాన్య", "ప్రమాది", "విక్రమ", "వృష", "చిత్రభాను", "సుభాను", "తారణ", "పార్థివ", "వ్యయ",
+  "సర్వజిత్తు", "సర్వధారి", "విరోధి", "వికృతి", "ఖర", "నందన", "విజయ", "జయ", "మన్మథ", "దుర్ముఖి",
+  "హేవిళంబి", "విళంబి", "వికారి", "శార్వరి", "ప్లవ", "శుభకృతు", "శోభకృతు", "క్రోధి", "విశ్వావసు", "పరాభవ",
+  "ప్లవంగ", "కీలక", "సౌమ్య", "సాధారణ", "విరోధికృతు", "పరీధావి", "ప్రమాదీచ", "ఆనంద", "రాక్షస", "అనల",
+  "పింగళ", "కాళయుక్తి", "సిద్ధార్థి", "రౌద్రి", "దుర్మతి", "దుందుభి", "రుధిరోద్గారి", "రక్తాక్షి", "క్రోధన", "అక్షయ"
+];
+
+// Helper Functions
+const getLocalDateString = (d: Date) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const parseTimeToDecimal = (timeStr: string) => {
+  const match = timeStr.match(/^(\d+):(\d+)\s*(AM|PM)$/i);
+  if (!match) return 6; // default fallback 6 AM
+  let h = parseInt(match[1]);
+  const m = parseInt(match[2]);
+  const isPM = match[3].toUpperCase() === 'PM';
+  if (isPM && h !== 12) h += 12;
+  if (!isPM && h === 12) h = 0;
+  return h + m / 60;
+};
+
+const formatHourDecimal = (dec: number) => {
+  const h = Math.floor(dec);
+  const m = Math.floor((dec - h) * 60);
+  const period = h >= 12 ? 'PM' : 'AM';
+  const displayH = h % 12 === 0 ? 12 : h % 12;
+  return `${displayH.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')} ${period}`;
+};
+
+const getSiderealSunLongitude = (date: Date) => {
+  const start = new Date(date.getFullYear(), 0, 0);
+  const diff = date.getTime() - start.getTime();
+  const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+  
+  // Sidereal Sun Longitude approximation (Lahiri Ayanamsa)
+  // Day of Year for Mesha Sankranti (Sun enters Aries) is approx April 14 (day 104)
+  const meanLong = ((dayOfYear - 104) * 0.98565 + 360) % 360;
+  
+  // Sinusoidal correction for Earth's orbital eccentricity (Equation of Center)
+  const radians = Math.PI / 180;
+  const anomaly = ((dayOfYear - 4) * 0.9856 * radians); // perihelion is around Jan 4
+  const correction = 1.91 * Math.sin(anomaly);
+  
+  return (meanLong + correction + 360) % 360;
+};
+
+const getSamvatsaram = (date: Date, rashiIndex: number) => {
+  const year = date.getFullYear();
+  // If month is Magha (9) or Phalguna (10) before Ugadi, we are in previous Telugu year
+  const isBeforeUgadi = rashiIndex === 9 || rashiIndex === 10;
+  const teluguYear = isBeforeUgadi ? year - 1 : year;
+  
+  // Ugadi 1987 was Prabhava (index 0)
+  const idx = (teluguYear - 1987 + 60) % 60;
+  
+  const nameEn = samvatsaramNamesEn[idx];
+  const nameTe = samvatsaramNamesTe[idx];
+  
+  return {
+    en: `Sri ${nameEn} Nama Samvatsaram`,
+    te: `శ్రీ ${nameTe} నామ సంవత్సరం`
+  };
+};
+
+const getAyana = (date: Date) => {
+  const month = date.getMonth();
+  const day = date.getDate();
+  const isUttarayan = (month > 0 && month < 6) || 
+                      (month === 0 && day >= 14) || 
+                      (month === 6 && day < 16);
+  if (isUttarayan) {
+    return { en: "Uttarayan", te: "ఉత్తరాయణం" };
+  } else {
+    return { en: "Dakshinayan", te: "దక్షిణాయణం" };
+  }
+};
+
+const getRituvu = (rashiIndex: number) => {
+  const rituvus = [
+    { en: "Vasanta Ruthuvu", te: "వసంత ఋతువు" },   // Chaitra & Vaishakha
+    { en: "Greeshma Ruthuvu", te: "గ్రీష్మ ఋతువు" },  // Jyeshtha & Ashadha
+    { en: "Varsha Ruthuvu", te: "వర్ష ఋతువు" },     // Shravana & Bhadrapada
+    { en: "Sharad Ruthuvu", te: "శరద్ ఋతువు" },     // Ashwayuja & Kartika
+    { en: "Hemanta Ruthuvu", te: "హేమంత ఋతువు" },   // Margashira & Pushya
+    { en: "Shishira Ruthuvu", te: "శిశిర ఋతువు" }    // Magha & Phalguna
+  ];
+  
+  // Rashi index mappings: 11 (Chaitra) & 0 (Vaishakha) is Vasanta, 1 & 2 Greeshma, etc.
+  if (rashiIndex === 11 || rashiIndex === 0) return rituvus[0];
+  if (rashiIndex === 1 || rashiIndex === 2) return rituvus[1];
+  if (rashiIndex === 3 || rashiIndex === 4) return rituvus[2];
+  if (rashiIndex === 5 || rashiIndex === 6) return rituvus[3];
+  if (rashiIndex === 7 || rashiIndex === 8) return rituvus[4];
+  return rituvus[5];
+};
+
+const getMasamName = (rashiIndex: number, rashiPrev: number, rashiNext: number, rashiPrevPrev: number) => {
+  let prefixEn = "";
+  let prefixTe = "";
+  
+  if (rashiPrev === rashiNext) {
+    prefixEn = "Adhika ";
+    prefixTe = "అధిక ";
+  } else if (rashiPrev === rashiPrevPrev) {
+    prefixEn = "Nija ";
+    prefixTe = "నిజ ";
+  }
+  
+  return {
+    en: `${prefixEn}${masamNamesEn[rashiIndex]}`,
+    te: `${prefixTe}${masamNamesTe[rashiIndex]}`
+  };
+};
+
+// API Mapping Layer
+const mapApiDetailsToUI = (apiData: any, currentDate: Date) => {
+  const tithiNumber = apiData.tithi.number;
+  const sunLongitude = apiData.sun_longitude;
+  
+  // Calculate Sun's longitude at previous, next, and double-previous Amavasya
+  const sunLongPrevAmavasya = (sunLongitude - (tithiNumber * 0.9856 * 0.9843) + 360) % 360;
+  const sunLongNextAmavasya = (sunLongitude + (30 - tithiNumber) * 0.9856 * 0.9843 + 360) % 360;
+  const sunLongPrevPrev = (sunLongPrevAmavasya - 29.53 + 360) % 360;
+
+  const rashiPrev = Math.floor(sunLongPrevAmavasya / 30);
+  const rashiNext = Math.floor(sunLongNextAmavasya / 30);
+  const rashiPrevPrev = Math.floor(sunLongPrevPrev / 30);
+  const rashiIndex = rashiPrev; 
+
+  // Resolve Tithi Details
+  const isShukla = tithiNumber <= 15;
+  const tithiIdx = isShukla ? tithiNumber - 1 : tithiNumber - 16;
+  const tithiNameEn = tithiNamesEn[tithiIdx];
+  const tithiNameTe = tithiNamesTe[tithiIdx];
+  const pakshaEn = isShukla ? "Shukla Paksha" : "Krishna Paksha";
+  const pakshaTe = isShukla ? "శుక్ల పక్షం" : "కృష్ణ పక్షం";
+
+  // Resolve Nakshatra Details
+  const nakshatraNameApi = apiData.nakshatra.name;
+  const nIdx = nakshatraNamesEn.findIndex(name => name.toLowerCase() === nakshatraNameApi.toLowerCase());
+  const nakshatraEn = nIdx !== -1 ? nakshatraNamesEn[nIdx] : nakshatraNameApi;
+  const nakshatraTe = nIdx !== -1 ? nakshatraNamesTe[nIdx] : nakshatraNameApi;
+
+  // Resolve Yoga Details
+  const yogaNameApi = apiData.yoga.name;
+  const yIdx = yogaNamesEn.findIndex(name => name.toLowerCase() === yogaNameApi.toLowerCase());
+  const yogaEn = yIdx !== -1 ? yogaNamesEn[yIdx] : yogaNameApi;
+  const yogaTe = yIdx !== -1 ? yogaNamesTe[yIdx] : yogaNameApi;
+
+  // Resolve Karana Details
+  const karanaNameApi = apiData.karana.name;
+  const kIdx = karanaNamesEn.findIndex(name => name.toLowerCase() === karanaNameApi.toLowerCase());
+  const karanaEn = kIdx !== -1 ? karanaNamesEn[kIdx] : karanaNameApi;
+  const karanaTe = kIdx !== -1 ? karanaNamesTe[kIdx] : karanaNameApi;
+
+  // Parse sunrise & sunset for varjyam / durmuhurtham math
+  const sunriseHour = parseTimeToDecimal(apiData.sun.sunrise);
+  const sunsetHour = parseTimeToDecimal(apiData.sun.sunset);
+  
+  const varjyamStartHour = sunriseHour + 4;
+  const varjyamEndHour = varjyamStartHour + 1.8;
+  const durmuhurthamStart = sunsetHour - 1.5;
+  const durmuhurthamEnd = durmuhurthamStart + 0.8;
+
+  return {
+    masam: getMasamName(rashiIndex, rashiPrev, rashiNext, rashiPrevPrev),
+    paksha: { en: pakshaEn, te: pakshaTe },
+    samvatsaram: getSamvatsaram(currentDate, rashiIndex),
+    ayana: getAyana(currentDate),
+    rituvu: getRituvu(rashiIndex),
+    tithi: {
+      en: `${tithiNameEn} (Until next change)`,
+      te: `${tithiNameTe} (${pakshaTe})`
+    },
+    nakshatra: {
+      en: `${nakshatraEn} (Pada ${apiData.nakshatra.pada || 1})`,
+      te: `${nakshatraTe} (${apiData.nakshatra.pada || 1}వ పాదం)`
+    },
+    yoga: {
+      en: yogaEn,
+      te: yogaTe
+    },
+    karana: {
+      en: karanaEn,
+      te: karanaTe
+    },
+    sunrise: apiData.sun.sunrise,
+    sunset: apiData.sun.sunset,
+    varjyam: `${formatHourDecimal(varjyamStartHour)} – ${formatHourDecimal(varjyamEndHour)}`,
+    durmuhurtham: `${formatHourDecimal(durmuhurthamStart)} – ${formatHourDecimal(durmuhurthamEnd)}`,
+    rahuKalam: apiData.muhurta.rahu_kalam,
+    yamagandam: apiData.muhurta.yamagandam,
+    gulika: apiData.muhurta.gulika_kalam
+  };
+};
+
+const getPartRange = (sunriseHour: number, sunsetHour: number, dayOfWeek: number, parts: number[]) => {
+  const sunriseMin = sunriseHour * 60;
+  const sunsetMin = sunsetHour * 60;
+  const dayLength = sunsetMin - sunriseMin;
+  const partLength = dayLength / 8;
+  const partNumber = parts[dayOfWeek];
+  const startMin = sunriseMin + (partNumber - 1) * partLength;
+  const endMin = sunriseMin + partNumber * partLength;
+  return `${formatHourDecimal(startMin / 60)} – ${formatHourDecimal(endMin / 60)}`;
+};
+
+// Offline Trigonometric Fallback Engine (Visakhapatnam Coordinates: 17.6868° N, 83.2185° E)
+const getPanchangDetailsOffline = (currentDate: Date) => {
+  const sunLongitude = getSiderealSunLongitude(currentDate);
+
+  const julianDate = currentDate.getTime() / 86400000 + 2440587.5;
+  const referenceJulian = 2461176.5; 
+  const daysSinceRef = julianDate - referenceJulian;
+  const cycle = 29.530588853;
+  const currentAge = (daysSinceRef % cycle + cycle) % cycle;
+  
+  const tithiDouble = (currentAge / cycle) * 30;
+  const tithiNum = Math.floor(tithiDouble) + 1; 
+  
+  const siderealCycle = 27.321661;
+  const refSidereal = 2461173.65; 
+  const siderealAge = ((julianDate - refSidereal) % siderealCycle + siderealCycle) % siderealCycle;
+  const nakshatraNum = Math.floor((siderealAge / siderealCycle) * 27) + 1;
+  
+  const dayOfWeek = currentDate.getDay();
+  const start = new Date(currentDate.getFullYear(), 0, 0);
+  const diff = currentDate.getTime() - start.getTime();
+  const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+  
+  const lat = 17.6868;
+  const lng = 83.2185;
+  const radians = Math.PI / 180;
+  
+  const declination = 23.45 * Math.sin(2 * Math.PI * (284 + dayOfYear) / 365);
+  const decRad = declination * radians;
+  const latRad = lat * radians;
+  
+  const cosH = (Math.sin(-0.833 * radians) - Math.sin(latRad) * Math.sin(decRad)) / (Math.cos(latRad) * Math.cos(decRad));
+  let H = 6; 
+  if (cosH >= -1 && cosH <= 1) {
+    H = Math.acos(cosH) / radians / 15;
+  }
+  
+  const eqTime = 9.87 * Math.sin(2 * (360 * (dayOfYear - 81) / 365) * radians) - 7.53 * Math.cos((360 * (dayOfYear - 81) / 365) * radians) - 1.5 * Math.sin((360 * (dayOfYear - 81) / 365) * radians);
+  const solNoon = 12 - (eqTime / 60) + (82.5 - lng) * 4 / 60;
+  
+  const sunriseHour = solNoon - H;
+  const sunsetHour = solNoon + H;
+
+  const mockApiData = {
+    tithi: { number: tithiNum, name: tithiNamesEn[tithiNum - 1] },
+    nakshatra: { name: nakshatraNamesEn[nakshatraNum - 1], pada: 1 },
+    yoga: { name: yogaNamesEn[((tithiNum + nakshatraNum) % 27)] },
+    karana: { name: karanaNamesEn[((tithiNum * 2) % 11)] },
+    sun: {
+      sunrise: formatHourDecimal(sunriseHour),
+      sunset: formatHourDecimal(sunsetHour)
+    },
+    sun_longitude: sunLongitude,
+    muhurta: {
+      rahu_kalam: getPartRange(sunriseHour, sunsetHour, dayOfWeek, [8, 2, 7, 5, 6, 4, 3]),
+      yamagandam: getPartRange(sunriseHour, sunsetHour, dayOfWeek, [5, 4, 3, 2, 1, 7, 6]),
+      gulika_kalam: getPartRange(sunriseHour, sunsetHour, dayOfWeek, [7, 6, 5, 4, 3, 2, 1])
+    }
+  };
+
+  return mapApiDetailsToUI(mockApiData, currentDate);
+};
+
 const Panchangam = () => {
   const [date, setDate] = useState(new Date());
+  const [apiData, setApiData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
+  // Time updater
   useEffect(() => {
     const timer = setInterval(() => setDate(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
+
+  // Fetch astronomical data from Nitya Panchangam API
+  useEffect(() => {
+    let active = true;
+    const formattedDate = getLocalDateString(date);
+
+    const fetchPanchang = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `https://nityapanchangam.com/api/panchangam.php?date=${formattedDate}&lat=17.6868&lng=83.2185`
+        );
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        if (data && !data.error) {
+          if (active) {
+            setApiData(data);
+          }
+        } else {
+          throw new Error(data?.error || 'API returned an error');
+        }
+      } catch (err) {
+        console.error('Error fetching Panchangam API, falling back to offline equations:', err);
+        if (active) {
+          setApiData(null); // Triggers fallback to local calculations
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchPanchang();
+
+    return () => {
+      active = false;
+    };
+  }, [getLocalDateString(date)]);
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-IN', {
@@ -23,247 +424,32 @@ const Panchangam = () => {
     return { en: days[date.getDay()], te: teluguDays[date.getDay()] };
   };
 
-  // Dynamic Astrological Calculations (Visakhapatnam Coordinates: 17.6868° N, 83.2185° E)
-  const getPanchangDetails = (currentDate: Date) => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth() + 1; // 1-12
-    const day = currentDate.getDate();
-    
-    // 100% accurate, real-world Telugu calendar data override for May 24, 2026
-    if (year === 2026 && month === 5 && day === 24) {
-      return {
-        masam: { en: 'Adhika Jyeshtha Masam', te: 'అధిక జ్యేష్ఠ మాసం' },
-        paksha: { en: 'Shukla Paksha', te: 'శుక్ల పక్షం' },
-        samvatsaram: { en: 'Sri Parabhava Nama Samvatsaram', te: 'శ్రీ పరాభవ నామ సంవత్సరం' },
-        ayana: { en: 'Uttarayan', te: 'ఉత్తరాయణం' },
-        rituvu: { en: 'Greeshma Ruthuvu', te: 'గ్రీష్మ ఋతువు' },
-        tithi: { 
-          en: 'Navami (Until 04:22 AM, May 25)', 
-          te: 'నవమి (తెల్లవారుజామున 04:22 వరకు), తరువాత దశమి' 
-        },
-        nakshatra: { 
-          en: 'Poorva Phalguni / Pubba (Until 02:48 AM, May 25)', 
-          te: 'పూర్వ ఫల్గుణి / పుబ్బ (రాత్రి 02:48 వరకు), తరువాత ఉత్తర ఫల్గుణి' 
-        },
-        yoga: { 
-          en: 'Harshana (Until 02:41 AM, May 25)', 
-          te: 'హర్షణ (రాత్రి 02:41 వరకు)' 
-        },
-        karana: { 
-          en: 'Balava (Until 04:29 PM) & Kaulava (Until 04:32 AM, May 25)', 
-          te: 'బాలవ (సాయంత్రం 04:29 వరకు) & కౌలవ (తెల్లవారుజామున 04:32 వరకు)' 
-        },
-        sunrise: "05:45 AM",
-        sunset: "06:40 PM",
-        varjyam: "10:23 AM – 12:02 PM",
-        durmuhurtham: "04:56 PM – 05:48 PM",
-        rahuKalam: "05:02 PM – 06:40 PM",
-        yamagandam: "12:13 PM – 01:49 PM",
-        gulika: "03:26 PM – 05:02 PM"
-      };
-    }
+  const details = apiData 
+    ? mapApiDetailsToUI(apiData, date) 
+    : getPanchangDetailsOffline(date);
 
-    // 1. Sunrise & Sunset Solar Equations for Visakhapatnam
-    const start = new Date(currentDate.getFullYear(), 0, 0);
-    const diff = currentDate.getTime() - start.getTime();
-    const oneDay = 1000 * 60 * 60 * 24;
-    const dayOfYear = Math.floor(diff / oneDay);
-    
-    const lat = 17.6868;
-    const lng = 83.2185;
-    const radians = Math.PI / 180;
-    
-    const declination = 23.45 * Math.sin(2 * Math.PI * (284 + dayOfYear) / 365);
-    const decRad = declination * radians;
-    const latRad = lat * radians;
-    
-    const cosH = (Math.sin(-0.833 * radians) - Math.sin(latRad) * Math.sin(decRad)) / (Math.cos(latRad) * Math.cos(decRad));
-    let H = 6; 
-    if (cosH >= -1 && cosH <= 1) {
-      H = Math.acos(cosH) / radians / 15;
-    }
-    
-    const eqTime = 9.87 * Math.sin(2 * (360 * (dayOfYear - 81) / 365) * radians) - 7.53 * Math.cos((360 * (dayOfYear - 81) / 365) * radians) - 1.5 * Math.sin((360 * (dayOfYear - 81) / 365) * radians);
-    const solNoon = 12 - (eqTime / 60) + (82.5 - lng) * 4 / 60;
-    
-    const sunriseHour = solNoon - H;
-    const sunsetHour = solNoon + H;
-    
-    const formatTime = (hourDecimal: number) => {
-      const h = Math.floor(hourDecimal);
-      const m = Math.floor((hourDecimal - h) * 60);
-      const period = h >= 12 ? 'PM' : 'AM';
-      const displayH = h % 12 === 0 ? 12 : h % 12;
-      return `${displayH.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')} ${period}`;
-    };
-    
-    const sunriseMin = sunriseHour * 60;
-    const sunsetMin = sunsetHour * 60;
-    
-    // 2. Auspicious Timings calculated from Sunrise & Sunset
-    const dayOfWeek = currentDate.getDay();
-    const dayLength = sunsetMin - sunriseMin;
-    const partLength = dayLength / 8;
-    
-    const rahuParts = [8, 2, 7, 5, 6, 4, 3]; 
-    const yamaParts = [5, 4, 3, 2, 1, 7, 6];
-    const gulikaParts = [7, 6, 5, 4, 3, 2, 1];
-    
-    const getPartRange = (partNumber: number) => {
-      const startMin = sunriseMin + (partNumber - 1) * partLength;
-      const endMin = sunriseMin + partNumber * partLength;
-      return `${formatTime(startMin / 60)} – ${formatTime(endMin / 60)}`;
-    };
-    
-    // 3. Moon Phase (Tithi & Paksha) & Sidereal Moon Orbit (Nakshatra)
-    const julianDate = currentDate.getTime() / 86400000 + 2440587.5;
-    const referenceJulian = 2461176.5; // Highly Calibrated Reference for May 2026
-    const daysSinceRef = julianDate - referenceJulian;
-    const cycle = 29.530588853;
-    const currentAge = (daysSinceRef % cycle + cycle) % cycle;
-    
-    const tithiDouble = (currentAge / cycle) * 30;
-    const tithiNum = Math.floor(tithiDouble) + 1; 
-    
-    const siderealCycle = 27.321661;
-    const refSidereal = 2461173.65; // Highly Calibrated Reference for May 2026
-    const siderealAge = ((julianDate - refSidereal) % siderealCycle + siderealCycle) % siderealCycle;
-    const nakshatraNum = Math.floor((siderealAge / siderealCycle) * 27) + 1;
-    
-    const tithiNamesEn = [
-      'Prathama', 'Dwitiya', 'Tritiya', 'Chaturthi', 'Panchami', 
-      'Shashti', 'Saptami', 'Ashtami', 'Navami', 'Dashami', 
-      'Ekadashi', 'Dwadashi', 'Trayodashi', 'Chaturdashi', 'Pournami',
-      'Prathama', 'Dwitiya', 'Tritiya', 'Chaturthi', 'Panchami', 
-      'Shashti', 'Saptami', 'Ashtami', 'Navami', 'Dashami', 
-      'Ekadashi', 'Dwadashi', 'Trayodashi', 'Chaturdashi', 'Amavasya'
-    ];
-    
-    const tithiNamesTe = [
-      'పాడ్యమి', 'విదియ', 'తదియ', 'చవితి', 'పంచమి', 
-      'షష్ఠి', 'సప్తమి', 'అష్టమి', 'నవమి', 'దశమి', 
-      'ఏకాదశి', 'ద్వాదశి', 'త్రయోదశి', 'చతుర్దశి', 'పౌర్ణమి',
-      'పాడ్యమి', 'విదియ', 'తదియ', 'చవితి', 'పంచమి', 
-      'షష్ఠి', 'సప్తమి', 'అష్టమి', 'నవమి', 'దశమి', 
-      'ఏకాదశి', 'ద్వాదశి', 'త్రయోదశి', 'చతుర్దశి', 'అమావాస్య'
-    ];
-    
-    const pakshaName = tithiNum <= 15 
-      ? { en: 'Shukla Paksha', te: 'శుక్ల పక్షం' } 
-      : { en: 'Krishna Paksha', te: 'కృష్ణ పక్షం' };
-      
-    const nakshatraNamesEn = [
-      'Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira', 'Ardra', 
-      'Punarvasu', 'Pushya', 'Ashlesha', 'Magha', 'Poorva Phalguni', 'Uttara Phalguni', 
-      'Hasta', 'Chitra', 'Swati', 'Vishakha', 'Anuradha', 'Jyeshta', 'Mula', 
-      'Poorvashadha', 'Uttarashadha', 'Shravana', 'Dhanishta', 'Shatabhisha', 
-      'Poorvabhadra', 'Uttarabhadra', 'Revati'
-    ];
-    
-    const nakshatraNamesTe = [
-      'అశ్విని', 'భరణి', 'కృత్తిక', 'రోహిణి', 'మృగశిర', 'ఆరుద్ర', 
-      'పునర్వసు', 'పుష్యమి', 'ఆశ్లేష', 'మఖ', 'పూర్వఫల్గుణి', 'ఉత్తరఫల్గుణి', 
-      'హస్త', 'చిత్త', 'స్వాతి', 'విశాఖ', 'అనూరాధ', 'జ్యేష్ఠ', 'మూల', 
-      'పూర్వాషాఢ', 'ఉత్తరాషాఢ', 'శ్రవణం', 'ధనిష్ఠ', 'శతభిషం', 
-      'పూర్వాభాద్ర', 'ఉత్తరాభాద్ర', 'రేవతి'
-    ];
-    
-    const yogaNamesEn = [
-      'Vishkumbha', 'Preeti', 'Ayushman', 'Saubhagya', 'Shobhana', 'Atiganda',
-      'Sukarma', 'Dhriti', 'Shoola', 'Ganda', 'Vriddhi', 'Dhruva', 'Vyaghati',
-      'Harshana', 'Vajra', 'Siddhi', 'Vyatipata', 'Variyan', 'Parigha', 'Shiva',
-      'Siddha', 'Sadhya', 'Shubha', 'Shukla', 'Brahma', 'Indra', 'Vaidhriti'
-    ];
-    
-    const yogaNamesTe = [
-      'విష్కంభం', 'ప్రీతి', 'ఆయుష్మాన్', 'సౌభాగ్యం', 'శోభనం', 'అతిగండం',
-      'సుకర్మ', 'ధృతి', 'శూలం', 'గండం', 'వృద్ధి', 'ధ్రువం', 'వ్యాఘాతం',
-      'హర్షణం', 'వజ్రం', 'సిద్ధి', 'వ్యతీపాతం', 'వరియాన్', 'పరిఘం', 'శివం',
-      'సిద్ధం', 'సాధ్యం', 'శుభం', 'శుక్లం', 'బ్రహ్మం', 'ఐంద్రం', 'వైధృతి'
-    ];
-    
-    const karanaNamesEn = [
-      'Bava', 'Balava', 'Kaulava', 'Taitila', 'Gara', 'Vanija', 'Vishti',
-      'Shakuni', 'Chatushpada', 'Naga', 'Kintughna'
-    ];
-    
-    const karanaNamesTe = [
-      'బవ', 'బాలవ', 'కౌలవ', 'తైతుల', 'గరజ', 'వణిజ', 'విష్టి',
-      'శకుని', 'చతుష్పాద', 'నాగ', 'కింస్తుఘ్నం'
-    ];
-     
-    const yogaNum = ((tithiNum + nakshatraNum) % 27) + 1;
-    const karanaNum = ((tithiNum * 2) % 11) + 1;
-    
-    const monthIndex = currentDate.getMonth(); 
-    let masamIdx = monthIndex;
-    if (currentDate.getDate() < 15) {
-      masamIdx = (monthIndex - 1 + 12) % 12;
-    }
-    
-    const masamNamesEn = [
-      'Chaitra Masam', 'Vaishakha Masam', 'Jyeshtha Masam', 'Ashadha Masam', 
-      'Shravana Masam', 'Bhadrapada Masam', 'Ashvin Masam', 'Kartika Masam', 
-      'Margashira Masam', 'Pushya Masam', 'Magha Masam', 'Phalguna Masam'
-    ];
-    
-    const masamNamesTe = [
-      'చైత్ర మాసం', 'వైశాఖ మాసం', 'జ్యేష్ఠ మాసం', 'ఆషాఢ మాసం', 
-      'శ్రావణ మాసం', 'భాద్రపద మాసం', 'ఆశ్వయుజ మాసం', 'కార్తీక మాసం', 
-      'మార్గశిర మాసం', 'పుష్య మాసం', 'మాఘ మాసం', 'ఫాల్గుణ మాసం'
-    ];
-    
-    const nextTithiChangeHour = ((tithiDouble % 1) * 24);
-    const changeHour = Math.floor(nextTithiChangeHour);
-    const changeMin = Math.floor((nextTithiChangeHour - changeHour) * 60);
-    const ampm = changeHour >= 12 ? 'PM' : 'AM';
-    const displayHour = changeHour % 12 === 0 ? 12 : changeHour % 12;
-    const untilTime = `${displayHour.toString().padStart(2, '0')}:${changeMin.toString().padStart(2, '0')} ${ampm}`;
-    
-    const varjyamStartHour = (sunriseHour + 4);
-    const varjyamEndHour = (varjyamStartHour + 1.8);
-    const formatHourDecimal = (dec: number) => {
-      const h = Math.floor(dec);
-      const m = Math.floor((dec - h) * 60);
-      const period = h >= 12 ? 'PM' : 'AM';
-      const displayH = h % 12 === 0 ? 12 : h % 12;
-      return `${displayH.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')} ${period}`;
-    };
-    
-    return {
-      masam: { en: masamNamesEn[masamIdx], te: masamNamesTe[masamIdx] },
-      paksha: pakshaName,
-      samvatsaram: { en: 'Sri Parabhava Nama Samvatsaram', te: 'శ్రీ పరాభవ నామ సంవత్సరం' },
-      ayana: { en: 'Uttarayan', te: 'ఉత్తరాయణం' },
-      rituvu: { en: 'Greeshma Ruthuvu', te: 'గ్రీష్మ ఋతువు' },
-      tithi: { 
-        en: `${tithiNamesEn[tithiNum - 1]} (Until ${untilTime})`, 
-        te: `${tithiNamesTe[tithiNum - 1]} (సాయంత్రం ${untilTime} వరకు)` 
-      },
-      nakshatra: { 
-        en: nakshatraNamesEn[nakshatraNum - 1], 
-        te: nakshatraNamesTe[nakshatraNum - 1] 
-      },
-      yoga: { 
-        en: `${yogaNamesEn[yogaNum - 1]} (Until ${untilTime})`, 
-        te: `${yogaNamesTe[yogaNum - 1]} (సాయంత్రం ${untilTime} వరకు)` 
-      },
-      karana: { 
-        en: `${karanaNamesEn[karanaNum - 1]} (Until ${untilTime})`, 
-        te: `${karanaNamesTe[karanaNum - 1]} (సాయంత్రం ${untilTime} వరకు)` 
-      },
-      sunrise: formatTime(sunriseHour),
-      sunset: formatTime(sunsetHour),
-      varjyam: `${formatHourDecimal(varjyamStartHour)} – ${formatHourDecimal(varjyamEndHour)}`,
-      durmuhurtham: `${formatHourDecimal(sunsetHour - 1.5)} – ${formatHourDecimal(sunsetHour - 0.7)}`,
-      rahuKalam: getPartRange(rahuParts[dayOfWeek]),
-      yamagandam: getPartRange(yamaParts[dayOfWeek]),
-      gulika: getPartRange(gulikaParts[dayOfWeek])
-    };
-  };
-
-  const details = getPanchangDetails(date);
   const day = formatDay(date);
+
+  if (loading) {
+    return (
+      <section id="panchangam" className="section-padding bg-gradient-to-b from-white to-primary/5 py-6 sm:py-8 relative overflow-hidden">
+        <div className="container-custom relative z-10 px-4">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/20 mb-6">
+              <CalendarIcon className="w-4 h-4 text-primary animate-pulse" />
+              <span className="text-xs font-bold tracking-[0.2em] uppercase text-primary animate-pulse">Loading Sacred Almanac...</span>
+            </div>
+          </div>
+          <div className="flex items-center justify-center min-h-[350px]">
+            <div className="relative">
+              <div className="w-16 h-16 border-4 border-amber-600/20 border-t-amber-600 rounded-full animate-spin"></div>
+              <div className="absolute inset-0 flex items-center justify-center text-xl font-bold text-amber-600 animate-pulse font-serif">ॐ</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="panchangam" className="section-padding bg-gradient-to-b from-white to-primary/5 py-6 sm:py-8 relative overflow-hidden">

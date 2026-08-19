@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   CreditCard, 
   Landmark, 
@@ -8,21 +8,28 @@ import {
   Sparkles, 
   Utensils, 
   Award, 
-  QrCode, 
   Download, 
   Printer, 
   User, 
   Phone, 
   CheckCircle2, 
   RefreshCw,
-  Lock
+  Lock,
+  Calendar,
+  Star
 } from "lucide-react";
 import { toast } from "sonner";
-// @ts-ignore
 import html2pdf from "html2pdf.js";
+import vinayakaLogo from "@/assets/vinayaka-logo.png";
 
-const Donations = () => {
-  const [activeTab, setActiveTab] = useState<"prasada" | "anna">("prasada");
+interface DonationsProps {
+  preselectedSeva?: string | null;
+  preselectedAmount?: number | null;
+  clearPreselect?: () => void;
+}
+
+const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: DonationsProps) => {
+  const [activeTab, setActiveTab] = useState<"prasada" | "anna" | "special">("prasada");
 
   // E-Receipt Form States
   const [isReceiptFormOpen, setIsReceiptFormOpen] = useState(false);
@@ -34,7 +41,18 @@ const Donations = () => {
   const [address, setAddress] = useState("");
   const [amountPaid, setAmountPaid] = useState("");
   const [sevaPurpose, setSevaPurpose] = useState("General Donation");
+  const [poojaDate, setPoojaDate] = useState("");
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
+  const hasFixedPrice = sevaPurpose !== "General Donation" && sevaPurpose !== "Annadanam";
+
+  useEffect(() => {
+    if (preselectedSeva) {
+      handleSponsorSelect(preselectedSeva, preselectedAmount || null);
+      if (clearPreselect) {
+        clearPreselect();
+      }
+    }
+  }, [preselectedSeva, preselectedAmount]);
   const [screenshotPreview, setScreenshotPreview] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [generatedReceipt, setGeneratedReceipt] = useState<{
@@ -50,6 +68,7 @@ const Donations = () => {
     proofUrl: string;
     paymentId?: string;
     isOnline?: boolean;
+    poojaDate?: string;
   } | null>(null);
 
   const loadRazorpay = () => {
@@ -95,6 +114,10 @@ const Donations = () => {
     switch (purpose) {
       case "General Donation":
         return "General Donation / సాధారణ విరాళం";
+      case "Saswatha Abhisheka Seva":
+        return "Saswatha Abhisheka Seva / శాశ్వత అభిషేక सేవ";
+      case "Ganesha Navaratri Abhishekam":
+        return "Ganesha Navaratri Abhishekam / గణపతి నవరాత్రుల అభిషేకం";
       case "Annadanam":
         return "Annadanam / అన్నదానం";
       case "Pulihora Daily":
@@ -102,8 +125,8 @@ const Donations = () => {
         return "Pulihora / పులిహోర";
       case "Sweet Pongal 10 Kg":
         return "Sweet Pongal / Kesari (10 Kg) / 10 కేజీల చక్కెరపొంగలి";
-      case "Undrallu Daily":
-        return "Undrallu / ఉండ్రాళ్ళు";
+      case "Sanagalu Daily":
+        return "Sanagalu / శనగలు";
       case "Undrallu 10 Kg":
         return "Undrallu (10 Kg) / 10 కేజీల ఉండ్రాళ్ళు";
       case "Sweet Undrallu 10 Kg":
@@ -165,6 +188,13 @@ const Donations = () => {
       return;
     }
 
+    const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
+    if (!razorpayKey) {
+      toast.error("Razorpay Key is not configured. Please check VITE_RAZORPAY_KEY_ID in .env file.");
+      setIsUploading(false);
+      return;
+    }
+
     const today = new Date().toLocaleDateString('en-IN', {
       day: '2-digit',
       month: 'long',
@@ -178,13 +208,13 @@ const Donations = () => {
     const isEmail = emailRegex.test(contactTrimmed);
 
     const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_live_T5mLmd5srlk0IP",
+      key: razorpayKey,
       amount: Math.round(Number(amountPaid) * 100), // in paise
       currency: "INR",
       name: "Sri Sampath Vinayakagar Temple",
       description: getSevaDisplayName(sevaPurpose) || "General Donation",
-      image: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png",
-      handler: function (response: any) {
+      image: window.location.origin + "/logo.png",
+      handler: function (response: { razorpay_payment_id: string }) {
         const paymentId = response.razorpay_payment_id;
         toast.success(`Payment successful! Txn ID: ${paymentId}`);
 
@@ -198,9 +228,10 @@ const Donations = () => {
           amount: amountPaid,
           purpose: getSevaDisplayName(sevaPurpose),
           date: today,
-          proofUrl: "", // no screenshot URL needed
-          paymentId,
+          proofUrl: "",
           isOnline: true,
+          paymentId,
+          poojaDate: poojaDate ? new Date(poojaDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : undefined
         };
 
         setGeneratedReceipt(receiptData);
@@ -332,6 +363,31 @@ const Donations = () => {
     }
   };
 
+  const handleSevaPurposeChange = (purposeValue: string) => {
+    setSevaPurpose(purposeValue);
+    
+    const sevaPrices: Record<string, number | null> = {
+      "General Donation": null,
+      "Annadanam": 100,
+      "Pulihora Daily": 1000,
+      "Sweet Pongal 10 Kg": 1800,
+      "Sanagalu Daily": 1000,
+      "Undrallu 10 Kg": 1000,
+      "Sweet Undrallu 10 Kg": 1800,
+      "Saswatha Abhisheka Seva": 5000,
+      "Ganesha Navaratri Abhishekam": 2500,
+    };
+    
+    if (purposeValue in sevaPrices) {
+      const price = sevaPrices[purposeValue];
+      if (price !== null) {
+        setAmountPaid(price.toString());
+      } else {
+        setAmountPaid("");
+      }
+    }
+  };
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -446,6 +502,7 @@ const Donations = () => {
         date: today,
         proofUrl: uploadedUrl,
         isOnline: false,
+        poojaDate: poojaDate ? new Date(poojaDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : undefined,
       });
 
       setIsUploading(false);
@@ -483,6 +540,13 @@ const Donations = () => {
         <td class="value-td">${generatedReceipt.gotram}</td>
         <td class="label-td">Star / నక్షత్రం:</td>
         <td class="value-td">${generatedReceipt.nakshatram || 'N/A'}</td>
+      </tr>
+    ` : '';
+
+    const poojaDateRow = generatedReceipt?.poojaDate ? `
+      <tr>
+        <td class="label-td">Pooja Date / పూజ తేదీ:</td>
+        <td class="value-td" colspan="3">${generatedReceipt.poojaDate}</td>
       </tr>
     ` : '';
 
@@ -528,7 +592,7 @@ const Donations = () => {
             .logo-img {
               width: 75px;
               height: 75px;
-              object-fit: contain;
+              object-fit: cover;
               margin-right: 15px;
               border-radius: 50%;
               border: 2px solid #ca8a04;
@@ -666,7 +730,7 @@ const Donations = () => {
         <body>
           <div class="receipt-container">
             <div class="header-container">
-              <img src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png" class="logo-img" alt="Temple Logo" />
+              <img src="${window.location.origin}/logo.png" class="logo-img" alt="Temple Logo" />
               <div class="header-text">
                 <p class="gov-text">GOVERNMENT OF ANDHRA PRADESH - ENDOWMENTS DEPARTMENT</p>
                 <h1 class="temple-title">SRI SAMPATH VINAYAKAGAR TEMPLE</h1>
@@ -691,6 +755,7 @@ const Donations = () => {
                 <td class="value-td" colspan="3"><strong>${generatedReceipt?.name}</strong></td>
               </tr>
               ${gotramRow}
+              ${poojaDateRow}
               <tr>
                 <td class="label-td">Contact / సంప్రదించండి:</td>
                 <td class="value-td" colspan="3">${generatedReceipt?.phoneOrEmail}</td>
@@ -819,7 +884,8 @@ const Donations = () => {
             <div className="flex flex-wrap border-b border-stone-200 bg-stone-50 p-2 gap-2">
               {[
                 { id: "prasada", label: "Prasada Seva (ప్రసాద సేవ)", icon: <Sparkles size={16} /> },
-                { id: "anna", label: "Anna Prasadam (అన్న ప్రసాదం)", icon: <Utensils size={16} /> }
+                { id: "anna", label: "Anna Prasadam (అన్న ప్రసాదం)", icon: <Utensils size={16} /> },
+                { id: "special", label: "Special Seva (ప్రత్యేక సేవ)", icon: <Star size={16} /> }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -863,7 +929,7 @@ const Donations = () => {
                         {[
                           { name: "Pulihora", te: "పులిహోర", day: "Daily (ప్రతిరోజూ)", price: 1000, key: "Pulihora Daily" },
                           { name: "Sweet Pongal / Kesari (10 Kg)", te: "10 కేజీల చక్కెరపొంగలి", day: "Daily (ప్రతిరోజూ)", price: 1800, key: "Sweet Pongal 10 Kg" },
-                          { name: "Undrallu", te: "ఉండ్రాళ్ళు", day: "Daily (ప్రతిరోజూ)", price: 1000, key: "Undrallu Daily" },
+                          { name: "Sanagalu", te: "శనగలు", day: "Daily (ప్రతిరోజూ)", price: 1000, key: "Sanagalu Daily" },
                           { name: "Undrallu (10 Kg)", te: "10 కేజీల ఉండ్రాళ్ళు", day: "Wed Only (బుధవారం)", price: 1000, key: "Undrallu 10 Kg" },
                           { name: "Sweet Undrallu (10 Kg)", te: "10 కేజీల తీపి ఉండ్రాళ్ళు", day: "Fri Only (శుక్రవారం)", price: 1800, key: "Sweet Undrallu 10 Kg" }
                         ].map((item, i) => (
@@ -915,35 +981,71 @@ const Donations = () => {
                       </div>
                     </div>
 
-                    <div className="p-6 rounded-2xl border border-stone-200 flex flex-col justify-between">
+                    <div className="p-6 rounded-2xl border border-stone-200 flex flex-col justify-between h-full">
                       <div>
-                        <h5 className="font-serif font-bold text-amber-600 text-sm mb-2">Sponsor Food Distribution</h5>
-                        <p className="text-stone-600 text-xs leading-relaxed mb-4">
-                          You can sponsor Annadanam on special occasions like birthdays, marriages, or in memory of loved ones. Select an option to pre-fill.
+                        <h5 className="font-serif font-bold text-amber-600 text-sm mb-2">Sponsor Food Distribution / అన్నదానం</h5>
+                        <p className="text-stone-600 text-xs leading-relaxed mb-3">
+                          Sponsor Annadanam on special occasions like birthdays, marriages, or in memory of loved ones. Contribution starts from ₹100.
+                        </p>
+                        <p className="text-stone-500 text-[11px] leading-relaxed mb-6 font-sans">
+                          పుట్టినరోజులు, వివాహాలు లేదా ప్రియమైనవారి జ్ఞాపకార్థం అన్నదానం స్పాన్సర్ చేయండి. కనీస విరాళం ₹100 నుండి ప్రారంభం (మీకు నచ్చినంత సమర్పించవచ్చు).
                         </p>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          { label: "Sponsor 100 Devotees", amount: 1500 },
-                          { label: "Sponsor 250 Devotees", amount: 3500 },
-                          { label: "Sponsor 500 Devotees", amount: 7000 }
-                        ].map((tier, i) => (
-                          <button
-                            key={i}
-                            onClick={() => handleSponsorSelect(`Annadanam - ${tier.label}`, tier.amount)}
-                            className="flex-1 min-w-[110px] px-3 py-2.5 rounded-xl bg-amber-50 border border-amber-100 hover:border-amber-300 text-amber-900 font-bold text-xs text-center transition-all hover:scale-[1.02]"
-                          >
-                            ₹{tier.amount.toLocaleString('en-IN')}
-                          </button>
-                        ))}
-                        <button
-                          onClick={() => handleSponsorSelect("Annadanam", null)}
-                          className="flex-1 min-w-[110px] px-3 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 border border-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold text-xs text-center transition-all hover:scale-[1.02]"
-                        >
-                          Custom Amount
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => handleSponsorSelect("Annadanam", 100)}
+                        className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 border border-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold text-xs text-center transition-all hover:scale-[1.02] shadow-sm"
+                      >
+                        Sponsor Annadanam (కనీస విరాళం ₹100)
+                      </button>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "special" && (
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
+                    <div>
+                      <h4 className="text-amber-900 text-base font-bold font-serif">Special Puja & Abhisheka Sevas</h4>
+                      <p className="text-stone-500 text-xs mt-0.5">Sponsor special or annual deity services performed on your behalf.</p>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-800 text-[10px] font-bold uppercase tracking-wider border border-amber-500/20">Special Seva</span>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs sm:text-sm border-collapse">
+                      <thead>
+                        <tr className="border-b border-stone-200 text-stone-500 font-bold uppercase tracking-wider text-[10px]">
+                          <th className="py-3 pb-4">Offering / సేవ</th>
+                          <th className="py-3 pb-4 text-center">Scheduled Day</th>
+                          <th className="py-3 pb-4 text-right">Price / ధర</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-stone-100 text-stone-700">
+                        {[
+                          { name: "Saswatha Abhisheka Seva", te: "శాశ్వత అభిషేక సేవ", day: "Annual (సంవత్సరానికి ఒకసారి)", price: 5000, key: "Saswatha Abhisheka Seva" },
+                          { name: "Ganesha Navaratri Abhishekam", te: "గణపతి నవరాత్రుల అభిషేకం", day: "Navaratri Days (నవరాత్రులు)", price: 2500, key: "Ganesha Navaratri Abhishekam" }
+                        ].map((item, i) => (
+                          <tr key={i} className="hover:bg-stone-50/50 transition-colors">
+                            <td className="py-4">
+                              <span className="font-semibold text-stone-900 text-xs sm:text-sm">{item.name}</span>
+                              <div className="text-[11px] text-stone-500 font-sans mt-0.5">{item.te}</div>
+                            </td>
+                            <td className="py-4 text-center">
+                              <span className="px-2 py-1 rounded bg-stone-100 text-stone-600 text-[10px] font-semibold">{item.day}</span>
+                            </td>
+                            <td className="py-4 text-right">
+                              <button
+                                onClick={() => handleSponsorSelect(item.key, item.price)}
+                                className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold text-xs hover:from-amber-600 hover:to-amber-700 active:scale-95 transition-all shadow-sm hover:scale-[1.03]"
+                              >
+                                Sponsor ₹{item.price.toLocaleString('en-IN')}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               )}
@@ -1058,10 +1160,15 @@ const Donations = () => {
                       id="donation-amount-input"
                       type="number"
                       required
-                      min="1"
+                      min={sevaPurpose === "Annadanam" ? "100" : "1"}
                       value={amountPaid}
                       onChange={(e) => setAmountPaid(e.target.value)}
-                      className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all font-bold text-amber-600"
+                      readOnly={hasFixedPrice}
+                      className={`w-full px-4 py-3.5 rounded-xl border border-stone-200 text-sm font-bold shadow-sm transition-all ${
+                        hasFixedPrice
+                          ? "bg-stone-100 text-stone-500 cursor-not-allowed"
+                          : "bg-white text-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                      }`}
                       placeholder="Enter amount"
                     />
                   </div>
@@ -1074,19 +1181,46 @@ const Donations = () => {
                     </label>
                     <select
                       value={sevaPurpose}
-                      onChange={(e) => setSevaPurpose(e.target.value)}
+                      onChange={(e) => handleSevaPurposeChange(e.target.value)}
                       className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
                     >
                       <option value="General Donation">General Donation (సాధారణ విరాళం)</option>
                       <option value="Annadanam">Annadanam (అన్నదానం)</option>
                       <option value="Pulihora Daily">Pulihora (పులిహోర - ₹1,000)</option>
                       <option value="Sweet Pongal 10 Kg">Sweet Pongal 10 Kg (10 కేజీల చక్కెరపొంగలి - ₹1,800)</option>
-                      <option value="Undrallu Daily">Undrallu (ఉండ్రాళ్ళు - ₹1,000)</option>
+                      <option value="Sanagalu Daily">Sanagalu (శనగలు - ₹1,000)</option>
                       <option value="Undrallu 10 Kg">Undrallu 10 Kg (10 కేజీల ఉండ్రాళ్ళు బుధవారం - ₹1,000)</option>
                       <option value="Sweet Undrallu 10 Kg">Sweet Undrallu 10 Kg (10 కేజీల తీపి ఉండ్రాళ్ళు శుక్రవారం - ₹1,800)</option>
+                      <option value="Saswatha Abhisheka Seva">Saswatha Abhisheka Seva (శాశ్వత అభిషేక సేవ - ₹5,000)</option>
+                      <option value="Ganesha Navaratri Abhishekam">Ganesha Navaratri Abhishekam (గణపతి నవరాత్రుల అభిషేకం - ₹2,500)</option>
                     </select>
                   </div>
                 </div>
+
+                {(sevaPurpose === "Saswatha Abhisheka Seva" || sevaPurpose === "Ganesha Navaratri Abhishekam") && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                    <div className="space-y-1 md:col-span-1">
+                      <label className="text-xs text-stone-600 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                        <Calendar size={13} className="text-amber-600" />
+                        Pooja Date / పూజ తేదీ *
+                      </label>
+                      <input
+                        type="date"
+                        required
+                        value={poojaDate}
+                        onChange={(e) => setPoojaDate(e.target.value)}
+                        min={sevaPurpose === "Ganesha Navaratri Abhishekam" ? "2026-09-14" : undefined}
+                        max={sevaPurpose === "Ganesha Navaratri Abhishekam" ? "2026-09-23" : undefined}
+                        className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all font-sans"
+                      />
+                      {sevaPurpose === "Ganesha Navaratri Abhishekam" && (
+                        <p className="text-[10px] text-amber-700 font-medium mt-1">
+                          Please choose a date between Sep 14, 2026 and Sep 23, 2026.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Address */}
                 <div className="space-y-1">
@@ -1157,11 +1291,11 @@ const Donations = () => {
                         </div>
                         <div className="flex-1">
                           <h4 className="font-bold text-stone-900 text-sm flex items-center justify-between">
-                            <span>🏛️ Bank Transfer / QR Scan</span>
+                            <span>🏛️ Bank Transfer / UPI ID</span>
                             {paymentMethod === "manual" && <span className="text-xs font-bold text-amber-600 uppercase">Selected</span>}
                           </h4>
                           <p className="text-stone-500 text-xs mt-1 leading-relaxed">
-                            Transfer directly to the temple's official bank account or scan the UPI QR code. Requires screenshot upload.
+                            Transfer directly to the temple's official bank account or UPI ID. Requires screenshot upload.
                           </p>
                         </div>
                       </div>
@@ -1184,66 +1318,37 @@ const Donations = () => {
                       </p>
                     </div>
                   ) : (
-                    /* Bank Details and UPI QR Code Uploader */
+                    /* Bank Details and UPI ID Uploader */
                     <div className="p-6 rounded-2xl bg-stone-50 border border-stone-200 space-y-6">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        
-                        {/* Account Details */}
-                        <div className="space-y-4">
-                          <h4 className="font-serif font-bold text-amber-600 text-sm">Devasthanam Bank Account</h4>
-                          <div className="space-y-2 text-xs">
-                            {[
-                              { label: "Account Name", value: bankDetails.accountName },
-                              { label: "Bank Name", value: bankDetails.bankName },
-                              { label: "Account Number", value: bankDetails.accountNumber, copy: true },
-                              { label: "IFSC Code", value: bankDetails.ifscCode, copy: true },
-                              { label: "Branch", value: bankDetails.branch }
-                            ].map((detail, idx) => (
-                              <div key={idx} className="flex justify-between items-center p-2.5 rounded-lg bg-white border border-stone-200">
-                                <div>
-                                  <span className="text-[10px] uppercase font-bold text-stone-400 block">{detail.label}</span>
-                                  <span className="text-stone-900 font-semibold">{detail.value}</span>
-                                </div>
-                                {detail.copy && (
-                                  <button
-                                    type="button"
-                                    onClick={() => copyToClipboard(detail.value, detail.label)}
-                                    className="p-1.5 rounded-md hover:bg-stone-100 text-stone-400 hover:text-stone-700 transition-colors"
-                                    title={`Copy ${detail.label}`}
-                                  >
-                                    <ClipboardCheck size={14} />
-                                  </button>
-                                )}
+                      {/* Account Details */}
+                      <div className="space-y-4 max-w-xl mx-auto">
+                        <h4 className="font-serif font-bold text-amber-600 text-sm text-center">Devasthanam Bank Account</h4>
+                        <div className="space-y-2 text-xs">
+                          {[
+                            { label: "Account Name", value: bankDetails.accountName },
+                            { label: "Bank Name", value: bankDetails.bankName },
+                            { label: "Account Number", value: bankDetails.accountNumber, copy: true },
+                            { label: "IFSC Code", value: bankDetails.ifscCode, copy: true },
+                            { label: "Branch", value: bankDetails.branch },
+                            { label: "UPI ID", value: bankDetails.upiId, copy: true }
+                          ].map((detail, idx) => (
+                            <div key={idx} className="flex justify-between items-center p-2.5 rounded-lg bg-white border border-stone-200">
+                              <div>
+                                <span className="text-[10px] uppercase font-bold text-stone-400 block">{detail.label}</span>
+                                <span className="text-stone-900 font-semibold">{detail.value}</span>
                               </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* UPI QR Scan Code */}
-                        <div className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-stone-200 text-center">
-                          <h4 className="font-serif font-bold text-amber-600 text-sm mb-2">Scan & Pay via UPI QR</h4>
-                          
-                          <div className="p-3 border-2 border-dashed border-amber-500 rounded-2xl bg-white shadow-inner mb-3">
-                            <QrCode size={120} className="text-stone-900" />
-                          </div>
-
-                          <div className="text-xs mb-2">
-                            <span className="text-stone-400 block text-[9px] uppercase font-bold">Temple UPI ID</span>
-                            <span className="text-stone-900 font-mono font-bold flex items-center gap-1.5 justify-center">
-                              {bankDetails.upiId}
-                              <button
-                                type="button"
-                                onClick={() => copyToClipboard(bankDetails.upiId, "UPI ID")}
-                                className="p-1 rounded hover:bg-stone-100 text-stone-400 hover:text-stone-700"
-                              >
-                                <ClipboardCheck size={12} />
-                              </button>
-                            </span>
-                          </div>
-
-                          <span className="text-[10px] text-stone-400">
-                            Scan with PhonePe, GPay, Paytm, BHIM or any banking app
-                          </span>
+                              {detail.copy && (
+                                <button
+                                  type="button"
+                                  onClick={() => copyToClipboard(detail.value, detail.label)}
+                                  className="p-1.5 rounded-md hover:bg-stone-100 text-stone-400 hover:text-stone-700 transition-colors"
+                                  title={`Copy ${detail.label}`}
+                                >
+                                  <ClipboardCheck size={14} />
+                                </button>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       </div>
 
@@ -1350,13 +1455,13 @@ const Donations = () => {
                 >
                   {/* Watermark Seal */}
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none w-64 h-64">
-                    <img src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png" alt="Ganesha Watermark" className="w-full h-full object-contain" />
+                    <img src={vinayakaLogo} alt="Ganesha Watermark" className="w-full h-full object-cover rounded-full" />
                   </div>
 
                   {/* Header */}
                   <div className="text-center border-b-2 border-amber-600 pb-5 relative z-10 flex flex-col sm:flex-row items-center gap-4">
                     <div className="w-16 h-16 shrink-0 bg-stone-50 p-1 rounded-full border border-amber-400 flex items-center justify-center">
-                      <img src="https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png" alt="Logo" className="w-full h-full object-contain rounded-full" />
+                      <img src={vinayakaLogo} alt="Logo" className="w-full h-full object-cover rounded-full" />
                     </div>
                     <div className="flex-1 text-center sm:text-left">
                       <p className="text-[10px] font-bold text-amber-600 uppercase tracking-widest leading-none">
@@ -1401,6 +1506,12 @@ const Donations = () => {
                             <td className="p-3 border border-stone-200 text-stone-900 font-semibold">{generatedReceipt.gotram}</td>
                             <td className="p-3 border border-stone-200 font-semibold bg-amber-50/30 text-amber-600">Star / నక్షత్రం:</td>
                             <td className="p-3 border border-stone-200 text-stone-900 font-semibold">{generatedReceipt.nakshatram || "N/A"}</td>
+                          </tr>
+                        )}
+                        {generatedReceipt.poojaDate && (
+                          <tr>
+                            <td className="p-3 border border-stone-200 font-semibold bg-amber-50/30 text-amber-600">Pooja Date / పూజ తేదీ:</td>
+                            <td className="p-3 border border-stone-200 text-stone-900 font-bold" colSpan={3}>{generatedReceipt.poojaDate}</td>
                           </tr>
                         )}
                         <tr>
@@ -1500,6 +1611,7 @@ const Donations = () => {
                       setPhoneOrEmail("");
                       setAddress("");
                       setAmountPaid("");
+                      setPoojaDate("");
                       setScreenshotFile(null);
                       setScreenshotPreview("");
                     }}

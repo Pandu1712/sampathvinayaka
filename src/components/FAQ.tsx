@@ -4,7 +4,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 const faqData = [
   {
     question: "What are the Sampath Vinayakagar Temple timings?",
-    answer: "The temple is open daily for Sarva Darshanam (General Darshan) from 6:00 AM to 11:00 AM and 5:30 PM to 8:00 PM. Key rituals include Homam (5:00 AM – 6:30 AM), Abhishekam (7:00 AM – 8:30 AM), and Vehicle Pooja (6:30 AM – 10:30 AM & 4:30 PM – 8:00 PM). During Ganesha Navaratri, Special Abhishekam is performed from 7:00 AM to 12:00 PM.",
+    answer: "The temple is open daily for Sarva Darshanam (General Darshan) from 6:00 AM to 11:00 AM and 5:30 PM to 8:00 PM. Key rituals include Homam (5:00 AM – 6:30 AM), Abhishekam (7:00 AM – 8:30 AM), and Vehicle Pooja (6:00 AM – 11:00 AM & 5:30 PM – 8:00 PM). During Ganesha Navaratri, Special Abhishekam is performed from 7:00 AM to 12:00 PM.",
   },
   {
     question: "How to reach Sampath Vinayakagar Temple in Vizag?",
