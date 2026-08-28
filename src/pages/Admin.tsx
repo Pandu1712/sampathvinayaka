@@ -34,7 +34,9 @@ import {
   UserCheck,
   Search,
   BookOpen,
-  RefreshCw
+  RefreshCw,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { toast } from "sonner";
 import { 
@@ -59,6 +61,7 @@ const Admin = () => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [user, setUser] = useState<FirebaseUser | { email: string } | null>(null);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [activeTab, setActiveTab] = useState<"dashboard" | "sevas" | "donations" | "events" | "feedback" | "panchangam">("dashboard");
@@ -464,14 +467,24 @@ const Admin = () => {
 
             <div>
               <label className="block text-xs font-serif font-black tracking-widest text-primary uppercase mb-2">Password</label>
-              <input 
-                type="password" 
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="w-full px-4 py-3 rounded-xl bg-black/40 border border-primary/20 text-white placeholder-white/30 focus:border-primary/60 focus:outline-none transition-colors text-sm"
-              />
+              <div className="relative">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="w-full pl-4 pr-12 py-3 rounded-xl bg-black/40 border border-primary/20 text-white placeholder-white/30 focus:border-primary/60 focus:outline-none transition-colors text-sm font-sans"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-white transition-colors cursor-pointer"
+                  title={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
             <button 
