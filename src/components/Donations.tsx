@@ -21,6 +21,8 @@ import {
 import { toast } from "sonner";
 import html2pdf from "html2pdf.js";
 import vinayakaLogo from "@/assets/vinayaka-logo.png";
+import { db } from "@/lib/firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 interface DonationsProps {
   preselectedSeva?: string | null;
@@ -42,6 +44,8 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
   const [amountPaid, setAmountPaid] = useState("");
   const [sevaPurpose, setSevaPurpose] = useState("General Donation");
   const [poojaDate, setPoojaDate] = useState("");
+  const [poojaTime, setPoojaTime] = useState("5:30 PM - 8:00 PM");
+  const [testBypass, setTestBypass] = useState(false);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const hasFixedPrice = sevaPurpose !== "General Donation" && sevaPurpose !== "Annadanam";
 
@@ -69,6 +73,7 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
     paymentId?: string;
     isOnline?: boolean;
     poojaDate?: string;
+    poojaTime?: string;
   } | null>(null);
 
   const loadRazorpay = () => {
@@ -84,6 +89,72 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
       script.onerror = () => resolve(false);
       document.body.appendChild(script);
     });
+  };
+
+  const saveToFirestore = async (receipt: any) => {
+    try {
+      if (db) {
+        // 1. Add to Donations ledger
+        await addDoc(collection(db, "donations"), {
+          receiptNo: receipt.receiptNo,
+          name: receipt.name,
+          purpose: receipt.purpose,
+          amount: Number(receipt.amount),
+          date: new Date().toISOString().split("T")[0],
+          method: receipt.isOnline ? "Online" : "Manual",
+          proofUrl: receipt.proofUrl || "",
+          transactionId: receipt.paymentId || ""
+        });
+
+        // 2. Add to Seva Bookings calendar if it's a booking
+        if (receipt.purpose !== "General Donation /సాధారణ విరాళం" && receipt.purpose !== "General Donation") {
+          await addDoc(collection(db, "bookings"), {
+            name: receipt.name,
+            gotram: receipt.gotram || "",
+            nakshatram: receipt.nakshatram || "",
+            phone: receipt.phoneOrEmail,
+            seva: receipt.purpose,
+            date: receipt.poojaDate || new Date().toISOString().split("T")[0],
+            timeSlot: receipt.poojaTime || "5:30 PM - 8:00 PM",
+            status: "Pending",
+            transactionId: receipt.paymentId || "Manual Proof Uploaded"
+          });
+        }
+      } else {
+        // Offline fallback: save to localStorage
+        const localDonations = JSON.parse(localStorage.getItem("local_donations") || "[]");
+        localDonations.push({
+          receiptNo: receipt.receiptNo,
+          name: receipt.name,
+          purpose: receipt.purpose,
+          amount: Number(receipt.amount),
+          date: new Date().toISOString().split("T")[0],
+          method: receipt.isOnline ? "Online" : "Manual",
+          proofUrl: receipt.proofUrl || "",
+          transactionId: receipt.paymentId || ""
+        });
+        localStorage.setItem("local_donations", JSON.stringify(localDonations));
+
+        if (receipt.purpose !== "General Donation /సాధారణ విరాళం" && receipt.purpose !== "General Donation") {
+          const localBookings = JSON.parse(localStorage.getItem("local_bookings") || "[]");
+          localBookings.push({
+            id: `BK${Math.floor(100 + Math.random() * 900)}`,
+            name: receipt.name,
+            gotram: receipt.gotram || "",
+            nakshatram: receipt.nakshatram || "",
+            phone: receipt.phoneOrEmail,
+            seva: receipt.purpose,
+            date: receipt.poojaDate || new Date().toISOString().split("T")[0],
+            timeSlot: receipt.poojaTime || "5:30 PM - 8:00 PM",
+            status: "Pending",
+            transactionId: receipt.paymentId || "Manual Proof Uploaded"
+          });
+          localStorage.setItem("local_bookings", JSON.stringify(localBookings));
+        }
+      }
+    } catch (error) {
+      console.error("Error writing donation/booking to Firestore:", error);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -180,6 +251,18 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
   };
 
   const handleOnlinePayment = async () => {
+    // Validate evening booking hours constraint (5:30 PM to 8:00 PM) for Sevas
+    if (sevaPurpose !== "General Donation" && !testBypass) {
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const startLimit = 17 * 60 + 30; // 17:30
+      const endLimit = 20 * 60; // 20:00
+      if (currentMinutes < startLimit || currentMinutes > endLimit) {
+        toast.error("Booking Window Closed: Seva bookings are strictly open only in the evening between 5:30 PM and 8:00 PM.");
+        return;
+      }
+    }
+
     setIsUploading(true);
     const loaded = await loadRazorpay();
     if (!loaded) {
@@ -206,7 +289,7 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const cleanPhone = contactTrimmed.replace(/[-\s()]/g, "");
     const isEmail = emailRegex.test(contactTrimmed);
-
+ 
     const options = {
       key: razorpayKey,
       amount: Math.round(Number(amountPaid) * 100), // in paise
@@ -217,7 +300,7 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
       handler: function (response: { razorpay_payment_id: string }) {
         const paymentId = response.razorpay_payment_id;
         toast.success(`Payment successful! Txn ID: ${paymentId}`);
-
+ 
         const receiptData = {
           receiptNo,
           name: devoteeName,
@@ -231,10 +314,12 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
           proofUrl: "",
           isOnline: true,
           paymentId,
-          poojaDate: poojaDate ? new Date(poojaDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : undefined
+          poojaDate: poojaDate ? new Date(poojaDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : undefined,
+          poojaTime: poojaTime
         };
-
+ 
         setGeneratedReceipt(receiptData);
+        saveToFirestore(receiptData);
         setIsUploading(false);
         toast.success("Official E-Receipt generated successfully! 🙏");
 
@@ -391,6 +476,18 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate evening booking hours constraint (5:30 PM to 8:00 PM) for Sevas
+    if (sevaPurpose !== "General Donation" && !testBypass) {
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const startLimit = 17 * 60 + 30; // 17:30
+      const endLimit = 20 * 60; // 20:00
+      if (currentMinutes < startLimit || currentMinutes > endLimit) {
+        toast.error("Booking Window Closed: Seva bookings are strictly open only in the evening between 5:30 PM and 8:00 PM.");
+        return;
+      }
+    }
+
     // 1. Devotee Name Validation
     const nameTrimmed = devoteeName.trim();
     if (nameTrimmed.length < 3) {
@@ -490,7 +587,7 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
         year: 'numeric'
       });
 
-      setGeneratedReceipt({
+      const manualReceipt = {
         receiptNo,
         name: devoteeName,
         gotram: gotram.trim() || undefined,
@@ -503,7 +600,11 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
         proofUrl: uploadedUrl,
         isOnline: false,
         poojaDate: poojaDate ? new Date(poojaDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : undefined,
-      });
+        poojaTime: poojaTime
+      };
+
+      setGeneratedReceipt(manualReceipt);
+      saveToFirestore(manualReceipt);
 
       setIsUploading(false);
       toast.success("Official E-Receipt generated successfully! 🙏");
@@ -1197,8 +1298,9 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
                   </div>
                 </div>
 
-                {(sevaPurpose === "Saswatha Abhisheka Seva" || sevaPurpose === "Ganesha Navaratri Abhishekam") && (
+                {sevaPurpose !== "General Donation" && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                    {/* Pooja Date */}
                     <div className="space-y-1 md:col-span-1">
                       <label className="text-xs text-stone-600 font-bold uppercase tracking-wider flex items-center gap-1.5">
                         <Calendar size={13} className="text-amber-600" />
@@ -1218,6 +1320,39 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
                           Please choose a date between Sep 14, 2026 and Sep 23, 2026.
                         </p>
                       )}
+                    </div>
+
+                    {/* Pooja Time Slot */}
+                    <div className="space-y-1 md:col-span-1">
+                      <label className="text-xs text-stone-600 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                        <span className="text-amber-600 text-sm">🕐</span>
+                        Pooja Time Slot / సమయం *
+                      </label>
+                      <select
+                        required
+                        value={poojaTime}
+                        onChange={(e) => setPoojaTime(e.target.value)}
+                        className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                      >
+                        <option value="5:30 PM - 8:00 PM">Evening (5:30 PM – 8:00 PM Only)</option>
+                      </select>
+                      <p className="text-[10px] text-amber-700 font-medium mt-1">
+                        Pooja performed during evening darshan hours only.
+                      </p>
+                    </div>
+
+                    {/* Test Mode Bypass */}
+                    <div className="space-y-1 md:col-span-1 flex items-center gap-2 pt-6">
+                      <input
+                        type="checkbox"
+                        id="test-bypass-check"
+                        checked={testBypass}
+                        onChange={(e) => setTestBypass(e.target.checked)}
+                        className="w-4 h-4 rounded text-amber-600 border-stone-300 focus:ring-amber-500 cursor-pointer"
+                      />
+                      <label htmlFor="test-bypass-check" className="text-xs text-stone-500 font-semibold cursor-pointer">
+                        Bypass evening booking hours validation (Test Mode)
+                      </label>
                     </div>
                   </div>
                 )}

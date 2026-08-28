@@ -86,14 +86,14 @@ const milestonesHi = [
 ];
 
 const galleryImages = [
-  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087509/IMG_5686_ixb1rc.jpg", title: "Lord Ganesha Deity Closeup", span: "col-span-2 row-span-2" },
+  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087513/DSC_2942_zwtokt.jpg", title: "Temple Deity Alankaram", span: "col-span-2 row-span-2" },
+  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087512/DSC_2235_s6uwsk.jpg", title: "Inner Sanctum Pooja", span: "col-span-1 row-span-1" },
   { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087511/DSC_2151_k72wsc.jpg", title: "Golden Gopuram Alankaram", span: "col-span-1 row-span-1" },
-  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087511/DSC_2228_ktwsy9.jpg", title: "Evening Aarti Ceremony", span: "col-span-1 row-span-1" },
-  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086046/DSC_1883_aelmrp.jpg", title: "Maha Abhishekam", span: "col-span-1 row-span-1" },
+  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087510/DSC_2183_qwpfao.jpg", title: "Evening Aarti Ceremony", span: "col-span-1 row-span-1" },
+  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087508/DSC_2084_xjxbov.jpg", title: "Devotional Gathering", span: "col-span-1 row-span-1" },
+  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086841/IMG_5524_f8j84i.jpg", title: "Sacred Offerings", span: "col-span-2 row-span-1" },
+  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086841/IMG_5547_qs5cey.jpg", title: "Prasad Preparation", span: "col-span-1 row-span-1" },
   { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086839/DSC_2313_gdfw5g.jpg", title: "Devotional Lamp Ritual", span: "col-span-1 row-span-1" },
-  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087507/IMG_5684_xxnzl6.jpg", title: "Shimmering Flower Decoration", span: "col-span-2 row-span-1" },
-  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086874/IMG_5634_fczm4z.jpg", title: "Sacred Pooja Offerings", span: "col-span-1 row-span-1" },
-  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086347/DSC_2262_patlba.jpg", title: "Inner Sanctum Bliss", span: "col-span-1 row-span-1" },
 ];
 
 const upcomingEvents = [

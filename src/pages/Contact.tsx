@@ -1,14 +1,43 @@
 import { useState } from "react";
 import Layout from "@/components/Layout";
 import templeHero1 from "@/assets/temple-hero-1.jpg";
+import { db } from "@/lib/firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 const Contact = () => {
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Thank you for your message! We will get back to you soon. 🙏");
-    setFormData({ name: "", email: "", subject: "", message: "" });
+    try {
+      if (db) {
+        await addDoc(collection(db, "feedbacks"), {
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          date: new Date().toISOString().split("T")[0],
+          status: "New"
+        });
+      } else {
+        const localFeedbacks = JSON.parse(localStorage.getItem("local_feedbacks") || "[]");
+        localFeedbacks.push({
+          id: Date.now(),
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          date: new Date().toISOString().split("T")[0],
+          status: "New"
+        });
+        localStorage.setItem("local_feedbacks", JSON.stringify(localFeedbacks));
+      }
+      alert("Thank you for your message! We will get back to you soon. 🙏");
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    } catch (err) {
+      console.error("Error saving feedback:", err);
+      alert("Could not submit message. Please try again.");
+    }
   };
 
   return (
