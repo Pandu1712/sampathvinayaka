@@ -12,6 +12,7 @@ import Events from "./pages/Events.tsx";
 import Contact from "./pages/Contact.tsx";
 import Members from "./pages/Members.tsx";
 import Admin from "./pages/Admin.tsx";
+import EventBook from "./pages/EventBook.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/members" element={<Members />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/sampath-book-2026" element={<EventBook />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

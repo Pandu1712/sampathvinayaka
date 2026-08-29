@@ -42,13 +42,18 @@ const Contact = () => {
 
   return (
     <Layout>
-      {/* Hero */}
-      <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
-        <img src={templeHero1} alt="Temple" className="absolute inset-0 w-full h-full object-cover" width={1920} height={1080} />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(20,15,10,0.5), rgba(20,15,10,0.8))" }} />
-        <div className="hero-text-container">
-          <p className="text-primary text-sm tracking-[0.3em] uppercase mb-4 animate-fade-rise">Get in Touch</p>
-          <h1 className="hero-title">Contact Us</h1>
+      {/* Hero Section */}
+      <section className="py-12 sm:py-16 relative overflow-hidden text-center bg-gradient-to-b from-[#1C1917] to-background border-b border-primary/15 animate-fade-rise">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsla(38,72%,50%,0.05)_0,transparent_70%)] pointer-events-none" />
+        <div className="max-w-4xl mx-auto relative z-10 px-4">
+          <p className="text-primary text-xs sm:text-sm tracking-[0.4em] uppercase mb-3 font-black">🙏 Get in Touch</p>
+          <h1 className="text-3xl sm:text-5xl font-bold text-white font-serif tracking-wide leading-tight">
+            Contact Us
+          </h1>
+          <div className="h-1 w-24 bg-primary/40 rounded-full mx-auto mt-4 shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+          <p className="text-stone-300 mt-4 max-w-xl mx-auto text-xs sm:text-sm font-serif italic">
+            Visit the temple or write to us for any queries
+          </p>
         </div>
       </section>
 

@@ -14,16 +14,17 @@ import male3 from "@/assets/member-male-3.png";
 import prasadRao from "@/assets/prasad-rao.jpg";
 import founderImage from "@/assets/rajeswaran.jpg";
 import priestPooja from "@/assets/priest-pooja.jpg";
+import { BookOpen, Download, Sparkles } from "lucide-react";
 
 
 /* ─── Data ─── */
 const services = [
   { icon: "🪔", title: "Daily Pooja", desc: "Morning and evening worship rituals performed by temple priests", timing: "6:00 AM & 7:00 PM", price: "Free" },
   { icon: "🔔", title: "Maha Aarti", desc: "Grand evening aarti ceremony with 108 lamps and devotional music", timing: "7:00 PM Daily", price: "Free" },
-  { icon: "💐", title: "Abhishekam", desc: "Sacred bathing ritual of the deity with milk, honey, and holy water", timing: "7:00 AM – 8:30 AM Daily", price: "₹501" },
-  { icon: "🎋", title: "Homam / Havan", desc: "Sacred fire ritual for prosperity, health, and spiritual growth", timing: "5:00 AM – 6:30 AM Daily", price: "₹1,001" },
-  { icon: "🙏", title: "Special Darshan", desc: "VIP darshan with direct access to the sanctum sanctorum", timing: "All Day", price: "₹201" },
-  { icon: "🎊", title: "Marriage Ceremony", desc: "Traditional temple wedding conducted by temple priests", timing: "Muhurtam Days", price: "₹5,001" },
+  { icon: "💐", title: "Abhishekam", desc: "Sacred bathing ritual of the deity with milk, honey, and holy water", timing: "7:00 AM – 8:30 AM Daily", price: "Free" },
+  { icon: "🎋", title: "Homam / Havan", desc: "Sacred fire ritual for prosperity, health, and spiritual growth", timing: "5:00 AM – 6:30 AM Daily", price: "Free" },
+  { icon: "🙏", title: "Special Darshan", desc: "VIP darshan with direct access to the sanctum sanctorum", timing: "All Day", price: "Free" },
+  { icon: "🎊", title: "Marriage Ceremony", desc: "Traditional temple wedding conducted by temple priests", timing: "Muhurtam Days", price: "Free" },
   { icon: "📖", title: "Vedic Classes", desc: "Learn ancient scriptures, shlokas, and spiritual practices", timing: "Sat & Sun 8 AM", price: "Free" },
 ];
 
@@ -292,6 +293,91 @@ const Index = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ EVENT BOOK PROMOTION SECTION ═══════ */}
+      <section className="py-16 sm:py-24 px-4 bg-gradient-to-b from-stone-900 to-[#1C0505] relative overflow-hidden text-left border-y border-amber-500/20">
+        {/* Decorative elements */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsla(38,72%,50%,0.08)_0,transparent_75%)] pointer-events-none" />
+        <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/oriental-tiles.png')]" />
+
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            {/* Left Column: Premium Cover Display */}
+            <div className="lg:col-span-5 flex justify-center order-2 lg:order-1">
+              <div className="relative group w-64 sm:w-80 aspect-[3/4] rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(217,119,6,0.3)] border-2 border-amber-500/30 bg-[#1C0505] p-2.5 hover:shadow-[0_0_60px_rgba(217,119,6,0.55)] transition-all duration-500 hover:-translate-y-2">
+                <div className="relative w-full h-full rounded-2xl overflow-hidden">
+                  <img
+                    src="/sampath-book-cover.jpg"
+                    alt="Sampath Book 2026 Cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Information & CTA */}
+            <div className="lg:col-span-7 flex flex-col gap-6 order-1 lg:order-2">
+              <div>
+                <span className="text-amber-500 text-xs sm:text-sm tracking-[0.4em] uppercase font-black drop-shadow-md flex items-center gap-2">
+                  <Sparkles size={14} className="text-amber-500 animate-pulse" />
+                  New Souvenir Release
+                </span>
+                <h2 className="text-3xl sm:text-5xl font-bold font-serif text-white tracking-wide mt-2">
+                  Sampath Book - 2026
+                </h2>
+                <div className="h-1 w-24 bg-gradient-to-r from-amber-500/60 to-transparent mt-4 rounded-full" />
+              </div>
+
+              <p className="text-stone-300/90 text-sm sm:text-base leading-relaxed font-light">
+                Immerse yourself in the rich history, spiritual legends, and divine daily activities of our sacred abode. The newly published **Sampath Book 2026** documents decades of faith, the miraculous 1971 naval defense of Vizag, detailed puja procedures, and our community outreach programs.
+              </p>
+
+              {/* Highlight list */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-stone-300 text-xs sm:text-sm my-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-amber-500 font-bold">✓</span>
+                  <span>1971 Naval Miracle Archives</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-amber-500 font-bold">✓</span>
+                  <span>Daily Puja & Seva Timings</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-amber-500 font-bold">✓</span>
+                  <span>Ganesha Chaturthi 9-Day Journey</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-amber-500 font-bold">✓</span>
+                  <span>Charity & Community Highlights</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 mt-2">
+                <Link
+                  to="/sampath-book-2026"
+                  className="px-8 py-4 rounded-full font-bold text-stone-950 text-sm tracking-wider uppercase bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 shadow-lg hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5 active:scale-95 transition-all text-center flex items-center justify-center gap-2"
+                >
+                  <BookOpen size={16} />
+                  <span>Read Online</span>
+                </Link>
+                <a
+                  href="/Sampath-Book-2026.pdf"
+                  download="Sampath-Book-2026.pdf"
+                  className="px-8 py-4 rounded-full font-bold text-white text-sm tracking-wider uppercase bg-transparent border-2 border-amber-500/50 hover:border-amber-400 hover:bg-white/5 active:scale-95 transition-all text-center flex items-center justify-center gap-2"
+                >
+                  <Download size={16} />
+                  <span>Download PDF (27MB)</span>
+                </a>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>

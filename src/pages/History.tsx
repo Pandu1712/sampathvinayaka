@@ -76,23 +76,18 @@ const History = () => {
 
   return (
     <Layout>
-      {/* Hero Header */}
-      <section className="relative h-[45vh] sm:h-[50vh] flex items-center justify-center overflow-hidden bg-[#1C1917] border-b border-primary/20">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsla(38,72%,50%,0.15)_0,transparent_70%)] pointer-events-none" />
-        
-        {/* Soft Background Image Overlay */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-overlay" 
-          style={{ backgroundImage: `url(${getOptimizedImageUrl("https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087507/IMG_5684_xxnzl6.jpg", 400)})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1C1917]/50 via-transparent to-[#000000]" />
-
-        <div className="relative z-10 text-center px-4 max-w-4xl animate-fade-rise">
-          <p className="text-primary text-xs sm:text-sm tracking-[0.4em] uppercase mb-4 font-black drop-shadow-md">🙏 Sri Sampath Vinayakagar</p>
-          <h1 className="text-4xl sm:text-6xl font-bold font-serif text-white tracking-wide">
+      {/* Hero Section */}
+      <section className="py-12 sm:py-16 relative overflow-hidden text-center bg-gradient-to-b from-[#1C1917] to-background border-b border-primary/15 animate-fade-rise">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsla(38,72%,50%,0.05)_0,transparent_70%)] pointer-events-none" />
+        <div className="max-w-4xl mx-auto relative z-10 px-4">
+          <p className="text-primary text-xs sm:text-sm tracking-[0.4em] uppercase mb-3 font-black">🙏 Sri Sampath Vinayakagar</p>
+          <h1 className="text-3xl sm:text-5xl font-bold text-white font-serif tracking-wide leading-tight">
             {lang === "en" ? "Temple History" : lang === "te" ? "ఆలయ చరిత్ర" : "मंदिर का इतिहास"}
           </h1>
-          <div className="h-1 w-32 bg-gradient-to-r from-transparent via-primary/60 to-transparent mx-auto mt-6 rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+          <div className="h-1 w-24 bg-primary/40 rounded-full mx-auto mt-4 shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+          <p className="text-stone-300 mt-4 max-w-xl mx-auto text-xs sm:text-sm font-serif italic">
+            {lang === "en" ? "A Divine Legacy of Faith and Protection" : lang === "te" ? "భక్తి మరియు రక్షణ యొక్క దైవిక వారసత్వం" : "श्रद्धा और सुरक्षा की एक दिव्य विरासत"}
+          </p>
         </div>
       </section>
 

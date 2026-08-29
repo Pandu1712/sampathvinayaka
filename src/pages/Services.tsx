@@ -2,33 +2,29 @@ import Layout from "@/components/Layout";
 import templeHero5 from "@/assets/temple-hero-5.jpg";
 
 const allServices = [
-  { icon: "💐", title: "Abhishekam", desc: "Sacred bathing ritual for the deity to seek blessings for health and success.", timing: "7:00 AM – 8:30 AM", price: "₹501" },
-  { icon: "🚗", title: "Vehicle Pooja", desc: "Traditional pooja for new vehicles to ensure safety and prosperity.", timing: "6:00 AM – 11:00 AM & 5:30 PM – 8:00 PM", price: "₹500 / ₹1000" },
-  { icon: "🎊", title: "Special Abhishekam (Ganesha Navaratri)", desc: "Special bathing ritual performed for the deity during the auspicious days of Ganesha Navaratri.", timing: "7:00 AM – 12:00 PM", price: "Varies" },
+  { icon: "💐", title: "Abhishekam", desc: "Sacred bathing ritual for the deity to seek blessings for health and success.", timing: "7:00 AM – 8:30 AM", price: "Free" },
+  { icon: "🚗", title: "Vehicle Pooja", desc: "Traditional pooja for new vehicles to ensure safety and prosperity.", timing: "6:00 AM – 11:00 AM & 5:30 PM – 8:00 PM", price: "Free" },
+  { icon: "🎊", title: "Special Abhishekam (Ganesha Navaratri)", desc: "Special bathing ritual performed for the deity during the auspicious days of Ganesha Navaratri.", timing: "7:00 AM – 12:00 PM", price: "Free" },
   { icon: "🪔", title: "Daily Pooja", desc: "Morning and evening worship rituals performed by head priests with vedic chanting.", timing: "6:00 AM & 7:00 PM", price: "Free" },
-  { icon: "🎋", title: "Homam / Havan", desc: "Sacred fire ritual for prosperity, health, and spiritual growth.", timing: "5:00 AM – 6:30 AM", price: "₹1,001" },
+  { icon: "🎋", title: "Homam / Havan", desc: "Sacred fire ritual for prosperity, health, and spiritual growth.", timing: "5:00 AM – 6:30 AM", price: "Free" },
   { icon: "📖", title: "Vedic Classes", desc: "Learn ancient scriptures, shlokas, and spiritual practices for inner peace.", timing: "Sat & Sun 8 AM", price: "Free" },
 ];
 
 const Services = () => {
   return (
     <Layout>
-      {/* Hero */}
-      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden bg-black">
-        <img 
-          src={templeHero5} 
-          alt="Temple bell and lamp" 
-          className="absolute inset-0 w-full h-full object-cover opacity-60 animate-ken-burns scale-110" 
-          width={1920} 
-          height={1080} 
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80" />
-        <div className="relative z-10 text-center px-4">
-          <div className="animate-fade-rise opacity-0 [animation-fill-mode:forwards]">
-            <p className="text-primary text-sm tracking-[0.4em] uppercase mb-4 font-bold drop-shadow-lg">Sacred Offerings</p>
-            <h1 className="hero-title !font-serif !italic drop-shadow-2xl">Our Divine Services</h1>
-            <div className="h-1 w-24 bg-primary/60 mx-auto mt-4 rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
-          </div>
+      {/* Hero Section */}
+      <section className="py-12 sm:py-16 relative overflow-hidden text-center bg-gradient-to-b from-[#1C1917] to-background border-b border-primary/15 animate-fade-rise">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsla(38,72%,50%,0.05)_0,transparent_70%)] pointer-events-none" />
+        <div className="max-w-4xl mx-auto relative z-10 px-4">
+          <p className="text-primary text-xs sm:text-sm tracking-[0.4em] uppercase mb-3 font-black">🙏 Sacred Offerings</p>
+          <h1 className="text-3xl sm:text-5xl font-bold text-white font-serif tracking-wide leading-tight">
+            Our Divine Services
+          </h1>
+          <div className="h-1 w-24 bg-primary/40 rounded-full mx-auto mt-4 shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+          <p className="text-stone-300 mt-4 max-w-xl mx-auto text-xs sm:text-sm font-serif italic">
+            Devotional pujas and sevas performed regularly at the temple
+          </p>
         </div>
       </section>
 

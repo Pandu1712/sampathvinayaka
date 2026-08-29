@@ -1,4 +1,6 @@
 import Layout from "@/components/Layout";
+import { Link } from "react-router-dom";
+import { BookOpen, ArrowRight } from "lucide-react";
 const ganeshaImage = "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779092088/ChatGPT_Image_May_18_2026_01_44_24_PM_durfci.png";
 
 const upcomingEvents = [
@@ -21,22 +23,18 @@ const weeklySchedule = [
 const Events = () => {
   return (
     <Layout>
-      {/* Hero */}
-      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden bg-black">
-        <img 
-          src={ganeshaImage} 
-          alt="Temple festival" 
-          className="absolute inset-0 w-full h-full object-cover opacity-60 animate-ken-burns scale-110" 
-          width={1920} 
-          height={1080} 
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/80" />
-        <div className="relative z-10 container-custom">
-          <div className="text-left animate-fade-rise opacity-0 [animation-fill-mode:forwards]">
-            <p className="text-primary text-sm tracking-[0.4em] uppercase mb-4 font-bold drop-shadow-lg">Sacred Calendar</p>
-            <h1 className="hero-title !font-serif !italic drop-shadow-2xl">Events & Festivals</h1>
-            <div className="h-1 w-24 bg-primary/60 mt-4 rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
-          </div>
+      {/* Hero Section */}
+      <section className="py-12 sm:py-16 relative overflow-hidden text-center bg-gradient-to-b from-[#1C1917] to-background border-b border-primary/15 animate-fade-rise">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsla(38,72%,50%,0.05)_0,transparent_70%)] pointer-events-none" />
+        <div className="max-w-4xl mx-auto relative z-10 px-4">
+          <p className="text-primary text-xs sm:text-sm tracking-[0.4em] uppercase mb-3 font-black">🙏 Sacred Calendar</p>
+          <h1 className="text-3xl sm:text-5xl font-bold text-white font-serif tracking-wide leading-tight">
+            Events & Festivals
+          </h1>
+          <div className="h-1 w-24 bg-primary/40 rounded-full mx-auto mt-4 shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+          <p className="text-stone-300 mt-4 max-w-xl mx-auto text-xs sm:text-sm font-serif italic">
+            Participate in the auspicious celebrations and annual festivals
+          </p>
         </div>
       </section>
 
@@ -92,6 +90,32 @@ const Events = () => {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Event Book Callout Banner */}
+      <section className="py-12 px-4 bg-[#1C0505] border-y border-amber-500/20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsla(38,72%,50%,0.05)_0,transparent_75%)] pointer-events-none" />
+        <div className="container-custom relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 p-8 rounded-3xl border border-amber-500/35 bg-[#1C0505]/95 shadow-xl">
+          <div className="flex items-center gap-4 text-left">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center shrink-0">
+              <BookOpen className="text-amber-500 animate-pulse" size={24} />
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs uppercase tracking-[0.25em] text-amber-500 font-bold">Temple Publication</span>
+              <h3 className="text-xl sm:text-2xl font-bold font-serif text-white">Sampath Book - 2026 Souvenir</h3>
+              <p className="text-stone-300/80 text-xs sm:text-sm max-w-xl font-light">
+                Discover the detailed chronicles of temple history, daily puja descriptions, and Ganesha Chaturthi celebrations.
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/sampath-book-2026"
+            className="w-full md:w-auto px-6 py-3 rounded-full text-stone-950 font-bold text-xs tracking-wider uppercase bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 shadow-md hover:shadow-lg active:scale-95 transition-all text-center flex items-center justify-center gap-2 shrink-0 border border-amber-400/20"
+          >
+            <span>Read Souvenir Book</span>
+            <ArrowRight size={14} />
+          </Link>
         </div>
       </section>
 

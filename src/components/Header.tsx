@@ -18,6 +18,8 @@ const getLinkIcon = (name: string) => {
       return <Image size={18} />;
     case "events":
       return <CalendarIcon size={18} />;
+    case "event book":
+      return <BookOpen size={18} />;
     case "members":
       return <Users size={18} />;
     case "calendar":
@@ -87,9 +89,9 @@ const Header = () => {
       { name: "Services", href: "#services" },
       { name: "Gallery", href: "#gallery" },
       { name: "Events", href: "#events" },
+      { name: "Event Book", href: "/sampath-book-2026" },
       { name: "Members", href: "#members" },
       { name: "Calendar", href: "#panchangam" },
-
       { name: "Donations", href: "#donations" },
       { name: "Contact Us", href: "#contact" },
     ]
@@ -100,6 +102,7 @@ const Header = () => {
       { name: "Gallery", href: "/gallery" },
       { name: "Calendar", href: "/#panchangam" },
       { name: "Events", href: "/events" },
+      { name: "Event Book", href: "/sampath-book-2026" },
       { name: "Members", href: "/members" },
       { name: "Donations", href: "/#donations" },
       { name: "Contact Us", href: "/contact" },
@@ -108,7 +111,7 @@ const Header = () => {
   const scrollTo = (id: string) => {
     const el = document.getElementById(id.replace("#", ""));
     if (el) {
-      const headerHeight = window.innerWidth >= 640 ? 144 : 128; // match the layout header heights
+      const headerHeight = window.innerWidth >= 640 ? 96 : 88; // match the layout header heights
       const elementPosition = el.getBoundingClientRect().top + window.scrollY;
       const offsetPosition = elementPosition - headerHeight - 16; // subtract header height plus a small gap
 
@@ -176,22 +179,22 @@ const Header = () => {
       <div className="h-[4px] w-full bg-gradient-to-r from-transparent via-primary to-transparent opacity-80" />
 
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 sm:h-24">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-4 flex-shrink-0 group">
-            <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white flex items-center justify-center border-2 border-primary/30 shadow-[0_0_20px_rgba(var(--primary),0.2)] group-hover:border-primary/50 transition-all duration-500 overflow-hidden">
+          <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group">
+            <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white flex items-center justify-center border border-primary/30 shadow-[0_0_10px_rgba(var(--primary),0.15)] group-hover:border-primary/50 transition-all duration-500 overflow-hidden">
               <img src={vinayakaLogo} alt="Sampath Vinayakagar" className="w-full h-full object-cover rounded-full relative z-10 group-hover:scale-110 transition-transform duration-700" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-bold tracking-tight text-foreground leading-tight font-serif italic text-shadow-sm">
+              <span className="text-xs sm:text-sm font-bold tracking-tight text-foreground leading-tight font-serif italic text-shadow-sm">
                 Sampath Vinayakagar
               </span>
-              <div className="flex items-center gap-2">
-                <div className="h-px w-4 bg-primary/40" />
-                <span className="text-sm tracking-[0.4em] uppercase text-primary font-bold leading-tight">
+              <div className="flex items-center gap-1.5">
+                <div className="h-px w-3 bg-primary/40" />
+                <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-primary font-bold leading-tight">
                   Temple
                 </span>
-                <div className="h-px w-4 bg-primary/40" />
+                <div className="h-px w-3 bg-primary/40" />
               </div>
             </div>
           </Link>
