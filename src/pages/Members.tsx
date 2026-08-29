@@ -1,6 +1,7 @@
 import Layout from "@/components/Layout";
 import prasadRao from "@/assets/prasad-rao.jpg";
 import { getOptimizedImageUrl } from "@/utils/cloudinary";
+import priestPooja from "@/assets/priest-pooja.jpg";
 
 const membersList = [
   {
@@ -21,7 +22,7 @@ const membersList = [
     name: "Pandit P. Mohan Swamy",
     role: "Mukya Archaka",
     desc: "Chief Priest leading the sacred daily rituals, special alankarams, and performing divine archana, homam, and vehicle poojas for the devotees.",
-    img: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086840/DSC_5466_qteecl.jpg",
+    img: priestPooja,
     category: "Spiritual Services"
   }
 ];

@@ -12,6 +12,8 @@ import male1 from "@/assets/member-male-1.png";
 import male2 from "@/assets/member-male-2.png";
 import male3 from "@/assets/member-male-3.png";
 import prasadRao from "@/assets/prasad-rao.jpg";
+import founderImage from "@/assets/rajeswaran.jpg";
+import priestPooja from "@/assets/priest-pooja.jpg";
 
 
 /* ─── Data ─── */
@@ -86,9 +88,9 @@ const milestonesHi = [
 ];
 
 const galleryImages = [
-  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087513/DSC_2942_zwtokt.jpg", title: "Temple Deity Alankaram", span: "col-span-2 row-span-2" },
+  { src: priestPooja, title: "Sree Sampath Vinayagar Archana", span: "col-span-2 row-span-2" },
+  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087513/DSC_2942_zwtokt.jpg", title: "Temple Deity Alankaram", span: "col-span-1 row-span-1" },
   { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087512/DSC_2235_s6uwsk.jpg", title: "Inner Sanctum Pooja", span: "col-span-1 row-span-1" },
-  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087511/DSC_2151_k72wsc.jpg", title: "Golden Gopuram Alankaram", span: "col-span-1 row-span-1" },
   { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087510/DSC_2183_qwpfao.jpg", title: "Evening Aarti Ceremony", span: "col-span-1 row-span-1" },
   { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087508/DSC_2084_xjxbov.jpg", title: "Devotional Gathering", span: "col-span-1 row-span-1" },
   { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086841/IMG_5524_f8j84i.jpg", title: "Sacred Offerings", span: "col-span-2 row-span-1" },
@@ -122,7 +124,6 @@ const aboutImages = [
 
 const Index = () => {
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
-  const [aboutImageIndex, setAboutImageIndex] = useState(0);
   const [homeLightboxIndex, setHomeLightboxIndex] = useState<number | null>(null);
   const [timelineLang, setTimelineLang] = useState<"en" | "te" | "hi">("en");
   const [noteLang, setNoteLang] = useState<"en" | "te" | "hi">("te");
@@ -140,13 +141,6 @@ const Index = () => {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setAboutImageIndex((prev) => (prev + 1) % aboutImages.length);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,29 +195,24 @@ const Index = () => {
             </div>
           </div>
           <div className="relative animate-fade-in opacity-0 [animation-fill-mode:forwards] flex justify-center items-center py-4 lg:py-8">
-            <div className="relative w-full max-w-[320px] sm:max-w-[400px] lg:max-w-[450px] aspect-[3/4]">
+            <div className="relative w-full max-w-[320px] sm:max-w-[400px] lg:max-w-[450px] aspect-square">
               {/* Decorative Borders */}
               <div className="absolute -inset-4 border-2 border-primary/10 rounded-3xl -rotate-3 pointer-events-none" />
               <div className="absolute -inset-4 border-2 border-primary/5 rounded-3xl rotate-2 pointer-events-none" />
               
               <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl group">
                 <div className="relative w-full h-full overflow-hidden group-hover:scale-105 transition-transform duration-[2000ms] ease-out">
-                  {aboutImages.map((img, idx) => (
-                    <img
-                      key={idx}
-                      src={getOptimizedImageUrl(img, 600)}
-                      alt="Temple interior with sacred lamps"
-                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-                        idx === aboutImageIndex ? "opacity-100 z-10" : "opacity-0 z-0"
-                      }`}
-                      loading="lazy"
-                    />
-                  ))}
+                  <img
+                    src={founderImage}
+                    alt="Founder and Chairman SRI. T.S. RAJESWARAN"
+                    className="w-full h-full object-cover object-top"
+                    loading="lazy"
+                  />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80" />
                 <div className="absolute bottom-6 left-6 p-4 glass-dark rounded-2xl border border-white/10 shadow-2xl animate-fade-rise flex flex-col gap-1 z-20">
-                  <span className="text-primary text-2xl animate-bounce w-fit">🙏</span>
-                  <span className="text-white font-serif font-bold tracking-wider text-sm leading-tight">Sri Sampath<br />Vinayakagar</span>
+                  <span className="text-primary text-xs font-black uppercase tracking-widest w-fit">Founder & Chairman</span>
+                  <span className="text-white font-serif font-bold tracking-wider text-base leading-tight mt-0.5">Sri T.S.<br />Rajeswaran</span>
                 </div>
               </div>
             </div>
@@ -790,7 +779,7 @@ const Index = () => {
             {[
               { name: "D. V. V. Prasad Rao", role: "Assistant Commissioner & Executive Officer", img: prasadRao },
               { name: "Sri T. R. Cholan", role: "Founder Family Member", img: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087514/DSC_5404_osvkzt.jpg" },
-              { name: "Pandit P. Mohan Swamy", role: "Mukya Archaka", img: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086840/DSC_5466_qteecl.jpg" },
+              { name: "Pandit P. Mohan Swamy", role: "Mukya Archaka", img: priestPooja },
             ].map((m) => (
               <div key={m.name} className="premium-card group hover:-translate-y-3">
                 <div className="relative aspect-[4/5] overflow-hidden">

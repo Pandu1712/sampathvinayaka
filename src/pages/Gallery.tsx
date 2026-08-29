@@ -1,11 +1,16 @@
 import { useState } from "react";
 import Layout from "@/components/Layout";
 import { getOptimizedImageUrl } from "@/utils/cloudinary";
+import deity1 from "@/assets/deity-1.jpg";
+import deity2 from "@/assets/deity-2.jpg";
+import priestPooja from "@/assets/priest-pooja.jpg";
 
 const images = [
-  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087513/DSC_2942_zwtokt.jpg", span: "col-span-2 row-span-2" },
+  { src: priestPooja, span: "col-span-2 row-span-2" },
+  { src: deity1, span: "col-span-1 row-span-1" },
+  { src: deity2, span: "col-span-1 row-span-1" },
+  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087513/DSC_2942_zwtokt.jpg", span: "col-span-1 row-span-1" },
   { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087512/DSC_2235_s6uwsk.jpg", span: "col-span-1 row-span-1" },
-  { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087511/DSC_2151_k72wsc.jpg", span: "col-span-1 row-span-1" },
   { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087510/DSC_2183_qwpfao.jpg", span: "col-span-1 row-span-1" },
   { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087508/DSC_2084_xjxbov.jpg", span: "col-span-1 row-span-1" },
   { src: "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779086841/IMG_5524_f8j84i.jpg", span: "col-span-2 row-span-1" },
@@ -77,37 +82,28 @@ const Gallery = () => {
 
   return (
     <Layout>
-      {/* Hero */}
-      <section className="relative h-[55vh] flex items-center justify-center overflow-hidden bg-zinc-950">
-        <img 
-          src={getOptimizedImageUrl("https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087511/DSC_2151_k72wsc.jpg", 1200)} 
-          alt="Temple gopuram alankaram" 
-          className="absolute inset-0 w-full h-full object-cover opacity-60 animate-ken-burns scale-110" 
-          width={1920} 
-          height={1080} 
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-zinc-950" />
-        <div className="relative z-10 text-center px-4">
-          <div className="animate-fade-rise opacity-0 [animation-fill-mode:forwards]">
-            <p className="text-primary text-sm tracking-[0.4em] uppercase mb-4 font-bold drop-shadow-lg">Sacred Visual Journey</p>
-            <h1 className="hero-title !font-serif !italic drop-shadow-2xl">Temple Gallery</h1>
-            <div className="h-1 w-24 bg-primary/60 mx-auto mt-4 rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
-          </div>
+      <div className="pt-28 sm:pt-32 min-h-screen bg-zinc-950">
+        {/* Gallery Title Header */}
+        <div className="container-custom text-center mb-10 relative z-10 animate-fade-rise">
+          <p className="text-primary text-xs sm:text-sm tracking-[0.4em] uppercase mb-3 font-black">📸 Sacred Visual Journey</p>
+          <h1 className="text-4xl sm:text-5xl font-serif text-white tracking-wide">
+            Temple <span className="gold-shimmer italic">Gallery</span>
+          </h1>
+          <div className="h-[2px] w-24 bg-gradient-to-r from-transparent via-primary/40 to-transparent mx-auto mt-4" />
         </div>
-      </section>
 
-      {/* Gallery Grid */}
-      <section className="section-padding px-4 bg-zinc-950 relative overflow-hidden min-h-screen">
+        {/* Gallery Grid */}
+        <section className="px-4 pb-16 sm:pb-24 bg-zinc-950 relative overflow-hidden">
         {/* Traditional background texture details */}
         <div className="absolute top-0 left-0 w-full h-full opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/oriental-tiles.png')]" />
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[150px] pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[150px] pointer-events-none" />
-        
+
         <div className="container-custom relative z-10">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-[200px] sm:auto-rows-[300px] md:auto-rows-[350px]">
             {images.map((img, i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className={`${img.span} relative group cursor-pointer shadow-xl hover:shadow-[0_15px_30px_rgba(251,191,36,0.15)] transition-all duration-500 animate-fade-rise p-2.5 sm:p-3.5 rounded-[1.5rem] bg-amber-950/20 border border-primary/25 backdrop-blur-sm`}
                 style={{ animationDelay: `${i * 80}ms`, opacity: 0, animationFillMode: "forwards" }}
                 onClick={() => openLightbox(i)}
@@ -135,7 +131,7 @@ const Gallery = () => {
       {lightboxIndex !== null && (
         <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center transition-all duration-300">
           {/* Close button */}
-          <button 
+          <button
             onClick={closeLightbox}
             className="absolute top-6 right-6 z-50 p-3 rounded-full bg-white/5 border border-primary/30 text-white hover:bg-primary hover:text-black transition-all hover:scale-110 shadow-lg"
             aria-label="Close Lightbox"
@@ -146,7 +142,7 @@ const Gallery = () => {
           </button>
 
           {/* Left Arrow */}
-          <button 
+          <button
             onClick={prevImage}
             className="absolute left-6 top-1/2 -translate-y-1/2 z-50 p-3.5 rounded-full bg-white/5 border border-primary/30 text-white hover:bg-primary hover:text-black transition-all hover:scale-110 shadow-lg"
             aria-label="Previous Image"
@@ -158,15 +154,15 @@ const Gallery = () => {
 
           {/* Main Image Frame */}
           <div className="relative max-w-[90vw] max-h-[80vh] sm:max-h-[85vh] p-3 sm:p-4 bg-amber-950/30 border border-primary/40 rounded-2xl shadow-[0_0_50px_rgba(251,191,36,0.2)] flex items-center justify-center">
-            <img 
-              src={getOptimizedImageUrl(images[lightboxIndex].src, 1200)} 
+            <img
+              src={getOptimizedImageUrl(images[lightboxIndex].src, 1200)}
               alt={`Temple Deity Darshan ${lightboxIndex + 1}`}
               className="max-w-full max-h-[75vh] object-contain rounded-lg border border-primary/20"
             />
           </div>
 
           {/* Right Arrow */}
-          <button 
+          <button
             onClick={nextImage}
             className="absolute right-6 top-1/2 -translate-y-1/2 z-50 p-3.5 rounded-full bg-white/5 border border-primary/30 text-white hover:bg-primary hover:text-black transition-all hover:scale-110 shadow-lg"
             aria-label="Next Image"
@@ -190,21 +186,22 @@ const Gallery = () => {
           <p className="text-primary text-sm tracking-[0.4em] uppercase mb-4 font-bold">Follow Our Journey</p>
           <h2 className="text-4xl font-bold text-foreground font-serif mb-6">Stay <span className="gold-shimmer italic">Connected</span></h2>
           <div className="flex flex-wrap justify-center gap-4">
-             {["Instagram", "Facebook", "YouTube"].map((social) => (
-                <a 
-                  key={social}
-                  href="#" 
-                  className="group flex items-center gap-3 px-6 py-4 rounded-2xl glass-dark border border-white/5 hover:border-primary/40 transition-all duration-500 hover:-translate-y-2"
-                >
-                  <span className="text-primary font-bold tracking-widest uppercase text-sm">{social}</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary/40 group-hover:scale-150 transition-transform" />
-                </a>
-             ))}
+            {["Instagram", "Facebook", "YouTube"].map((social) => (
+              <a
+                key={social}
+                href="#"
+                className="group flex items-center gap-3 px-6 py-4 rounded-2xl glass-dark border border-white/5 hover:border-primary/40 transition-all duration-500 hover:-translate-y-2"
+              >
+                <span className="text-primary font-bold tracking-widest uppercase text-sm">{social}</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-primary/40 group-hover:scale-150 transition-transform" />
+              </a>
+            ))}
           </div>
         </div>
       </section>
-    </Layout>
-  );
+    </div>
+  </Layout>
+);
 };
 
 export default Gallery;

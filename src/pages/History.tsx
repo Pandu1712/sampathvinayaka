@@ -2,6 +2,7 @@ import { useState } from "react";
 import Layout from "@/components/Layout";
 import { getOptimizedImageUrl } from "@/utils/cloudinary";
 import { MapPin, Train, Plane, Sparkles, Languages } from "lucide-react";
+import founderImage from "@/assets/rajeswaran.jpg";
 
 const History = () => {
   const [lang, setLang] = useState<"en" | "te" | "hi">("en");
@@ -147,16 +148,16 @@ const History = () => {
             {/* Left side: Premium Deity Circular Plaque (matches screenshot concept) */}
             <div className="lg:col-span-4 flex flex-col items-center lg:sticky lg:top-28">
               <div className="relative group">
-                {/* Traditional Decorative Borders */}
-                <div className="absolute -inset-4 border border-primary/20 rounded-full rotate-6 pointer-events-none animate-spin-slow duration-[10000ms]" />
-                <div className="absolute -inset-4 border-2 border-primary/10 rounded-full -rotate-3 pointer-events-none" />
+                 {/* Traditional Decorative Borders */}
+                <div className="absolute -inset-3 border border-primary/20 rounded-3xl pointer-events-none" />
+                <div className="absolute -inset-1.5 border-2 border-primary/10 rounded-3xl pointer-events-none" />
                 
                 {/* Deity Image Holder */}
-                <div className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-full overflow-hidden border-[6px] border-white shadow-[0_15px_45px_rgba(0,0,0,0.3)] bg-gradient-to-b from-primary/10 to-primary/5">
+                <div className="relative w-72 h-72 sm:w-80 sm:h-80 rounded-3xl overflow-hidden border-[6px] border-white shadow-[0_15px_45px_rgba(0,0,0,0.3)] bg-gradient-to-b from-primary/10 to-primary/5">
                   <img
-                    src={getOptimizedImageUrl("https://res.cloudinary.com/ddmzgotdd/image/upload/v1779087509/IMG_5686_ixb1rc.jpg", 600)}
-                    alt="Presiding Deity Lord Ganesha"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1500ms]"
+                    src={founderImage}
+                    alt="Founder and Chairman SRI. T.S. RAJESWARAN"
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-[1500ms]"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-45" />
                 </div>
@@ -164,10 +165,18 @@ const History = () => {
               
               <div className="text-center mt-6">
                 <h3 className="font-serif text-lg font-bold text-foreground tracking-wide">
-                  {lang === "en" ? "Sri Sampath Vinayakagar" : "శ్రీ సంపత్ వినాయగర్"}
+                  {lang === "en"
+                    ? "SRI. T.S. RAJESWARAN"
+                    : lang === "te"
+                    ? "శ్రీ టి.యస్. రాజేశ్వరన్"
+                    : "श्री टी.एस. राजेश्वरन"}
                 </h3>
                 <p className="text-primary text-xs uppercase tracking-[0.2em] font-bold mt-1">
-                  {lang === "en" ? "Presiding Deity" : "ప్రధాన అర్చనా మూర్తి"}
+                  {lang === "en"
+                    ? "Founder & Chairman"
+                    : lang === "te"
+                    ? "వ్యవస్థాపకుడు & చైర్మన్"
+                    : "संस्थापक एवं अध्यक्ष"}
                 </p>
               </div>
             </div>
