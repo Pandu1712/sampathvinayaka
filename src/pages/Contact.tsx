@@ -68,7 +68,7 @@ const Contact = () => {
             <div className="mt-5 space-y-3">
               {[
                 { icon: "📍", label: "Address", value: "Asilmetta, Visakhapatnam, Andhra Pradesh 530020" },
-                { icon: "📞", label: "General", value: "(+91) 891-2755650 / 891-2760740" },
+                { icon: "📞", label: "General", value: "(+91) 891-2760740" },
                 { icon: "💬", label: "WhatsApp", value: "+91 94910 00712" },
                 { icon: "🆘", label: "Helpline", value: "+91 97044 38668" },
                 { icon: "🕐", label: "Darshan Timings", value: "Daily: 6:00 AM – 8:00 PM" },

@@ -234,9 +234,9 @@ const Header = () => {
 
           {/* CTA Desktop */}
           <div className="hidden xl:flex items-center gap-3 shrink-0">
-            <a href="tel:+918912755650" className="hidden min-[1680px]:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+            <a href="tel:+918912760740" className="hidden min-[1680px]:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
               <Phone size={14} />
-              <span>(+91) 891-2755650</span>
+              <span>(+91) 891-2760740</span>
             </a>
             <div className="hidden min-[1680px]:block w-px h-6 bg-border" />
             <a href="https://wa.me/919491000712" target="_blank" rel="noopener noreferrer" className="hidden min-[1680px]:flex items-center gap-2 text-sm text-muted-foreground hover:text-green-500 transition-colors">
@@ -373,13 +373,13 @@ const Header = () => {
 
         {/* Footer Actions */}
         <div className="flex flex-col gap-4 pt-6 border-t border-primary/20 relative z-10 shrink-0">
-          <a href="tel:+918912755650" className="flex items-center gap-4 text-white/80 hover:text-primary transition-colors group">
+          <a href="tel:+918912760740" className="flex items-center gap-4 text-white/80 hover:text-primary transition-colors group">
             <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/25 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
               <Phone size={16} className="text-primary animate-pulse" />
             </div>
             <div className="flex flex-col">
               <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Temple Contact</span>
-              <span className="text-sm font-medium tracking-wide">(+91) 891-2755650</span>
+              <span className="text-sm font-medium tracking-wide">(+91) 891-2760740</span>
             </div>
           </a>
 

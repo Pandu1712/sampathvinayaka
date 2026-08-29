@@ -854,7 +854,7 @@ const Index = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
                 { icon: "📍", label: "Address", value: "Asilmetta, Visakhapatnam, Andhra Pradesh 530020" },
-                { icon: "📞", label: "General", value: "(+91) 891-2755650 / 2760740" },
+                { icon: "📞", label: "General", value: "(+91) 891-2760740" },
                 { icon: "💬", label: "WhatsApp", value: "+91 94910 00712" },
                 { icon: "🆘", label: "Helpline", value: "+91 97044 38668" },
                 { icon: "🕐", label: "Timings", value: "Daily: 6:00 AM – 8:00 PM" },

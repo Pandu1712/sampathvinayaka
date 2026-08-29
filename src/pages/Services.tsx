@@ -78,7 +78,7 @@ const Services = () => {
                   <a href="/contact" className="px-6 py-5 rounded-full bg-primary text-primary-foreground font-bold hover:shadow-primary/40 hover:-translate-y-1 transition-all shadow-xl text-sm">Contact Us Now</a>
                   <div className="flex items-center gap-4 text-primary font-bold text-sm">
                     <span className="w-12 h-px bg-primary/40" />
-                    Or Call: (+91) 891-2755650
+                    Or Call: (+91) 891-2760740
                   </div>
                </div>
              </div>

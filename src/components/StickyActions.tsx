@@ -2,7 +2,7 @@ import { MessageCircle, MapPin } from "lucide-react";
 import BackgroundMusic from "./BackgroundMusic";
 
 const StickyActions = () => {
-  const whatsappNumber = "919704438668";
+  const whatsappNumber = "919491000712";
   const mapsLink = "https://www.google.com/maps/search/Sri+Sampath+Vinayakagar+Temple+Visakhapatnam";
 
   return (
