@@ -123,6 +123,11 @@ const aboutImages = [
   "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779085980/DSC_1186_x046cn.jpg"
 ];
 
+const isNavaratriBookingExpired = () => {
+  const expiryDate = new Date("2026-09-16T00:00:00");
+  return new Date() >= expiryDate;
+};
+
 const Index = () => {
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
   const [homeLightboxIndex, setHomeLightboxIndex] = useState<number | null>(null);
@@ -527,36 +532,38 @@ const Index = () => {
               </div>
 
               {/* Seva 2: Ganesha Navaratri Abhishekam */}
-              <div className="p-6 rounded-2xl glass border border-white/40 hover:border-primary/20 hover:scale-[1.01] transition-all duration-300 shadow-sm hover:shadow-lg flex flex-col justify-between gap-4 animate-fade-rise">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-start gap-2">
-                    <h4 className="text-primary font-bold text-base font-serif">
+              {!isNavaratriBookingExpired() && (
+                <div className="p-6 rounded-2xl glass border border-white/40 hover:border-primary/20 hover:scale-[1.01] transition-all duration-300 shadow-sm hover:shadow-lg flex flex-col justify-between gap-4 animate-fade-rise">
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-start gap-2">
+                      <h4 className="text-primary font-bold text-base font-serif">
+                        {sevaLang === "en" 
+                          ? "Ganesha Navaratri Abhishekam" 
+                          : sevaLang === "te" 
+                            ? "గణపతి నవరాత్రుల అభిషేకం" 
+                            : "गणपति नवरात्रि अभिषेक"}
+                      </h4>
+                      <span className="text-lg font-black text-foreground shrink-0">
+                        {sevaLang === "en" ? "₹2,500" : sevaLang === "te" ? "రూ. 2,500/-" : "₹2,500"}
+                      </span>
+                    </div>
+                    <p className="text-muted-foreground text-xs leading-relaxed font-sans font-light">
                       {sevaLang === "en" 
-                        ? "Ganesha Navaratri Abhishekam" 
+                        ? "Pooja performed on one of the 9 days of Ganesha Navaratri with the devotee's Gotra & Namam." 
                         : sevaLang === "te" 
-                          ? "గణపతి నవరాత్రుల అభిషేకం" 
-                          : "गणपति नवरात्रि अभिषेक"}
-                    </h4>
-                    <span className="text-lg font-black text-foreground shrink-0">
-                      {sevaLang === "en" ? "₹2,500" : sevaLang === "te" ? "రూ. 2,500/-" : "₹2,500"}
-                    </span>
+                          ? "గణపతి నవరాత్రుల 9 రోజులలో ఒక రోజు భక్తుల గోత్ర నామములతో జరిపించు పూజ." 
+                          : "गणेश नवरात्रि के 9 दिनों में से किसी एक दिन श्रद्धालुओं के गोत्र और नाम के साथ की जाने वाली पूजा।"}
+                    </p>
                   </div>
-                  <p className="text-muted-foreground text-xs leading-relaxed font-sans font-light">
-                    {sevaLang === "en" 
-                      ? "Pooja performed on one of the 9 days of Ganesha Navaratri with the devotee's Gotra & Namam." 
-                      : sevaLang === "te" 
-                        ? "గणపతి నవరాత్రుల 9 రోజులలో ఒక రోజు భక్తుల గోత్ర నామములతో జరిపించు పూజ." 
-                        : "गणेश नवरात्रि के 9 दिनों में से किसी एक दिन श्रद्धालुओं के गोत्र और नाम के साथ की जाने वाली पूजा।"}
-                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleSevaBook("Ganesha Navaratri Abhishekam", 2500)}
+                    className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-serif font-black tracking-widest text-xs hover:from-amber-600 hover:to-amber-700 active:scale-95 transition-all shadow-sm hover:scale-[1.03]"
+                  >
+                    {sevaLang === "en" ? "Pay Amount / Book Seva" : sevaLang === "te" ? "విరాళం చెల్లించండి / బుక్ చేయండి" : "भुगतान करें / बुक सेवा"}
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleSevaBook("Ganesha Navaratri Abhishekam", 2500)}
-                  className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-serif font-black tracking-widest text-xs hover:from-amber-600 hover:to-amber-700 active:scale-95 transition-all shadow-sm hover:scale-[1.03]"
-                >
-                  {sevaLang === "en" ? "Pay Amount / Book Seva" : sevaLang === "te" ? "విరాళం చెల్లించండి / బుక్ చేయండి" : "भुगतान करें / बुक सेवा"}
-                </button>
-              </div>
+              )}
             </div>
           </div>
 

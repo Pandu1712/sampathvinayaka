@@ -30,6 +30,11 @@ interface DonationsProps {
   clearPreselect?: () => void;
 }
 
+const isNavaratriBookingExpired = () => {
+  const expiryDate = new Date("2026-09-16T00:00:00");
+  return new Date() >= expiryDate;
+};
+
 const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: DonationsProps) => {
   const [activeTab, setActiveTab] = useState<"prasada" | "anna" | "special">("prasada");
 
@@ -252,7 +257,7 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
 
   const handleOnlinePayment = async () => {
     // Validate evening booking hours constraint (5:30 PM to 8:00 PM) for Sevas
-    if (sevaPurpose !== "General Donation" && !testBypass) {
+    if (sevaPurpose !== "General Donation" && sevaPurpose !== "Ganesha Navaratri Abhishekam" && !testBypass) {
       const now = new Date();
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
       const startLimit = 17 * 60 + 30; // 17:30
@@ -419,6 +424,12 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
     // Pre-fill devotee inputs
     setSevaPurpose(purposeValue);
     setAmountPaid(fixedAmount !== null ? fixedAmount.toString() : "");
+    if (purposeValue === "Ganesha Navaratri Abhishekam") {
+      setPoojaDate("2026-09-14");
+      setPoojaTime("4:00 AM - 6:00 AM");
+    } else {
+      setPoojaTime("5:30 PM - 8:00 PM");
+    }
 
     // Scroll smoothly to form section
     setTimeout(() => {
@@ -471,13 +482,20 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
         setAmountPaid("");
       }
     }
+
+    if (purposeValue === "Ganesha Navaratri Abhishekam") {
+      setPoojaDate("2026-09-14");
+      setPoojaTime("4:00 AM - 6:00 AM");
+    } else {
+      setPoojaTime("5:30 PM - 8:00 PM");
+    }
   };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate evening booking hours constraint (5:30 PM to 8:00 PM) for Sevas
-    if (sevaPurpose !== "General Donation" && !testBypass) {
+    if (sevaPurpose !== "General Donation" && sevaPurpose !== "Ganesha Navaratri Abhishekam" && !testBypass) {
       const now = new Date();
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
       const startLimit = 17 * 60 + 30; // 17:30
@@ -1125,7 +1143,7 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
                       <tbody className="divide-y divide-stone-100 text-stone-700">
                         {[
                           { name: "Saswatha Abhisheka Seva", te: "శాశ్వత అభిషేక సేవ", day: "Annual (సంవత్సరానికి ఒకసారి)", price: 5000, key: "Saswatha Abhisheka Seva" },
-                          { name: "Ganesha Navaratri Abhishekam", te: "గణపతి నవరాత్రుల అభిషేకం", day: "Navaratri Days (నవరాత్రులు)", price: 2500, key: "Ganesha Navaratri Abhishekam" }
+                          ...(!isNavaratriBookingExpired() ? [{ name: "Ganesha Navaratri Abhishekam", te: "గణపతి నవరాత్రుల అభిషేకం", day: "Navaratri Days (నవరాత్రులు)", price: 2500, key: "Ganesha Navaratri Abhishekam" }] : [])
                         ].map((item, i) => (
                           <tr key={i} className="hover:bg-stone-50/50 transition-colors">
                             <td className="py-4">
@@ -1293,7 +1311,9 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
                       <option value="Undrallu 10 Kg">Undrallu 10 Kg (10 కేజీల ఉండ్రాళ్ళు బుధవారం - ₹1,000)</option>
                       <option value="Sweet Undrallu 10 Kg">Sweet Undrallu 10 Kg (10 కేజీల తీపి ఉండ్రాళ్ళు శుక్రవారం - ₹1,800)</option>
                       <option value="Saswatha Abhisheka Seva">Saswatha Abhisheka Seva (శాశ్వత అభిషేక సేవ - ₹5,000)</option>
-                      <option value="Ganesha Navaratri Abhishekam">Ganesha Navaratri Abhishekam (గణపతి నవరాత్రుల అభిషేకం - ₹2,500)</option>
+                      {!isNavaratriBookingExpired() && (
+                        <option value="Ganesha Navaratri Abhishekam">Ganesha Navaratri Abhishekam (గణపతి నవరాత్రుల అభిషేకం - ₹2,500)</option>
+                      )}
                     </select>
                   </div>
                 </div>
@@ -1311,13 +1331,14 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
                         required
                         value={poojaDate}
                         onChange={(e) => setPoojaDate(e.target.value)}
+                        disabled={sevaPurpose === "Ganesha Navaratri Abhishekam"}
                         min={sevaPurpose === "Ganesha Navaratri Abhishekam" ? "2026-09-14" : undefined}
-                        max={sevaPurpose === "Ganesha Navaratri Abhishekam" ? "2026-09-23" : undefined}
-                        className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all font-sans"
+                        max={sevaPurpose === "Ganesha Navaratri Abhishekam" ? "2026-09-14" : undefined}
+                        className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all font-sans disabled:opacity-75"
                       />
                       {sevaPurpose === "Ganesha Navaratri Abhishekam" && (
-                        <p className="text-[10px] text-amber-700 font-medium mt-1">
-                          Please choose a date between Sep 14, 2026 and Sep 23, 2026.
+                        <p className="text-[10px] text-amber-700 font-bold mt-1">
+                          గణపతి నవరాత్రుల అభిషేకం పూజ సెప్టెంబర్ 14న మాత్రమే జరుగును. (This booking is locked to September 14, 2026 only).
                         </p>
                       )}
                     </div>
@@ -1332,12 +1353,19 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
                         required
                         value={poojaTime}
                         onChange={(e) => setPoojaTime(e.target.value)}
-                        className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                        disabled={sevaPurpose === "Ganesha Navaratri Abhishekam"}
+                        className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all disabled:opacity-75"
                       >
-                        <option value="5:30 PM - 8:00 PM">Evening (5:30 PM – 8:00 PM Only)</option>
+                        {sevaPurpose === "Ganesha Navaratri Abhishekam" ? (
+                          <option value="4:00 AM - 6:00 AM">Morning (4:00 AM – 6:00 AM Only)</option>
+                        ) : (
+                          <option value="5:30 PM - 8:00 PM">Evening (5:30 PM – 8:00 PM Only)</option>
+                        )}
                       </select>
-                      <p className="text-[10px] text-amber-700 font-medium mt-1">
-                        Pooja performed during evening darshan hours only.
+                      <p className="text-[10px] text-amber-700 font-medium mt-1 font-sans">
+                        {sevaPurpose === "Ganesha Navaratri Abhishekam" 
+                          ? "ఈ పూజ కేవలం ఉదయం గం. 4:00 నుండి గం. 6:00 వరకు మాత్రమే జరుగును. (Morning 4:00 AM – 6:00 AM only)."
+                          : "Pooja performed during evening darshan hours only."}
                       </p>
                     </div>
 
