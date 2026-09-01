@@ -50,7 +50,6 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
   const [sevaPurpose, setSevaPurpose] = useState("General Donation");
   const [poojaDate, setPoojaDate] = useState("");
   const [poojaTime, setPoojaTime] = useState("5:30 PM - 8:00 PM");
-  const [testBypass, setTestBypass] = useState(false);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const hasFixedPrice = sevaPurpose !== "General Donation" && sevaPurpose !== "Annadanam";
 
@@ -257,7 +256,7 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
 
   const handleOnlinePayment = async () => {
     // Validate evening booking hours constraint (5:30 PM to 8:00 PM) for Sevas
-    if (sevaPurpose !== "General Donation" && sevaPurpose !== "Ganesha Navaratri Abhishekam" && !testBypass) {
+    if (sevaPurpose !== "General Donation" && sevaPurpose !== "Ganesha Navaratri Abhishekam") {
       const now = new Date();
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
       const startLimit = 17 * 60 + 30; // 17:30
@@ -495,7 +494,7 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
     e.preventDefault();
 
     // Validate evening booking hours constraint (5:30 PM to 8:00 PM) for Sevas
-    if (sevaPurpose !== "General Donation" && sevaPurpose !== "Ganesha Navaratri Abhishekam" && !testBypass) {
+    if (sevaPurpose !== "General Donation" && sevaPurpose !== "Ganesha Navaratri Abhishekam") {
       const now = new Date();
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
       const startLimit = 17 * 60 + 30; // 17:30
@@ -1318,72 +1317,7 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
                   </div>
                 </div>
 
-                {sevaPurpose !== "General Donation" && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-                    {/* Pooja Date */}
-                    <div className="space-y-1 md:col-span-1">
-                      <label className="text-xs text-stone-600 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                        <Calendar size={13} className="text-amber-600" />
-                        Pooja Date / పూజ తేదీ *
-                      </label>
-                      <input
-                        type="date"
-                        required
-                        value={poojaDate}
-                        onChange={(e) => setPoojaDate(e.target.value)}
-                        disabled={sevaPurpose === "Ganesha Navaratri Abhishekam"}
-                        min={sevaPurpose === "Ganesha Navaratri Abhishekam" ? "2026-09-14" : undefined}
-                        max={sevaPurpose === "Ganesha Navaratri Abhishekam" ? "2026-09-14" : undefined}
-                        className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all font-sans disabled:opacity-75"
-                      />
-                      {sevaPurpose === "Ganesha Navaratri Abhishekam" && (
-                        <p className="text-[10px] text-amber-700 font-bold mt-1">
-                          గణపతి నవరాత్రుల అభిషేకం పూజ సెప్టెంబర్ 14న మాత్రమే జరుగును. (This booking is locked to September 14, 2026 only).
-                        </p>
-                      )}
-                    </div>
 
-                    {/* Pooja Time Slot */}
-                    <div className="space-y-1 md:col-span-1">
-                      <label className="text-xs text-stone-600 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                        <span className="text-amber-600 text-sm">🕐</span>
-                        Pooja Time Slot / సమయం *
-                      </label>
-                      <select
-                        required
-                        value={poojaTime}
-                        onChange={(e) => setPoojaTime(e.target.value)}
-                        disabled={sevaPurpose === "Ganesha Navaratri Abhishekam"}
-                        className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all disabled:opacity-75"
-                      >
-                        {sevaPurpose === "Ganesha Navaratri Abhishekam" ? (
-                          <option value="4:00 AM - 6:00 AM">Morning (4:00 AM – 6:00 AM Only)</option>
-                        ) : (
-                          <option value="5:30 PM - 8:00 PM">Evening (5:30 PM – 8:00 PM Only)</option>
-                        )}
-                      </select>
-                      <p className="text-[10px] text-amber-700 font-medium mt-1 font-sans">
-                        {sevaPurpose === "Ganesha Navaratri Abhishekam" 
-                          ? "ఈ పూజ కేవలం ఉదయం గం. 4:00 నుండి గం. 6:00 వరకు మాత్రమే జరుగును. (Morning 4:00 AM – 6:00 AM only)."
-                          : "Pooja performed during evening darshan hours only."}
-                      </p>
-                    </div>
-
-                    {/* Test Mode Bypass */}
-                    <div className="space-y-1 md:col-span-1 flex items-center gap-2 pt-6">
-                      <input
-                        type="checkbox"
-                        id="test-bypass-check"
-                        checked={testBypass}
-                        onChange={(e) => setTestBypass(e.target.checked)}
-                        className="w-4 h-4 rounded text-amber-600 border-stone-300 focus:ring-amber-500 cursor-pointer"
-                      />
-                      <label htmlFor="test-bypass-check" className="text-xs text-stone-500 font-semibold cursor-pointer">
-                        Bypass evening booking hours validation (Test Mode)
-                      </label>
-                    </div>
-                  </div>
-                )}
 
                 {/* Address */}
                 <div className="space-y-1">

@@ -60,7 +60,7 @@ const Footer = () => {
               </li>
               <li className="flex gap-3">
                 <span className="text-primary">🆘</span>
-                <span className="font-semibold text-foreground">+91 97044 38668</span>
+                <span className="font-semibold text-foreground">+91 94910 00712</span>
               </li>
             </ul>
           </div>
