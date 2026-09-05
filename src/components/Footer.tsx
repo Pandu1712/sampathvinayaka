@@ -21,6 +21,8 @@ const Footer = () => {
                 { name: "Home", path: "/" },
                 { name: "History", path: "/history" },
                 { name: "Services", path: "/services" },
+                { name: "Events & Festivals", path: "/events" },
+                { name: "e-Procurement Tenders", path: "/tenders" },
                 { name: "Gallery", path: "/gallery" },
                 { name: "Admin Portal", path: "/admin" },
               ].map((link) => (

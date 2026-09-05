@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Phone, Flower2, Sparkles, MapPin, Home, BookOpen, Image, Calendar as CalendarIcon, Users, Heart, Clock } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, Phone, Flower2, Sparkles, MapPin, Home, BookOpen, Image, Calendar as CalendarIcon, Users, Heart, Clock, FileText } from "lucide-react";
 import vinayakaLogo from "@/assets/vinayaka-logo.png";
 
 
@@ -18,6 +18,8 @@ const getLinkIcon = (name: string) => {
       return <Image size={18} />;
     case "events":
       return <CalendarIcon size={18} />;
+    case "tenders":
+      return <FileText size={18} />;
     case "event book":
       return <BookOpen size={18} />;
     case "members":
@@ -39,7 +41,29 @@ const Header = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("home");
   const location = useLocation();
+  const navigate = useNavigate();
   const isHome = location.pathname === "/";
+
+  const handleTenderNavigate = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (location.pathname === "/tenders") {
+      const el = document.getElementById("tender-details") || document.getElementById("tender-section");
+      if (el) {
+        const headerHeight = window.innerWidth >= 640 ? 96 : 88;
+        const elementPosition = el.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({
+          top: elementPosition - headerHeight - 16,
+          behavior: "smooth"
+        });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    } else {
+      navigate("/tenders");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => {
@@ -89,6 +113,7 @@ const Header = () => {
       { name: "Services", href: "#services" },
       { name: "Gallery", href: "#gallery" },
       { name: "Events", href: "#events" },
+      { name: "Tenders", href: "/tenders" },
       { name: "Event Book", href: "/sampath-book-2026" },
       { name: "Members", href: "#members" },
       { name: "Calendar", href: "#panchangam" },
@@ -102,6 +127,7 @@ const Header = () => {
       { name: "Gallery", href: "/gallery" },
       { name: "Calendar", href: "/#panchangam" },
       { name: "Events", href: "/events" },
+      { name: "Tenders", href: "/tenders" },
       { name: "Event Book", href: "/sampath-book-2026" },
       { name: "Members", href: "/members" },
       { name: "Donations", href: "/#donations" },
@@ -142,6 +168,23 @@ const Header = () => {
       <div className="bg-[#1C1917] text-white/90 text-[10px] sm:text-xs h-8 w-full border-b border-primary/20 relative z-50 overflow-hidden flex items-center">
         <div className="w-full relative overflow-hidden flex items-center h-full">
           <div className="animate-marquee whitespace-nowrap flex items-center gap-8 absolute h-full top-0">
+            {/* Tender Announcement ticker item 1 */}
+            <button
+              type="button"
+              onClick={handleTenderNavigate}
+              className="inline-flex items-center gap-2 font-bold text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 active:scale-95 px-3 py-1 rounded-full border border-amber-500/40 transition-all cursor-pointer text-left focus:outline-none"
+              title="Click to view e-Procurement Tender details"
+            >
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                <span className="text-amber-200 uppercase tracking-wider text-[10px] font-black">⚡ TENDER NOTICE (05-09-2026):</span>
+                <span>e-Procurement Tender Schedules Open Tomorrow (06-09-2026, 10:00 AM) | Official Portal: e.www.ap.eprocurement.gov.in</span>
+              </span>
+              <span className="bg-amber-500 hover:bg-amber-400 text-stone-950 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm ml-1 transition-colors">
+                View Details →
+              </span>
+            </button>
+            <span className="opacity-30">|</span>
             <span className="flex items-center gap-1 font-medium">
               <span>Website designed by</span>
               <a
@@ -169,6 +212,36 @@ const Header = () => {
                   <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.665.989 3.3 1.489 5.358 1.49 5.404 0 9.8-4.386 9.803-9.789.002-2.618-1.01-5.078-2.861-6.93-1.85-1.851-4.31-2.864-6.924-2.865-5.417 0-9.817 4.39-9.82 9.795-.001 2.03.525 4.021 1.524 5.768L2.57 21.13l4.077-1.976zm11.59-5.185c-.303-.151-1.793-.883-2.073-.984-.28-.102-.484-.152-.688.152-.204.304-.79.983-.969 1.186-.179.203-.357.229-.66.077-1.155-.58-1.96-1.015-2.736-2.348-.3-.518.3-.481.857-1.597.09-.18.044-.337-.023-.472-.067-.136-.583-1.406-.8-1.928-.21-.508-.444-.439-.6-.447-.145-.007-.312-.009-.479-.009s-.439.062-.669.312c-.23.25-1.793 1.756-1.793 4.28 0 2.525 1.839 4.968 2.093 5.308.255.34 3.619 5.525 8.764 7.747 1.224.528 2.18.843 2.925 1.079 1.23.39 2.35.334 3.234.202.986-.147 2.073-.847 2.366-1.63.292-.782.292-1.452.204-1.597-.088-.146-.324-.229-.627-.38z"/>
                 </svg>
                 WhatsApp
+              </a>
+            </span>
+            <span className="opacity-30">|</span>
+
+            {/* Repeated Tender Announcement for smooth infinite marquee */}
+            <button
+              type="button"
+              onClick={handleTenderNavigate}
+              className="inline-flex items-center gap-2 font-bold text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 active:scale-95 px-3 py-1 rounded-full border border-amber-500/40 transition-all cursor-pointer text-left focus:outline-none"
+              title="Click to view e-Procurement Tender details"
+            >
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                <span className="text-amber-200 uppercase tracking-wider text-[10px] font-black">⚡ TENDER NOTICE (05-09-2026):</span>
+                <span>e-Procurement Tender Schedules Open Tomorrow (06-09-2026, 10:00 AM) | Official Portal: e.www.ap.eprocurement.gov.in</span>
+              </span>
+              <span className="bg-amber-500 hover:bg-amber-400 text-stone-950 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm ml-1 transition-colors">
+                View Details →
+              </span>
+            </button>
+            <span className="opacity-30">|</span>
+            <span className="flex items-center gap-1 font-medium">
+              <span>Website designed by</span>
+              <a
+                href="https://wa.me/917675852618"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline font-bold transition-all"
+              >
+                Ascend Media Labs
               </a>
             </span>
           </div>

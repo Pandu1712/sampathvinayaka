@@ -13,6 +13,7 @@ import Contact from "./pages/Contact.tsx";
 import Members from "./pages/Members.tsx";
 import Admin from "./pages/Admin.tsx";
 import EventBook from "./pages/EventBook.tsx";
+import Tenders from "./pages/Tenders.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/services" element={<Services />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/tenders" element={<Tenders />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/members" element={<Members />} />
           <Route path="/admin" element={<Admin />} />

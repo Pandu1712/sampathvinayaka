@@ -6,6 +6,7 @@ import HeroCarousel from "@/components/HeroCarousel";
 import Ashtothram from "@/components/Ashtothram";
 import Donations from "@/components/Donations";
 import Panchangam from "@/components/Panchangam";
+import TenderSection from "@/components/TenderSection";
 import ganeshaImage from "@/assets/vinayaka-logo.png";
 import purohit1 from "@/assets/purohit-1.jpg";
 import male1 from "@/assets/member-male-1.png";
@@ -14,7 +15,7 @@ import male3 from "@/assets/member-male-3.png";
 import prasadRao from "@/assets/prasad-rao.jpg";
 import founderImage from "@/assets/rajeswaran.jpg";
 import priestPooja from "@/assets/priest-pooja.jpg";
-import { BookOpen, Download, Sparkles } from "lucide-react";
+import { BookOpen, Download, Sparkles, FileText, ArrowRight, Calendar as CalendarIcon, Eye } from "lucide-react";
 
 
 /* ─── Data ─── */
@@ -131,9 +132,10 @@ const isNavaratriBookingExpired = () => {
 const Index = () => {
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
   const [homeLightboxIndex, setHomeLightboxIndex] = useState<number | null>(null);
-  const [timelineLang, setTimelineLang] = useState<"en" | "te" | "hi">("en");
-  const [noteLang, setNoteLang] = useState<"en" | "te" | "hi">("te");
-  const [sevaLang, setSevaLang] = useState<"en" | "te" | "hi">("te");
+  const [timelineLang, setTimelineLang] = useState<"en" | "te">("en");
+  const [noteLang, setNoteLang] = useState<"en" | "te">("en");
+  const [sevaLang, setSevaLang] = useState<"en" | "te">("en");
+  const [eventsTab, setEventsTab] = useState<"events" | "tenders">("events");
   const [preselectedSeva, setPreselectedSeva] = useState<string | null>(null);
   const [preselectedAmount, setPreselectedAmount] = useState<number | null>(null);
 
@@ -230,21 +232,19 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-8 animate-fade-rise opacity-0 [animation-fill-mode:forwards]">
             <div className="text-left">
               <p className="text-primary text-sm tracking-[0.4em] uppercase mb-4 font-bold">
-                {timelineLang === "en" ? "Temple History" : timelineLang === "te" ? "ఆలయ చరిత్ర" : "मंदिर का इतिहास"}
+                {timelineLang === "en" ? "Temple History" : "ఆలయ చరిత్ర"}
               </p>
               <h3 className="text-4xl font-bold text-foreground font-serif">
                 {timelineLang === "en" ? (
                   <>Our <span className="gold-shimmer italic">Sacred Journey</span></>
-                ) : timelineLang === "te" ? (
-                  <>మా <span className="gold-shimmer italic">దైవిక ప్రయాణం</span></>
                 ) : (
-                  <>हमारी <span className="gold-shimmer italic">दिव्य यात्रा</span></>
+                  <>మా <span className="gold-shimmer italic">దైవిక ప్రయాణం</span></>
                 )}
               </h3>
               <div className="h-1 w-24 bg-primary/40 rounded-full mt-6 shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
             </div>
 
-            {/* Premium Small Bilingual Toggle */}
+            {/* Premium Bilingual Toggle: EN & Telugu */}
             <div className="bg-gradient-to-b from-[#1C1917] to-[#000000] p-1 rounded-xl border border-primary/35 shadow-lg flex items-center gap-1 w-fit">
               <button
                 onClick={() => setTimelineLang("en")}
@@ -266,20 +266,10 @@ const Index = () => {
               >
                 తెలుగు
               </button>
-              <button
-                onClick={() => setTimelineLang("hi")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-serif font-black tracking-widest transition-all duration-300 ${
-                  timelineLang === "hi"
-                    ? "bg-primary text-primary-foreground shadow-sm scale-102"
-                    : "text-white/60 hover:text-white"
-                }`}
-              >
-                हिन्दी
-              </button>
             </div>
           </div>
           <div className="relative border-l-2 border-primary/20 ml-4 sm:ml-8 space-y-6 sm:space-y-8">
-            {(timelineLang === "en" ? milestonesEn : timelineLang === "te" ? milestonesTe : milestonesHi).map((m, i) => (
+            {(timelineLang === "en" ? milestonesEn : milestonesTe).map((m, i) => (
               <div key={i} className="relative pl-6 sm:pl-16 group animate-fade-rise opacity-0 [animation-fill-mode:forwards]" style={{ animationDelay: `${i * 150}ms` }}>
                 {/* Dot */}
                 <div className="absolute left-0 top-6 -translate-x-[13px] sm:-translate-x-[17px] w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-background border-[3px] sm:border-[4px] border-primary/20 flex items-center justify-center group-hover:border-primary transition-all duration-500 shadow-xl group-hover:scale-110">
@@ -484,17 +474,6 @@ const Index = () => {
                 >
                   తెలుగు
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setSevaLang("hi")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-serif font-black tracking-widest transition-all duration-300 ${
-                    sevaLang === "hi"
-                      ? "bg-primary text-primary-foreground shadow-sm scale-102"
-                      : "text-white/60 hover:text-white"
-                  }`}
-                >
-                  हिन्दी
-                </button>
               </div>
             </div>
 
@@ -506,20 +485,16 @@ const Index = () => {
                     <h4 className="text-primary font-bold text-base font-serif">
                       {sevaLang === "en" 
                         ? "Saswatha Abhisheka Seva (Lifetime Abhishekam)" 
-                        : sevaLang === "te" 
-                          ? "శాశ్వత అభిషేక సేవ" 
-                          : "शाश्वत अभिषेक सेवा"}
+                        : "శాశ్వత అభిషేక సేవ"}
                     </h4>
                     <span className="text-lg font-black text-foreground shrink-0">
-                      {sevaLang === "en" ? "₹5,000" : sevaLang === "te" ? "రూ. 5,000/-" : "₹5,000"}
+                      {sevaLang === "en" ? "₹5,000" : "రూ. 5,000/-"}
                     </span>
                   </div>
                   <p className="text-muted-foreground text-xs leading-relaxed font-sans font-light">
                     {sevaLang === "en" 
                       ? "Pooja performed every year on a date chosen by the devotee with their Gotra & Namam (For 10 Years)." 
-                      : sevaLang === "te" 
-                        ? "10 సంవత్సరముల పాటు భక్తులు కోరిన రోజున వారి గోత్ర నామములతో జరిపించు పూజ." 
-                        : "10 वर्षों के लिए श्रद्धालुओं की इच्छानुसार हर वर्ष उनकी चुनी हुई तिथि पर उनके गोत्र और नाम के साथ की जाने वाली पूजा।"}
+                      : "10 సంవత్సరముల పాటు భక్తులు కోరిన రోజున వారి గోత్ర నామములతో జరిపించు పూజ."}
                   </p>
                 </div>
                 <button
@@ -527,7 +502,7 @@ const Index = () => {
                   onClick={() => handleSevaBook("Saswatha Abhisheka Seva", 5000)}
                   className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-serif font-black tracking-widest text-xs hover:from-amber-600 hover:to-amber-700 active:scale-95 transition-all shadow-sm hover:scale-[1.03]"
                 >
-                  {sevaLang === "en" ? "Pay Amount / Book Seva" : sevaLang === "te" ? "విరాళం చెల్లించండి / బుక్ చేయండి" : "भुगतान करें / बुक सेवा"}
+                  {sevaLang === "en" ? "Pay Amount / Book Seva" : "విరాళం చెల్లించండి / బుక్ చేయండి"}
                 </button>
               </div>
 
@@ -539,20 +514,16 @@ const Index = () => {
                       <h4 className="text-primary font-bold text-base font-serif">
                         {sevaLang === "en" 
                           ? "Ganesha Navaratri Abhishekam" 
-                          : sevaLang === "te" 
-                            ? "గణపతి నవరాత్రుల అభిషేకం" 
-                            : "गणपति नवरात्रि अभिषेक"}
+                          : "గణపతి నవరాత్రుల అభిషేకం"}
                       </h4>
                       <span className="text-lg font-black text-foreground shrink-0">
-                        {sevaLang === "en" ? "₹2,500" : sevaLang === "te" ? "రూ. 2,500/-" : "₹2,500"}
+                        {sevaLang === "en" ? "₹2,500" : "రూ. 2,500/-"}
                       </span>
                     </div>
                     <p className="text-muted-foreground text-xs leading-relaxed font-sans font-light">
                       {sevaLang === "en" 
                         ? "Pooja performed on one of the 9 days of Ganesha Navaratri with the devotee's Gotra & Namam." 
-                        : sevaLang === "te" 
-                          ? "గణపతి నవరాత్రుల 9 రోజులలో ఒక రోజు భక్తుల గోత్ర నామములతో జరిపించు పూజ." 
-                          : "गणेश नवरात्रि के 9 दिनों में से किसी एक दिन श्रद्धालुओं के गोत्र और नाम के साथ की जाने वाली पूजा।"}
+                        : "గణపతి నవరాత్రుల 9 రోజులలో ఒక రోజు భక్తుల గోత్ర నామములతో జరిపించు పూజ."}
                     </p>
                   </div>
                   <button
@@ -560,7 +531,7 @@ const Index = () => {
                     onClick={() => handleSevaBook("Ganesha Navaratri Abhishekam", 2500)}
                     className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-serif font-black tracking-widest text-xs hover:from-amber-600 hover:to-amber-700 active:scale-95 transition-all shadow-sm hover:scale-[1.03]"
                   >
-                    {sevaLang === "en" ? "Pay Amount / Book Seva" : sevaLang === "te" ? "విరాళం చెల్లించండి / బుక్ చేయండి" : "भुगतान करें / बुक सेवा"}
+                    {sevaLang === "en" ? "Pay Amount / Book Seva" : "విరాళం చెల్లించండి / బుక్ చేయండి"}
                   </button>
                 </div>
               )}
@@ -575,14 +546,12 @@ const Index = () => {
                 <div className="text-3xl shrink-0">🔔</div>
                 <div className="text-left">
                   <h4 className="text-primary font-bold text-base font-serif uppercase tracking-wider">
-                    {noteLang === "en" ? "Important Note" : noteLang === "te" ? "ముఖ్య గమనిక" : "महत्वपूर्ण सूचना"}
+                    {noteLang === "en" ? "Important Note" : "ముఖ్య గమనిక"}
                   </h4>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {noteLang === "en" 
                       ? "Homam & Abhishekam Guidelines" 
-                      : noteLang === "te" 
-                        ? "హోమం & అభిషేకం నియమావళి" 
-                        : "हवन और अभिषेक के नियम"}
+                      : "హోమం & అభిషేకం నియమావళి"}
                   </p>
                 </div>
               </div>
@@ -611,37 +580,18 @@ const Index = () => {
                 >
                   తెలుగు
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setNoteLang("hi")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-serif font-black tracking-widest transition-all duration-300 ${
-                    noteLang === "hi"
-                      ? "bg-primary text-primary-foreground shadow-sm scale-102"
-                      : "text-white/60 hover:text-white"
-                  }`}
-                >
-                  हिन्दी
-                </button>
               </div>
             </div>
 
             {/* Note Content */}
             <div className="text-left">
-              {noteLang === "te" && (
-                <p className="text-foreground text-sm sm:text-base leading-relaxed font-sans font-light animate-fade-in">
-                  ఆలయంలో ప్రతిరోజూ హోమం మరియు అభిషేకం జరుగును. <strong>ఈ పూజలకు ఎటువంటి రుసుము (చార్జీలు) లేదు.</strong> ఈ కార్యక్రమాలలో పాల్గొనదలచిన భక్తులు 10 రోజుల ముందే ఆలయాన్ని సందర్శించి, సాయంత్రం 5:30 నుండి 7:00 గంటల మధ్య అర్చకుల వద్ద రిజిస్టర్ చేసుకోవాలి. కావలసిన పూజా సామాగ్రి జాబితాను తీసుకొని, ఆ సామగ్రిని మీరు బుక్ చేసుకున్న తేదీకి ముందు రోజు సాయంత్రం 6:00 గంటల కల్లా ఆలయానికి సమర్పించవలసి ఉంటుంది.
-                </p>
-              )}
-
-              {noteLang === "en" && (
+              {noteLang === "en" ? (
                 <p className="text-foreground text-sm sm:text-base leading-relaxed font-sans font-light animate-fade-in">
                   Daily Homam and Abhishekam are performed. <strong>There are no charges or fees for these poojas.</strong> If you wish to participate in these rituals, please visit the temple 10 days in advance to register with the priests between 5:30 PM and 7:00 PM. Kindly collect the required pooja materials list, purchase the items, and submit them at the temple by 6:00 PM on the evening before your booked date.
                 </p>
-              )}
-
-              {noteLang === "hi" && (
+              ) : (
                 <p className="text-foreground text-sm sm:text-base leading-relaxed font-sans font-light animate-fade-in">
-                  मंदिर में प्रतिदिन हवन और अभिषेक किया जाता है। <strong>इन पूजाओं के लिए कोई शुल्क नहीं है।</strong> यदि आप इन अनुष्ठानों में भाग लेना चाहते हैं, तो कृपया 10 दिन पहले मंदिर आकर शाम 5:30 से 7:00 बजे के बीच पुजारियों के पास अपना पंजीकरण कराएं। आवश्यक पूजा सामग्री की सूची प्राप्त करें, सामग्री खरीदें और अपने बुक किए गए दिन से एक दिन पहले शाम 6:00 बजे तक मंदिर में जमा कर दें।
+                  ఆలయంలో ప్రతిరోజూ హోమం మరియు అభిషేకం జరుగును. <strong>ఈ పూజలకు ఎటువంటి రుసుము (చార్జీలు) లేదు.</strong> ఈ కార్యక్రమాలలో పాల్గొనదలచిన భక్తులు 10 రోజుల ముందే ఆలయాన్ని సందర్శించి, సాయంత్రం 5:30 నుండి 7:00 గంటల మధ్య అర్చకుల వద్ద రిజిస్టర్ చేసుకోవాలి. కావలసిన పూజా సామాగ్రి జాబితాను తీసుకొని, ఆ సామగ్రిని మీరు బుక్ చేసుకున్న తేదీకి ముందు రోజు సాయంత్రం 6:00 గంటల కల్లా ఆలయానికి సమర్పించవలసి ఉంటుంది.
                 </p>
               )}
             </div>
@@ -749,108 +699,187 @@ const Index = () => {
         </div>
       )}
 
-      {/* ═══════ EVENTS ═══════ */}
-      <section id="events" className="section-padding px-4 sm:px-4">
+      {/* ═══════ EVENTS & TENDERS ═══════ */}
+      <section id="events" className="section-padding px-4 sm:px-4 relative">
         <div className="container-custom">
-          <div className="text-left mb-8 animate-fade-rise opacity-0 [animation-fill-mode:forwards]">
-            <p className="text-primary text-sm tracking-[0.4em] uppercase mb-4 font-bold">Sacred Calendar</p>
-            <h2 className="text-4xl font-bold text-foreground font-serif">
-              Temple <span className="gold-shimmer italic">Events</span>
-            </h2>
-            <div className="h-1 w-24 bg-primary/40 rounded-full mt-6 shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 animate-fade-rise opacity-0 [animation-fill-mode:forwards]">
+            <div className="text-left">
+              <p className="text-primary text-sm tracking-[0.4em] uppercase mb-4 font-bold">Sacred Calendar & Public Notices</p>
+              <h2 className="text-4xl font-bold text-foreground font-serif">
+                Temple <span className="gold-shimmer italic">Events & Tenders</span>
+              </h2>
+              <div className="h-1 w-24 bg-primary/40 rounded-full mt-6 shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+            </div>
+
+            {/* Tab Switcher Pills */}
+            <div className="bg-gradient-to-b from-[#1C1917] to-[#000000] p-1.5 rounded-2xl border border-primary/35 shadow-lg flex items-center gap-1.5 self-start md:self-end shrink-0">
+              <button
+                onClick={() => setEventsTab("events")}
+                className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-serif font-black tracking-wider transition-all duration-300 flex items-center gap-2 ${
+                  eventsTab === "events"
+                    ? "bg-primary text-primary-foreground shadow-md scale-102"
+                    : "text-white/60 hover:text-white"
+                }`}
+              >
+                <CalendarIcon size={16} />
+                <span>Temple Events</span>
+              </button>
+              <button
+                onClick={() => setEventsTab("tenders")}
+                className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-serif font-black tracking-wider transition-all duration-300 flex items-center gap-2 ${
+                  eventsTab === "tenders"
+                    ? "bg-primary text-primary-foreground shadow-md scale-102"
+                    : "text-white/60 hover:text-white"
+                }`}
+              >
+                <FileText size={16} />
+                <span>e-Procurement Tenders</span>
+                <span className="px-1.5 py-0.5 rounded-full bg-red-600 text-white text-[9px] font-black uppercase tracking-wider animate-pulse">
+                  New
+                </span>
+              </button>
+            </div>
           </div>
 
-          <div className="flex flex-col gap-4 w-full relative">
-            <div className="absolute left-8 sm:left-12 top-0 bottom-0 w-px bg-gradient-to-b from-primary/10 via-primary/30 to-primary/10 hidden md:block" />
-
-            {upcomingEvents.map((e, i) => (
-              <div
-                key={i}
-                className="relative glass overflow-hidden flex flex-col md:flex-row gap-4 p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] items-center md:items-stretch group cursor-pointer border border-white/40 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 backdrop-blur-md animate-fade-rise opacity-0 [animation-fill-mode:forwards]"
-                style={{ animationDelay: `${i * 150}ms` }}
+          {/* Render Active Tab Content */}
+          {eventsTab === "tenders" ? (
+            <div className="mt-8 animate-fade-in">
+              <TenderSection embedded={true} />
+            </div>
+          ) : (
+            <>
+              {/* Urgent Tender Callout Card */}
+              <div 
+                onClick={() => setEventsTab("tenders")}
+                className="mb-8 p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-[#2A0808]/90 via-[#1C0808]/90 to-[#2A0808]/90 border-2 border-amber-500/40 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer hover:border-amber-500 hover:shadow-2xl transition-all group animate-fade-rise"
               >
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/15 transition-colors duration-700 pointer-events-none" />
-
-                <div className="flex-shrink-0 w-36 flex flex-col items-center justify-center bg-background rounded-3xl p-4 border-4 border-primary/10 group-hover:border-primary transition-all duration-500 shadow-inner relative z-10 group-hover:scale-105">
-                  <div className="text-4xl font-black text-primary transition-colors leading-none drop-shadow-sm">{e.date.split(' ')[1]}</div>
-                  <div className="text-sm font-bold text-primary/80 uppercase tracking-[0.2em] mt-3">{e.date.split(' ')[0]}</div>
-                  <div className="text-sm font-black text-primary/50 mt-1">{e.month}</div>
+                <div className="flex items-start sm:items-center gap-3.5 text-left">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform">
+                    <Sparkles className="text-amber-400 animate-pulse" size={24} />
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="text-[10px] uppercase font-black tracking-widest text-red-300 bg-red-600/30 px-2 py-0.5 rounded border border-red-500/40">
+                        ⚡ New Notice (05-09-2026)
+                      </span>
+                      <span className="text-[11px] text-amber-300 font-bold">
+                        Rc. No. 16(2)/2026
+                      </span>
+                      <span className="text-[10px] text-amber-400 font-semibold bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/20">
+                        Schedule Opens Tomorrow: 06-09-2026 (10:00 AM)
+                      </span>
+                    </div>
+                    <h4 className="text-sm sm:text-base font-bold text-white font-serif group-hover:text-primary transition-colors">
+                      e-Procurement Tender for Supply of Paditharam, Prasadam & Annaprasadam Provisions (7 Months)
+                    </h4>
+                    <p className="text-xs text-stone-300/80 font-light mt-0.5">
+                      Invited via AP Govt Portal: <strong className="text-amber-400 font-mono">e.www.ap.eprocurement.gov.in</strong> | EMD: ₹50,000/- | Schedule: ₹2,000/-
+                    </p>
+                  </div>
                 </div>
 
-                <div className="flex-1 text-center md:text-left py-2 relative z-10 flex flex-col justify-center">
-                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-5">
-                    <h3 className="text-2xl font-bold text-foreground font-serif group-hover:text-primary transition-colors duration-500">{e.title}</h3>
-                    <span className="text-sm px-4 py-1.5 rounded-full bg-primary/10 text-primary font-black border border-primary/20 uppercase tracking-[0.2em] shadow-sm">{e.type}</span>
-                  </div>
-                  <p className="text-muted-foreground text-sm font-light leading-relaxed max-w-4xl">{e.desc}</p>
-                </div>
-
-                <div className="flex-shrink-0 flex flex-col items-center justify-center p-4 bg-white/40 rounded-3xl border border-white/60 min-w-[220px] shadow-sm group-hover:shadow-md transition-shadow relative z-10 backdrop-blur-sm self-center md:self-stretch">
-                  <div className="text-primary mb-3 flex items-center gap-2">
-                    <div className="h-px w-4 bg-primary/40" />
-                    <span className="text-sm font-black uppercase tracking-[0.3em] opacity-80">Timing</span>
-                    <div className="h-px w-4 bg-primary/40" />
-                  </div>
-                  <div className="text-foreground font-black text-sm flex items-center gap-3">
-                    <span className="text-primary text-2xl group-hover:scale-125 transition-transform duration-500">🕐</span>
-                    {e.time}
-                  </div>
+                <div className="flex items-center gap-2 w-full md:w-auto shrink-0 justify-end">
+                  <button className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs uppercase tracking-wider font-serif flex items-center gap-1.5 shadow-md transition-all">
+                    <span>View Tender Details</span>
+                    <ArrowRight size={14} />
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
 
-          {/* Weekly Schedule */}
-          <div className="mt-10 sm:mt-14">
-            <h3 className="text-left text-2xl font-bold text-foreground font-serif mb-5 sm:mb-14">
-              Weekly <span className="text-primary">Schedule</span>
-            </h3>
-            {/* Desktop Table View */}
-            <div className="hidden sm:block overflow-x-auto -mx-4 sm:mx-0">
-              <table className="w-full min-w-[500px]">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-4 px-4 text-sm font-semibold text-foreground">Ritual / Category</th>
-                    <th className="text-left py-4 px-4 text-sm font-semibold text-foreground">Days</th>
-                    <th className="text-left py-4 px-4 text-sm font-semibold text-foreground">Specific Ritual</th>
-                    <th className="text-left py-4 px-4 text-sm font-semibold text-foreground">Time</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {weeklySchedule.map((s, i) => (
-                    <tr key={i} className="border-b border-border/50 hover:bg-card/50 transition-colors">
-                      <td className="py-4 px-4 text-sm font-medium text-foreground">{s.deity}</td>
-                      <td className="py-4 px-4 text-sm text-muted-foreground">{s.day}</td>
-                      <td className="py-4 px-4 text-sm text-muted-foreground">{s.special}</td>
-                      <td className="py-4 px-4 text-sm text-primary font-semibold">{s.time}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+              {/* Upcoming Events List */}
+              <div className="flex flex-col gap-4 w-full relative">
+                <div className="absolute left-8 sm:left-12 top-0 bottom-0 w-px bg-gradient-to-b from-primary/10 via-primary/30 to-primary/10 hidden md:block" />
 
-            {/* Mobile Card View */}
-            <div className="sm:hidden space-y-4">
-              {weeklySchedule.map((s, i) => (
-                <div key={i} className="p-4 rounded-xl bg-card border border-border shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="text-primary font-bold">{s.special}</h4>
-                    <span className="text-sm bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">{s.day}</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>
-                      <p className="text-muted-foreground mb-0.5">Category</p>
-                      <p className="text-foreground font-medium">{s.deity}</p>
+                {upcomingEvents.map((e, i) => (
+                  <div
+                    key={i}
+                    className="relative glass overflow-hidden flex flex-col md:flex-row gap-4 p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] items-center md:items-stretch group cursor-pointer border border-white/40 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 backdrop-blur-md animate-fade-rise opacity-0 [animation-fill-mode:forwards]"
+                    style={{ animationDelay: `${i * 150}ms` }}
+                  >
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/15 transition-colors duration-700 pointer-events-none" />
+
+                    <div className="flex-shrink-0 w-36 flex flex-col items-center justify-center bg-background rounded-3xl p-4 border-4 border-primary/10 group-hover:border-primary transition-all duration-500 shadow-inner relative z-10 group-hover:scale-105">
+                      <div className="text-4xl font-black text-primary transition-colors leading-none drop-shadow-sm">{e.date.split(' ')[1]}</div>
+                      <div className="text-sm font-bold text-primary/80 uppercase tracking-[0.2em] mt-3">{e.date.split(' ')[0]}</div>
+                      <div className="text-sm font-black text-primary/50 mt-1">{e.month}</div>
                     </div>
-                    <div>
-                      <p className="text-muted-foreground mb-0.5">Time</p>
-                      <p className="text-foreground font-medium">{s.time}</p>
+
+                    <div className="flex-1 text-center md:text-left py-2 relative z-10 flex flex-col justify-center">
+                      <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-5">
+                        <h3 className="text-2xl font-bold text-foreground font-serif group-hover:text-primary transition-colors duration-500">{e.title}</h3>
+                        <span className="text-sm px-4 py-1.5 rounded-full bg-primary/10 text-primary font-black border border-primary/20 uppercase tracking-[0.2em] shadow-sm">{e.type}</span>
+                      </div>
+                      <p className="text-muted-foreground text-sm font-light leading-relaxed max-w-4xl">{e.desc}</p>
+                    </div>
+
+                    <div className="flex-shrink-0 flex flex-col items-center justify-center p-4 bg-white/40 rounded-3xl border border-white/60 min-w-[220px] shadow-sm group-hover:shadow-md transition-shadow relative z-10 backdrop-blur-sm self-center md:self-stretch">
+                      <div className="text-primary mb-3 flex items-center gap-2">
+                        <div className="h-px w-4 bg-primary/40" />
+                        <span className="text-sm font-black uppercase tracking-[0.3em] opacity-80">Timing</span>
+                        <div className="h-px w-4 bg-primary/40" />
+                      </div>
+                      <div className="text-foreground font-black text-sm flex items-center gap-3">
+                        <span className="text-primary text-2xl group-hover:scale-125 transition-transform duration-500">🕐</span>
+                        {e.time}
+                      </div>
                     </div>
                   </div>
+                ))}
+              </div>
+
+              {/* Weekly Schedule */}
+              <div className="mt-10 sm:mt-14">
+                <h3 className="text-left text-2xl font-bold text-foreground font-serif mb-5 sm:mb-14">
+                  Weekly <span className="text-primary">Schedule</span>
+                </h3>
+                {/* Desktop Table View */}
+                <div className="hidden sm:block overflow-x-auto -mx-4 sm:mx-0">
+                  <table className="w-full min-w-[500px]">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left py-4 px-4 text-sm font-semibold text-foreground">Ritual / Category</th>
+                        <th className="text-left py-4 px-4 text-sm font-semibold text-foreground">Days</th>
+                        <th className="text-left py-4 px-4 text-sm font-semibold text-foreground">Specific Ritual</th>
+                        <th className="text-left py-4 px-4 text-sm font-semibold text-foreground">Time</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {weeklySchedule.map((s, i) => (
+                        <tr key={i} className="border-b border-border/50 hover:bg-card/50 transition-colors">
+                          <td className="py-4 px-4 text-sm font-medium text-foreground">{s.deity}</td>
+                          <td className="py-4 px-4 text-sm text-muted-foreground">{s.day}</td>
+                          <td className="py-4 px-4 text-sm text-muted-foreground">{s.special}</td>
+                          <td className="py-4 px-4 text-sm text-primary font-semibold">{s.time}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              ))}
-            </div>
-          </div>
+
+                {/* Mobile Card View */}
+                <div className="sm:hidden space-y-4">
+                  {weeklySchedule.map((s, i) => (
+                    <div key={i} className="p-4 rounded-xl bg-card border border-border shadow-sm">
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="text-primary font-bold">{s.special}</h4>
+                        <span className="text-sm bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">{s.day}</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <p className="text-muted-foreground mb-0.5">Category</p>
+                          <p className="text-foreground font-medium">{s.deity}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground mb-0.5">Time</p>
+                          <p className="text-foreground font-medium">{s.time}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
