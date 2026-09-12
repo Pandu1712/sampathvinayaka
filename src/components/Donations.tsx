@@ -114,18 +114,24 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
           transactionId: receipt.paymentId || ""
         });
 
-        // 2. Add to Seva Bookings record
-        await addDoc(collection(db, "bookings"), {
-          name: receipt.name,
-          phone: receipt.phoneOrEmail || "",
-          address: receipt.address || "",
-          gotram: receipt.gotram || "",
-          nakshatram: receipt.nakshatram || "",
-          seva: receipt.purpose,
-          amount: Number(receipt.amount),
-          date: new Date().toISOString().split("T")[0],
-          transactionId: receipt.paymentId || "Manual Proof Uploaded"
-        });
+        // 2. Add to Seva Bookings record only if it is an actual Seva (e.g. Saswatha Abhishekam, Ganesha Navaratri, Annadanam, etc.)
+        const isGeneralDonation = 
+          (receipt.purpose || "").toLowerCase().includes("general donation") || 
+          (receipt.purpose || "").toLowerCase().includes("సాధారణ విరాళం");
+
+        if (!isGeneralDonation) {
+          await addDoc(collection(db, "bookings"), {
+            name: receipt.name,
+            phone: receipt.phoneOrEmail || "",
+            address: receipt.address || "",
+            gotram: receipt.gotram || "",
+            nakshatram: receipt.nakshatram || "",
+            seva: receipt.purpose,
+            amount: Number(receipt.amount),
+            date: new Date().toISOString().split("T")[0],
+            transactionId: receipt.paymentId || "Manual Proof Uploaded"
+          });
+        }
       } else {
         // Offline fallback: save to localStorage
         const localDonations = JSON.parse(localStorage.getItem("local_donations") || "[]");
@@ -145,20 +151,26 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
         });
         localStorage.setItem("local_donations", JSON.stringify(localDonations));
 
-        const localBookings = JSON.parse(localStorage.getItem("local_bookings") || "[]");
-        localBookings.push({
-          id: `BK${Math.floor(100 + Math.random() * 900)}`,
-          name: receipt.name,
-          phone: receipt.phoneOrEmail || "",
-          address: receipt.address || "",
-          gotram: receipt.gotram || "",
-          nakshatram: receipt.nakshatram || "",
-          seva: receipt.purpose,
-          amount: Number(receipt.amount),
-          date: new Date().toISOString().split("T")[0],
-          transactionId: receipt.paymentId || "Manual Proof Uploaded"
-        });
-        localStorage.setItem("local_bookings", JSON.stringify(localBookings));
+        const isGeneralDonation = 
+          (receipt.purpose || "").toLowerCase().includes("general donation") || 
+          (receipt.purpose || "").toLowerCase().includes("సాధారణ విరాళం");
+
+        if (!isGeneralDonation) {
+          const localBookings = JSON.parse(localStorage.getItem("local_bookings") || "[]");
+          localBookings.push({
+            id: `BK${Math.floor(100 + Math.random() * 900)}`,
+            name: receipt.name,
+            phone: receipt.phoneOrEmail || "",
+            address: receipt.address || "",
+            gotram: receipt.gotram || "",
+            nakshatram: receipt.nakshatram || "",
+            seva: receipt.purpose,
+            amount: Number(receipt.amount),
+            date: new Date().toISOString().split("T")[0],
+            transactionId: receipt.paymentId || "Manual Proof Uploaded"
+          });
+          localStorage.setItem("local_bookings", JSON.stringify(localBookings));
+        }
       }
     } catch (error) {
       console.error("Error writing donation/booking to Firestore:", error);

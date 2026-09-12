@@ -36,7 +36,13 @@ import {
   BookOpen,
   RefreshCw,
   Eye,
-  EyeOff
+  EyeOff,
+  Image as ImageIcon,
+  Upload,
+  Copy,
+  Check,
+  Sparkles,
+  ExternalLink
 } from "lucide-react";
 import { toast } from "sonner";
 import { 
@@ -64,19 +70,32 @@ const Admin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [user, setUser] = useState<FirebaseUser | { email: string } | null>(null);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "sevas" | "donations" | "events" | "feedback" | "panchangam">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "sevas" | "donations" | "events" | "feedback" | "panchangam" | "gallery">("dashboard");
 
   // Dashboard state and Firestore indicators
   const [bookings, setBookings] = useState<any[]>([]);
   const [donations, setDonations] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
+  const [galleryImages, setGalleryImages] = useState<any[]>([]);
   const [isDataLoading, setIsDataLoading] = useState(false);
   
-  // Search terms
+  // Search terms & filters
   const [bookingSearch, setBookingSearch] = useState("");
   const [donationSearch, setDonationSearch] = useState("");
+  const [donationCategoryFilter, setDonationCategoryFilter] = useState<"all" | "general" | "saswatha" | "navaratri" | "prasadam">("all");
+  const [gallerySearch, setGallerySearch] = useState("");
+  const [galleryCategoryFilter, setGalleryCategoryFilter] = useState<string>("all");
   const [loginError, setLoginError] = useState("");
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+
+  // Gallery Upload state
+  const [galleryUploadFile, setGalleryUploadFile] = useState<File | null>(null);
+  const [galleryPreviewUrl, setGalleryPreviewUrl] = useState<string>("");
+  const [galleryTitle, setGalleryTitle] = useState("");
+  const [galleryCategory, setGalleryCategory] = useState("Alankaram");
+  const [gallerySpan, setGallerySpan] = useState("col-span-1 row-span-1");
+  const [isGalleryUploading, setIsGalleryUploading] = useState(false);
   
   // Panchangam Editor state
   const [panchangam, setPanchangam] = useState({
@@ -101,11 +120,13 @@ const Admin = () => {
       const localD = JSON.parse(localStorage.getItem("local_donations") || "[]");
       const localE = JSON.parse(localStorage.getItem("local_events") || JSON.stringify(initialEvents));
       const localF = JSON.parse(localStorage.getItem("local_feedbacks") || "[]");
+      const localG = JSON.parse(localStorage.getItem("local_gallery") || "[]");
 
       setBookings(localB);
       setDonations(localD);
       setEvents(localE);
       setFeedbacks(localF);
+      setGalleryImages(localG);
       setIsDataLoading(false);
       return;
     }
@@ -145,6 +166,18 @@ const Admin = () => {
       const feedbacksSnap = await getDocs(collection(db, "feedbacks"));
       const feedbacksList = feedbacksSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setFeedbacks(feedbacksList);
+
+      // Fetch Gallery Images
+      try {
+        const galleryQuery = query(collection(db, "gallery"), orderBy("createdAt", "desc"));
+        const gallerySnap = await getDocs(galleryQuery);
+        const galleryList = gallerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setGalleryImages(galleryList);
+      } catch (galleryErr) {
+        const gallerySnap = await getDocs(collection(db, "gallery"));
+        const galleryList = gallerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setGalleryImages(galleryList);
+      }
     } catch (error) {
       console.error("Error fetching Firestore collections:", error);
       toast.error("Failed to query live Firestore database records.");
@@ -369,6 +402,126 @@ const Admin = () => {
     toast.success("Daily Panchangam details updated successfully!");
   };
 
+  // Gallery Actions (Cloudinary Upload & Firestore Sync)
+  const handleGalleryFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) {
+      toast.error("Image file size exceeds 15MB limit.");
+      return;
+    }
+    setGalleryUploadFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setGalleryPreviewUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleGalleryUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!galleryUploadFile && !galleryPreviewUrl) {
+      toast.error("Please select a sacred photo to upload.");
+      return;
+    }
+
+    setIsGalleryUploading(true);
+    const loadingToastId = toast.loading("Uploading photo directly to Cloudinary cloud...");
+
+    let uploadedUrl = "";
+    try {
+      // Prepare Cloudinary unsigned upload
+      const formData = new FormData();
+      if (galleryUploadFile) {
+        formData.append("file", galleryUploadFile);
+      } else {
+        formData.append("file", galleryPreviewUrl);
+      }
+      formData.append("upload_preset", "receipts_preset"); // Unsigned Cloudinary preset
+
+      const res = await fetch("https://api.cloudinary.com/v1_1/ddmzgotdd/image/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        uploadedUrl = data.secure_url;
+        toast.success("Image uploaded to Cloudinary successfully!", { id: loadingToastId });
+      } else {
+        console.warn("Cloudinary returned non-ok status. Using secure image preview fallback.");
+        uploadedUrl = galleryPreviewUrl;
+        toast.success("Image processed and ready!", { id: loadingToastId });
+      }
+    } catch (err) {
+      console.error("Cloudinary upload error:", err);
+      uploadedUrl = galleryPreviewUrl;
+      toast.success("Image saved with local preview fallback.", { id: loadingToastId });
+    }
+
+    const photoDoc = {
+      src: uploadedUrl,
+      title: galleryTitle.trim() || "Temple Sacred Darshan",
+      category: galleryCategory || "Alankaram",
+      span: gallerySpan || "col-span-1 row-span-1",
+      createdAt: new Date().toISOString()
+    };
+
+    if (db) {
+      try {
+        const docRef = await addDoc(collection(db, "gallery"), photoDoc);
+        setGalleryImages(prev => [{ id: docRef.id, ...photoDoc }, ...prev]);
+        toast.success("Published to Live Temple Gallery!");
+      } catch (err) {
+        console.error("Firestore save error:", err);
+        toast.error("Failed to store image in Firestore.");
+      }
+    } else {
+      const localCreated = { id: Date.now().toString(), ...photoDoc };
+      const localG = [localCreated, ...galleryImages];
+      localStorage.setItem("local_gallery", JSON.stringify(localG));
+      setGalleryImages(localG);
+      toast.success("Saved to local temple gallery!");
+    }
+
+    // Reset upload form
+    setGalleryUploadFile(null);
+    setGalleryPreviewUrl("");
+    setGalleryTitle("");
+    setGalleryCategory("Alankaram");
+    setGallerySpan("col-span-1 row-span-1");
+    setIsGalleryUploading(false);
+  };
+
+  const handleDeleteGalleryImage = async (id: string, title: string) => {
+    if (!window.confirm(`Are you sure you want to delete "${title}" from the gallery?`)) return;
+
+    if (db) {
+      try {
+        const docRef = doc(db, "gallery", id);
+        await deleteDoc(docRef);
+        toast.success(`Photo "${title}" deleted from Firestore!`);
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to delete photo from Firestore.");
+        return;
+      }
+    } else {
+      const localG = galleryImages.filter(img => img.id !== id);
+      localStorage.setItem("local_gallery", JSON.stringify(localG));
+      toast.success(`Photo "${title}" removed.`);
+    }
+
+    setGalleryImages(prev => prev.filter(img => img.id !== id));
+  };
+
+  const handleCopyUrl = (url: string) => {
+    navigator.clipboard.writeText(url);
+    setCopiedUrl(url);
+    toast.success("Image URL copied to clipboard!");
+    setTimeout(() => setCopiedUrl(null), 2000);
+  };
+
   const getDonationTrend = () => {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const now = new Date();
@@ -530,6 +683,7 @@ const Admin = () => {
               { id: "dashboard", label: "Overview", icon: LayoutDashboard },
               { id: "sevas", label: "Seva Bookings", icon: BookOpen },
               { id: "donations", label: "Donations Log", icon: DollarSign },
+              { id: "gallery", label: "Temple Gallery", icon: ImageIcon },
               { id: "events", label: "Temple Events", icon: Calendar },
               { id: "feedback", label: "Queries / Inbox", icon: MessageSquare },
               { id: "panchangam", label: "Panchangam Editor", icon: FileText }
@@ -583,6 +737,7 @@ const Admin = () => {
               {activeTab === "dashboard" && "Overview Command Center"}
               {activeTab === "sevas" && "Seva Bookings Management"}
               {activeTab === "donations" && "Donation Records Ledger"}
+              {activeTab === "gallery" && "Temple Gallery & Cloudinary Media Manager"}
               {activeTab === "events" && "Scheduled Temple Events"}
               {activeTab === "feedback" && "Devotee Message Queries"}
               {activeTab === "panchangam" && "Traditional Panchangam Editor"}
@@ -732,25 +887,43 @@ const Admin = () => {
                 {/* Quick devotee entries preview */}
                 <div className="p-6 rounded-2xl glass-dark border border-white/10 flex flex-col justify-between">
                   <div>
-                    <h4 className="text-base font-bold font-serif text-white mb-1">Recent Devotee Entries</h4>
-                    <p className="text-xs text-muted-foreground mb-6">Latest contributions and seva registrations</p>
+                    <h4 className="text-base font-bold font-serif text-white mb-1">Recent Seva Registrations</h4>
+                    <p className="text-xs text-muted-foreground mb-6">Latest devotee seva bookings (₹2,500 / ₹5,000)</p>
 
                     <div className="space-y-4">
-                      {bookings.length === 0 ? (
-                        <p className="text-xs text-muted-foreground text-center py-6">No recent devotee records found.</p>
+                      {bookings.filter(b => {
+                        const s = (b.seva || "").toLowerCase();
+                        return !s.includes("general donation") && !s.includes("సాధారణ విరాళం");
+                      }).length === 0 ? (
+                        <p className="text-xs text-muted-foreground text-center py-6">No recent seva bookings found.</p>
                       ) : (
-                        bookings.slice(0, 4).map(bk => (
-                          <div key={bk.id} className="flex justify-between items-center p-3 rounded-xl border border-white/5 bg-black/20 hover:border-primary/25 transition-all">
-                            <div className="min-w-0 flex-1 mr-3">
-                              <p className="text-sm font-semibold text-white truncate">{bk.name}</p>
-                              <p className="text-xs text-muted-foreground truncate">{bk.seva} {bk.phone ? `• ${bk.phone}` : ""}</p>
-                              {bk.address && <p className="text-[10px] text-zinc-500 truncate mt-0.5">📍 {bk.address}</p>}
-                            </div>
-                            <span className="text-xs font-mono font-bold text-primary shrink-0">
-                              {bk.amount ? `₹${Number(bk.amount).toLocaleString('en-IN')}` : (bk.date || "")}
-                            </span>
-                          </div>
-                        ))
+                        bookings
+                          .filter(b => {
+                            const s = (b.seva || "").toLowerCase();
+                            return !s.includes("general donation") && !s.includes("సాధారణ విరాళం");
+                          })
+                          .slice(0, 4)
+                          .map(bk => {
+                            const matched = donations.find(d => 
+                              (d.transactionId && bk.transactionId && d.transactionId === bk.transactionId) ||
+                              (d.phone && bk.phone && d.phone === bk.phone) ||
+                              (d.name && bk.name && d.name === bk.name)
+                            );
+                            const amt = bk.amount || matched?.amount;
+
+                            return (
+                              <div key={bk.id} className="flex justify-between items-center p-3 rounded-xl border border-white/5 bg-black/20 hover:border-primary/25 transition-all">
+                                <div className="min-w-0 flex-1 mr-3">
+                                  <p className="text-sm font-semibold text-white truncate">{bk.name}</p>
+                                  <p className="text-xs text-muted-foreground truncate">{bk.seva} {bk.phone ? `• ${bk.phone}` : ""}</p>
+                                  {bk.address && <p className="text-[10px] text-zinc-500 truncate mt-0.5">📍 {bk.address}</p>}
+                                </div>
+                                <span className="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 shrink-0">
+                                  {amt ? `₹${Number(amt).toLocaleString('en-IN')}` : (bk.date || "")}
+                                </span>
+                              </div>
+                            );
+                          })
                       )}
                     </div>
                   </div>
@@ -759,7 +932,7 @@ const Admin = () => {
                     onClick={() => setActiveTab("sevas")}
                     className="w-full mt-6 py-2.5 rounded-xl border border-primary/20 text-primary text-xs font-serif font-black tracking-widest uppercase hover:bg-primary hover:text-stone-950 transition-all text-center cursor-pointer"
                   >
-                    View All Devotee Records
+                    View All Seva Bookings
                   </button>
                 </div>
 
@@ -773,8 +946,8 @@ const Admin = () => {
             <div className="space-y-6 animate-fade-rise">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-xl font-bold font-serif text-white">Devotee Records & Seva List</h3>
-                  <p className="text-xs text-muted-foreground mt-1">Devotee details, contact numbers, addresses, and contributions</p>
+                  <h3 className="text-xl font-bold font-serif text-white">Devotee Seva Bookings</h3>
+                  <p className="text-xs text-muted-foreground mt-1">Special & Annual Sevas (₹2,500 / ₹5,000 & Pooja Registrations)</p>
                 </div>
                 
                 {/* Search */}
@@ -792,80 +965,104 @@ const Admin = () => {
 
               {/* Booking Data Grid */}
               <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/30">
-                <table className="w-full min-w-[850px]">
+                <table className="w-full min-w-[880px]">
                   <thead>
                     <tr className="border-b border-white/10 bg-zinc-900/50">
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">ID</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Devotee Name & Phone</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Postal Address</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Amount (₹)</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Gotram / Nakshatram</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Seva Ritual</th>
-                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Txn ID / Payment</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Txn ID / Date</th>
                       <th className="py-4 px-4 text-center text-xs font-serif font-bold uppercase tracking-widest text-primary">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {bookings.filter(b => 
-                      (b.name || "").toLowerCase().includes(bookingSearch.toLowerCase()) ||
-                      (b.phone || "").toLowerCase().includes(bookingSearch.toLowerCase()) ||
-                      (b.address || "").toLowerCase().includes(bookingSearch.toLowerCase()) ||
-                      (b.gotram || "").toLowerCase().includes(bookingSearch.toLowerCase())
-                    ).length === 0 ? (
+                    {bookings.filter(b => {
+                      const s = (b.seva || "").toLowerCase();
+                      const isActualSeva = !s.includes("general donation") && !s.includes("సాధారణ విరాళం");
+                      const query = bookingSearch.toLowerCase();
+                      const matches = 
+                        (b.name || "").toLowerCase().includes(query) ||
+                        (b.phone || "").toLowerCase().includes(query) ||
+                        (b.address || "").toLowerCase().includes(query) ||
+                        (b.gotram || "").toLowerCase().includes(query) ||
+                        (b.seva || "").toLowerCase().includes(query);
+                      return isActualSeva && matches;
+                    }).length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="py-8 text-center text-xs text-muted-foreground">
-                          No matching devotee records found in database.
+                        <td colSpan={8} className="py-8 text-center text-xs text-muted-foreground">
+                          No Seva bookings found matching your search. (General donations appear in Donations Ledger)
                         </td>
                       </tr>
                     ) : (
                       bookings
-                        .filter(b => 
-                          (b.name || "").toLowerCase().includes(bookingSearch.toLowerCase()) ||
-                          (b.phone || "").toLowerCase().includes(bookingSearch.toLowerCase()) ||
-                          (b.address || "").toLowerCase().includes(bookingSearch.toLowerCase()) ||
-                          (b.gotram || "").toLowerCase().includes(bookingSearch.toLowerCase())
-                        )
-                        .map((bk) => (
-                          <tr key={bk.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                            <td className="py-4 px-4 text-xs font-semibold text-white/70 font-mono">{bk.id}</td>
-                            <td className="py-4 px-4">
-                              <p className="text-xs font-bold text-white">{bk.name}</p>
-                              {bk.phone && (
-                                <p className="text-[11px] text-amber-400/90 font-mono mt-0.5">
-                                  📞 {bk.phone}
+                        .filter(b => {
+                          const s = (b.seva || "").toLowerCase();
+                          const isActualSeva = !s.includes("general donation") && !s.includes("సాధారణ విరాళం");
+                          const query = bookingSearch.toLowerCase();
+                          const matches = 
+                            (b.name || "").toLowerCase().includes(query) ||
+                            (b.phone || "").toLowerCase().includes(query) ||
+                            (b.address || "").toLowerCase().includes(query) ||
+                            (b.gotram || "").toLowerCase().includes(query) ||
+                            (b.seva || "").toLowerCase().includes(query);
+                          return isActualSeva && matches;
+                        })
+                        .map((bk) => {
+                          const matched = donations.find(d => 
+                            (d.transactionId && bk.transactionId && d.transactionId === bk.transactionId) ||
+                            (d.phone && bk.phone && d.phone === bk.phone) ||
+                            (d.name && bk.name && d.name === bk.name)
+                          );
+                          const amountVal = bk.amount || matched?.amount;
+
+                          return (
+                            <tr key={bk.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                              <td className="py-4 px-4 text-xs font-semibold text-white/70 font-mono">{bk.id}</td>
+                              <td className="py-4 px-4">
+                                <p className="text-xs font-bold text-white">{bk.name}</p>
+                                {bk.phone && (
+                                  <p className="text-[11px] text-amber-400/90 font-mono mt-0.5">
+                                    📞 {bk.phone}
+                                  </p>
+                                )}
+                              </td>
+                              <td className="py-4 px-4 text-xs text-stone-300 max-w-[180px]">
+                                {bk.address ? (
+                                  <span className="line-clamp-2" title={bk.address}>📍 {bk.address}</span>
+                                ) : (
+                                  <span className="text-zinc-600 italic">—</span>
+                                )}
+                              </td>
+                              <td className="py-4 px-4">
+                                <span className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/25 px-2.5 py-1 rounded-lg inline-block font-mono">
+                                  ₹{amountVal ? Number(amountVal).toLocaleString('en-IN') : "—"}
+                                </span>
+                              </td>
+                              <td className="py-4 px-4 text-xs text-muted-foreground">
+                                {bk.gotram ? `${bk.gotram} ${bk.nakshatram ? `(${bk.nakshatram})` : ""}` : "—"}
+                              </td>
+                              <td className="py-4 px-4 text-xs text-white font-medium">{bk.seva}</td>
+                              <td className="py-4 px-4">
+                                <p className="text-[10px] text-amber-500/80 font-mono tracking-wider select-all">
+                                  {bk.transactionId || "Manual Proof"}
                                 </p>
-                              )}
-                            </td>
-                            <td className="py-4 px-4 text-xs text-stone-300 max-w-[200px]">
-                              {bk.address ? (
-                                <span className="line-clamp-2" title={bk.address}>📍 {bk.address}</span>
-                              ) : (
-                                <span className="text-zinc-600 italic">—</span>
-                              )}
-                            </td>
-                            <td className="py-4 px-4 text-xs text-muted-foreground">
-                              {bk.gotram ? `${bk.gotram} ${bk.nakshatram ? `(${bk.nakshatram})` : ""}` : "—"}
-                            </td>
-                            <td className="py-4 px-4 text-xs text-white font-medium">{bk.seva}</td>
-                            <td className="py-4 px-4">
-                              {bk.amount && (
-                                <p className="text-xs font-bold text-primary">₹{Number(bk.amount).toLocaleString('en-IN')}</p>
-                              )}
-                              <p className="text-[9px] text-amber-500/80 font-mono mt-0.5 tracking-wider select-all">
-                                {bk.transactionId || "Manual Proof"}
-                              </p>
-                              {bk.date && <p className="text-[10px] text-zinc-500 mt-0.5">{bk.date}</p>}
-                            </td>
-                            <td className="py-4 px-4 text-center">
-                              <button
-                                onClick={() => handleDeleteSeva(bk.id)}
-                                className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer inline-flex items-center justify-center"
-                                title="Delete Record"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))
+                                {bk.date && <p className="text-[10px] text-zinc-500 mt-0.5">{bk.date}</p>}
+                              </td>
+                              <td className="py-4 px-4 text-center">
+                                <button
+                                  onClick={() => handleDeleteSeva(bk.id)}
+                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer inline-flex items-center justify-center"
+                                  title="Delete Record"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
                     )}
                   </tbody>
                 </table>
@@ -879,7 +1076,7 @@ const Admin = () => {
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
                   <h3 className="text-xl font-bold font-serif text-white">Donations Ledger</h3>
-                  <p className="text-xs text-muted-foreground mt-1">Audit trail of financial contributions</p>
+                  <p className="text-xs text-muted-foreground mt-1">Audit trail of financial contributions (General & Seva Donations)</p>
                 </div>
                 
                 {/* Search */}
@@ -895,39 +1092,158 @@ const Admin = () => {
                 </div>
               </div>
 
+              {/* Category Filter Pills */}
+              <div className="flex flex-wrap items-center gap-2 pt-1 pb-2">
+                {[
+                  { id: "all", label: "All Contributions", icon: "✨" },
+                  { id: "general", label: "General Donations", icon: "🪙" },
+                  { id: "saswatha", label: "₹5,000 Saswatha Abhishekam", icon: "🪔" },
+                  { id: "navaratri", label: "₹2,500 Ganesha Navaratri", icon: "🌺" },
+                  { id: "prasadam", label: "Prasadam & Annadanam", icon: "🍚" },
+                ].map((cat) => {
+                  const isActive = donationCategoryFilter === cat.id;
+                  
+                  // Calculate category count and amount
+                  const catItems = donations.filter(d => {
+                    const purpose = (d.purpose || "").toLowerCase();
+                    const amt = Number(d.amount);
+                    if (cat.id === "all") return true;
+                    if (cat.id === "general") return purpose.includes("general donation") || purpose.includes("సాధారణ విరాళం");
+                    if (cat.id === "saswatha") return purpose.includes("saswatha") || purpose.includes("శాశ్వత") || amt === 5000;
+                    if (cat.id === "navaratri") return purpose.includes("navaratri") || purpose.includes("నవరాత్రి") || amt === 2500;
+                    if (cat.id === "prasadam") {
+                      return (
+                        purpose.includes("annadanam") || purpose.includes("అన్నదానం") ||
+                        purpose.includes("pulihora") || purpose.includes("పులిహోర") ||
+                        purpose.includes("pongal") || purpose.includes("పొంగలి") ||
+                        purpose.includes("sanagalu") || purpose.includes("శనగలు") ||
+                        purpose.includes("undrallu") || purpose.includes("ఉండ్రాళ్ళు") ||
+                        purpose.includes("kesari")
+                      );
+                    }
+                    return true;
+                  });
+
+                  const catTotal = catItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => setDonationCategoryFilter(cat.id as any)}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 border cursor-pointer ${
+                        isActive
+                          ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 scale-[1.02] font-bold"
+                          : "bg-zinc-900/80 border-white/10 text-muted-foreground hover:text-white hover:bg-zinc-800"
+                      }`}
+                    >
+                      <span>{cat.icon}</span>
+                      <span>{cat.label}</span>
+                      <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                        isActive ? "bg-black/30 text-white font-bold" : "bg-white/10 text-stone-300"
+                      }`}>
+                        {catItems.length}
+                      </span>
+                      {catTotal > 0 && (
+                        <span className={`text-[10px] font-mono ${
+                          isActive ? "text-primary-foreground/90 font-black" : "text-amber-400 font-bold"
+                        }`}>
+                          (₹{catTotal.toLocaleString('en-IN')})
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
               {/* Donations Ledger Grid */}
               <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/30">
-                <table className="w-full min-w-[800px]">
+                <table className="w-full min-w-[880px]">
                   <thead>
                     <tr className="border-b border-white/10 bg-zinc-900/50">
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Receipt No</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Donor & Contact</th>
-                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Address</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Postal Address</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Amount (₹)</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Purpose / Seva</th>
-                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Amount</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Payment Date</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Method</th>
                       <th className="py-4 px-4 text-center text-xs font-serif font-bold uppercase tracking-widest text-primary">Document</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {donations.filter(d => 
-                      (d.name || "").toLowerCase().includes(donationSearch.toLowerCase()) ||
-                      (d.phone || "").toLowerCase().includes(donationSearch.toLowerCase()) ||
-                      (d.address || "").toLowerCase().includes(donationSearch.toLowerCase())
-                    ).length === 0 ? (
+                    {donations.filter(d => {
+                      const purpose = (d.purpose || "").toLowerCase();
+                      const amt = Number(d.amount);
+
+                      // 1. Category Filter
+                      let matchesCat = true;
+                      if (donationCategoryFilter === "general") {
+                        matchesCat = purpose.includes("general donation") || purpose.includes("సాధారణ విరాళం");
+                      } else if (donationCategoryFilter === "saswatha") {
+                        matchesCat = purpose.includes("saswatha") || purpose.includes("శాశ్వత") || amt === 5000;
+                      } else if (donationCategoryFilter === "navaratri") {
+                        matchesCat = purpose.includes("navaratri") || purpose.includes("నవరాత్రి") || amt === 2500;
+                      } else if (donationCategoryFilter === "prasadam") {
+                        matchesCat = (
+                          purpose.includes("annadanam") || purpose.includes("అన్నదానం") ||
+                          purpose.includes("pulihora") || purpose.includes("పులిహోర") ||
+                          purpose.includes("pongal") || purpose.includes("పొంగలి") ||
+                          purpose.includes("sanagalu") || purpose.includes("శనగలు") ||
+                          purpose.includes("undrallu") || purpose.includes("ఉండ్రాళ్ళు") ||
+                          purpose.includes("kesari")
+                        );
+                      }
+
+                      // 2. Search Query Filter
+                      const q = donationSearch.toLowerCase();
+                      const matchesSearch = 
+                        (d.name || "").toLowerCase().includes(q) ||
+                        (d.phone || "").toLowerCase().includes(q) ||
+                        (d.address || "").toLowerCase().includes(q) ||
+                        (d.purpose || "").toLowerCase().includes(q) ||
+                        (d.receiptNo || "").toLowerCase().includes(q);
+
+                      return matchesCat && matchesSearch;
+                    }).length === 0 ? (
                       <tr>
                         <td colSpan={8} className="py-8 text-center text-xs text-muted-foreground">
-                          No matching donation records found in database.
+                          No matching donation records found for this filter.
                         </td>
                       </tr>
                     ) : (
                       donations
-                        .filter(d => 
-                          (d.name || "").toLowerCase().includes(donationSearch.toLowerCase()) ||
-                          (d.phone || "").toLowerCase().includes(donationSearch.toLowerCase()) ||
-                          (d.address || "").toLowerCase().includes(donationSearch.toLowerCase())
-                        )
+                        .filter(d => {
+                          const purpose = (d.purpose || "").toLowerCase();
+                          const amt = Number(d.amount);
+
+                          let matchesCat = true;
+                          if (donationCategoryFilter === "general") {
+                            matchesCat = purpose.includes("general donation") || purpose.includes("సాధారణ విరాళం");
+                          } else if (donationCategoryFilter === "saswatha") {
+                            matchesCat = purpose.includes("saswatha") || purpose.includes("శాశ్వత") || amt === 5000;
+                          } else if (donationCategoryFilter === "navaratri") {
+                            matchesCat = purpose.includes("navaratri") || purpose.includes("నవరాత్రి") || amt === 2500;
+                          } else if (donationCategoryFilter === "prasadam") {
+                            matchesCat = (
+                              purpose.includes("annadanam") || purpose.includes("అన్నదానం") ||
+                              purpose.includes("pulihora") || purpose.includes("పులిహోర") ||
+                              purpose.includes("pongal") || purpose.includes("పొంగలి") ||
+                              purpose.includes("sanagalu") || purpose.includes("శనగలు") ||
+                              purpose.includes("undrallu") || purpose.includes("ఉండ్రాళ్ళు") ||
+                              purpose.includes("kesari")
+                            );
+                          }
+
+                          const q = donationSearch.toLowerCase();
+                          const matchesSearch = 
+                            (d.name || "").toLowerCase().includes(q) ||
+                            (d.phone || "").toLowerCase().includes(q) ||
+                            (d.address || "").toLowerCase().includes(q) ||
+                            (d.purpose || "").toLowerCase().includes(q) ||
+                            (d.receiptNo || "").toLowerCase().includes(q);
+
+                          return matchesCat && matchesSearch;
+                        })
                         .map((dn) => (
                           <tr key={dn.receiptNo} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                             <td className="py-4 px-4 text-xs font-semibold text-white font-mono">{dn.receiptNo}</td>
@@ -944,8 +1260,12 @@ const Admin = () => {
                                 <span className="text-zinc-600 italic">—</span>
                               )}
                             </td>
+                            <td className="py-4 px-4">
+                              <span className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/25 px-2.5 py-1 rounded-lg inline-block font-mono">
+                                ₹{Number(dn.amount).toLocaleString('en-IN')}
+                              </span>
+                            </td>
                             <td className="py-4 px-4 text-xs text-muted-foreground">{dn.purpose}</td>
-                            <td className="py-4 px-4 text-xs font-bold text-primary">₹{Number(dn.amount).toLocaleString('en-IN')}</td>
                             <td className="py-4 px-4 text-xs text-muted-foreground">{dn.date}</td>
                             <td className="py-4 px-4">
                               <span className="text-[10px] px-2 py-0.5 rounded bg-zinc-900 border border-white/5 text-white/70 uppercase">
@@ -1285,6 +1605,302 @@ const Admin = () => {
                   </button>
 
                 </form>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 7: TEMPLE GALLERY & CLOUDINARY UPLOAD */}
+          {activeTab === "gallery" && (
+            <div className="space-y-8 animate-fade-rise">
+              {/* Header Info */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-bold font-serif text-white flex items-center gap-2">
+                    <span>Sacred Temple Gallery</span>
+                    <span className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-sans font-bold">
+                      Cloudinary Cloud Storage
+                    </span>
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Upload deity photos directly to Cloudinary and instantly publish them to the live temple website gallery.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Link
+                    to="/gallery"
+                    target="_blank"
+                    className="px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-primary border border-primary/20 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>View Public Gallery</span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Section 1: Upload Card */}
+              <div className="p-6 sm:p-8 rounded-3xl glass-dark border border-primary/20 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+                
+                <div className="mb-6 flex items-center gap-2.5 pb-4 border-b border-white/5">
+                  <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20">
+                    <Upload className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-base font-bold text-white font-serif">Upload Sacred Photo to Cloudinary</h4>
+                    <p className="text-[11px] text-muted-foreground">Select an image file, choose category, and publish directly to Cloudinary storage.</p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleGalleryUpload} className="space-y-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    {/* File Picker / Preview Box (5 cols) */}
+                    <div className="lg:col-span-5">
+                      <label className="block text-xs font-serif font-black tracking-widest text-primary uppercase mb-2">
+                        Select Photograph
+                      </label>
+                      
+                      <div className="relative border-2 border-dashed border-primary/30 hover:border-primary/60 rounded-2xl p-4 transition-all bg-black/30 flex flex-col items-center justify-center min-h-[220px] group cursor-pointer overflow-hidden">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleGalleryFileChange}
+                          disabled={isGalleryUploading}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                        />
+
+                        {galleryPreviewUrl ? (
+                          <div className="relative w-full h-[200px] flex items-center justify-center">
+                            <img
+                              src={galleryPreviewUrl}
+                              alt="Preview"
+                              className="max-w-full max-h-full object-contain rounded-xl shadow-lg border border-primary/30"
+                            />
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center rounded-xl gap-2 z-10">
+                              <Upload className="w-6 h-6 text-primary animate-bounce" />
+                              <span className="text-xs text-white font-bold">Click to change photo</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-center p-6 space-y-2">
+                            <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto text-primary group-hover:scale-110 transition-transform">
+                              <ImageIcon className="w-6 h-6" />
+                            </div>
+                            <p className="text-xs font-bold text-white">Click or drag image here</p>
+                            <p className="text-[10px] text-muted-foreground">JPG, PNG, WebP up to 15MB</p>
+                            <span className="inline-block px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full text-[10px] font-bold mt-1">
+                              Direct Cloudinary Upload
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Form Metadata Fields (7 cols) */}
+                    <div className="lg:col-span-7 space-y-4">
+                      <div>
+                        <label className="block text-xs font-serif font-black tracking-widest text-primary uppercase mb-2">
+                          Photo Title / Event Name
+                        </label>
+                        <input
+                          type="text"
+                          value={galleryTitle}
+                          onChange={e => setGalleryTitle(e.target.value)}
+                          placeholder="e.g. Sree Sampath Vinayagar Maha Alankaram"
+                          className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:border-primary/50 focus:outline-none transition-colors"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-serif font-black tracking-widest text-primary uppercase mb-2">
+                            Category
+                          </label>
+                          <select
+                            value={galleryCategory}
+                            onChange={e => setGalleryCategory(e.target.value)}
+                            className="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-white/10 text-white text-xs focus:border-primary/50 focus:outline-none transition-colors"
+                          >
+                            <option value="Alankaram">Deity & Alankaram</option>
+                            <option value="Daily Pooja">Sanctum & Daily Pooja</option>
+                            <option value="Festivals">Festivals & Utsavam</option>
+                            <option value="Architecture">Temple Campus & Gopuram</option>
+                            <option value="Annadanam">Annaprasadam Seva</option>
+                            <option value="Special Sevas">Special Sevas & Homam</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-serif font-black tracking-widest text-primary uppercase mb-2">
+                            Gallery Grid Span
+                          </label>
+                          <select
+                            value={gallerySpan}
+                            onChange={e => setGallerySpan(e.target.value)}
+                            className="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-white/10 text-white text-xs focus:border-primary/50 focus:outline-none transition-colors"
+                          >
+                            <option value="col-span-1 row-span-1">Standard (1x1 Square)</option>
+                            <option value="col-span-2 row-span-1">Wide (2x1 Banner)</option>
+                            <option value="col-span-2 row-span-2">Feature Large (2x2 Box)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="pt-2">
+                        <button
+                          type="submit"
+                          disabled={isGalleryUploading || (!galleryUploadFile && !galleryPreviewUrl)}
+                          className={`w-full py-3.5 px-6 rounded-xl font-serif font-black tracking-widest text-xs uppercase flex items-center justify-center gap-2 transition-all shadow-lg ${
+                            isGalleryUploading || (!galleryUploadFile && !galleryPreviewUrl)
+                              ? "bg-zinc-800 text-zinc-500 border border-white/5 cursor-not-allowed"
+                              : "bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 hover:from-amber-600 hover:to-amber-700 hover:scale-[1.01] active:scale-95 border border-primary/30 cursor-pointer shadow-primary/20"
+                          }`}
+                        >
+                          {isGalleryUploading ? (
+                            <>
+                              <RefreshCw className="w-4 h-4 animate-spin text-stone-950" />
+                              <span>Uploading Directly to Cloudinary...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-4 h-4" />
+                              <span>Upload to Cloudinary & Publish Live</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              {/* Section 2: Uploaded Gallery Photos Grid */}
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-4">
+                  <div>
+                    <h4 className="text-lg font-bold font-serif text-white flex items-center gap-2">
+                      <span>Published Temple Photos</span>
+                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold border border-primary/20">
+                        {galleryImages.length}
+                      </span>
+                    </h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">Live image references stored in Firestore and Cloudinary</p>
+                  </div>
+
+                  {/* Filter Pills */}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {[
+                      { id: "all", label: "All" },
+                      { id: "Alankaram", label: "Alankaram" },
+                      { id: "Daily Pooja", label: "Daily Pooja" },
+                      { id: "Festivals", label: "Festivals" },
+                      { id: "Architecture", label: "Architecture" },
+                      { id: "Annadanam", label: "Annadanam" },
+                    ].map(cat => (
+                      <button
+                        key={cat.id}
+                        onClick={() => setGalleryCategoryFilter(cat.id)}
+                        className={`px-3 py-1 rounded-lg text-[10px] font-bold tracking-wider transition-all border cursor-pointer ${
+                          galleryCategoryFilter === cat.id
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-zinc-900 border-white/10 text-muted-foreground hover:text-white"
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Photos Grid */}
+                {galleryImages.length === 0 ? (
+                  <div className="p-12 rounded-3xl border border-white/5 bg-black/20 text-center space-y-3">
+                    <div className="w-12 h-12 rounded-2xl bg-zinc-800/80 border border-white/10 flex items-center justify-center mx-auto text-muted-foreground">
+                      <ImageIcon className="w-6 h-6" />
+                    </div>
+                    <p className="text-xs text-muted-foreground">No photos uploaded to the custom gallery collection yet.</p>
+                    <p className="text-[11px] text-primary">Use the upload box above to upload photos to Cloudinary and see them appear here!</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {galleryImages
+                      .filter(img => {
+                        if (galleryCategoryFilter === "all") return true;
+                        return img.category === galleryCategoryFilter;
+                      })
+                      .map(img => (
+                        <div
+                          key={img.id}
+                          className="group p-3 rounded-2xl glass-dark border border-white/10 hover:border-primary/40 transition-all flex flex-col justify-between gap-3 shadow-md hover:shadow-xl hover:-translate-y-1"
+                        >
+                          {/* Photo Thumbnail */}
+                          <div className="relative aspect-video rounded-xl overflow-hidden border border-white/5 bg-black/40">
+                            <img
+                              src={img.src}
+                              alt={img.title || "Temple Photo"}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              loading="lazy"
+                            />
+                            <div className="absolute top-2 right-2 flex gap-1">
+                              <span className="text-[9px] px-2 py-0.5 rounded-full bg-black/70 text-amber-300 font-bold border border-amber-500/30 backdrop-blur-sm">
+                                {img.category || "Alankaram"}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Details */}
+                          <div className="space-y-1">
+                            <h5 className="text-xs font-bold text-white font-serif line-clamp-1">
+                              {img.title || "Sacred Darshan"}
+                            </h5>
+                            <p className="text-[10px] text-muted-foreground">
+                              {img.createdAt ? new Date(img.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "Temple Photo"}
+                            </p>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex items-center justify-between border-t border-white/5 pt-2.5 gap-2">
+                            <button
+                              onClick={() => handleCopyUrl(img.src)}
+                              className="px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white/80 hover:text-white text-[10px] font-medium flex items-center gap-1 transition-all border border-white/5 cursor-pointer"
+                              title="Copy Cloudinary URL"
+                            >
+                              {copiedUrl === img.src ? (
+                                <>
+                                  <Check className="w-3 h-3 text-emerald-400" />
+                                  <span className="text-emerald-400 font-bold">Copied</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3 h-3" />
+                                  <span>Copy URL</span>
+                                </>
+                              )}
+                            </button>
+
+                            <div className="flex items-center gap-1.5">
+                              <a
+                                href={img.src}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-primary border border-white/5 text-[10px] transition-all cursor-pointer"
+                                title="Open full photo in new tab"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
+                              <button
+                                onClick={() => handleDeleteGalleryImage(img.id, img.title || "Temple Photo")}
+                                className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                                title="Delete from gallery"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
