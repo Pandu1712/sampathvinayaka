@@ -729,31 +729,25 @@ const Admin = () => {
                   </div>
                 </div>
 
-                {/* Quick bookings preview */}
+                {/* Quick devotee entries preview */}
                 <div className="p-6 rounded-2xl glass-dark border border-white/10 flex flex-col justify-between">
                   <div>
-                    <h4 className="text-base font-bold font-serif text-white mb-1">Recent Booking Requests</h4>
-                    <p className="text-xs text-muted-foreground mb-6">Pending confirmation approvals</p>
+                    <h4 className="text-base font-bold font-serif text-white mb-1">Recent Devotee Entries</h4>
+                    <p className="text-xs text-muted-foreground mb-6">Latest contributions and seva registrations</p>
 
                     <div className="space-y-4">
                       {bookings.length === 0 ? (
-                        <p className="text-xs text-muted-foreground text-center py-6">No recent booking requests found.</p>
+                        <p className="text-xs text-muted-foreground text-center py-6">No recent devotee records found.</p>
                       ) : (
-                        bookings.slice(0, 3).map(bk => (
+                        bookings.slice(0, 4).map(bk => (
                           <div key={bk.id} className="flex justify-between items-center p-3 rounded-xl border border-white/5 bg-black/20 hover:border-primary/25 transition-all">
-                            <div>
-                              <p className="text-sm font-semibold text-white">{bk.name}</p>
-                              <p className="text-xs text-muted-foreground">{bk.seva} • {bk.date}</p>
+                            <div className="min-w-0 flex-1 mr-3">
+                              <p className="text-sm font-semibold text-white truncate">{bk.name}</p>
+                              <p className="text-xs text-muted-foreground truncate">{bk.seva} {bk.phone ? `• ${bk.phone}` : ""}</p>
+                              {bk.address && <p className="text-[10px] text-zinc-500 truncate mt-0.5">📍 {bk.address}</p>}
                             </div>
-                            
-                            <span className={`text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-wider ${
-                              bk.status === "Approved"
-                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                : bk.status === "Pending"
-                                  ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                                  : "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20"
-                            }`}>
-                              {bk.status}
+                            <span className="text-xs font-mono font-bold text-primary shrink-0">
+                              {bk.amount ? `₹${Number(bk.amount).toLocaleString('en-IN')}` : (bk.date || "")}
                             </span>
                           </div>
                         ))
@@ -765,7 +759,7 @@ const Admin = () => {
                     onClick={() => setActiveTab("sevas")}
                     className="w-full mt-6 py-2.5 rounded-xl border border-primary/20 text-primary text-xs font-serif font-black tracking-widest uppercase hover:bg-primary hover:text-stone-950 transition-all text-center cursor-pointer"
                   >
-                    View All Bookings
+                    View All Devotee Records
                   </button>
                 </div>
 
@@ -779,8 +773,8 @@ const Admin = () => {
             <div className="space-y-6 animate-fade-rise">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-xl font-bold font-serif text-white">Devotee Seva Bookings</h3>
-                  <p className="text-xs text-muted-foreground mt-1">Manage and approve devotee pooja rituals</p>
+                  <h3 className="text-xl font-bold font-serif text-white">Devotee Records & Seva List</h3>
+                  <p className="text-xs text-muted-foreground mt-1">Devotee details, contact numbers, addresses, and contributions</p>
                 </div>
                 
                 {/* Search */}
@@ -790,7 +784,7 @@ const Admin = () => {
                     type="text"
                     value={bookingSearch}
                     onChange={e => setBookingSearch(e.target.value)}
-                    placeholder="Search by devotee name..."
+                    placeholder="Search name, phone, address..."
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-white/30 focus:border-primary/50 focus:outline-none transition-colors text-xs"
                   />
                 </div>
@@ -802,69 +796,73 @@ const Admin = () => {
                   <thead>
                     <tr className="border-b border-white/10 bg-zinc-900/50">
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">ID</th>
-                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Devotee Name</th>
-                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Gotram</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Devotee Name & Phone</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Postal Address</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Gotram / Nakshatram</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Seva Ritual</th>
-                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Pooja Date</th>
-                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Time Slot / Txn ID</th>
-                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Status</th>
-                      <th className="py-4 px-4 text-center text-xs font-serif font-bold uppercase tracking-widest text-primary">Actions</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Txn ID / Payment</th>
+                      <th className="py-4 px-4 text-center text-xs font-serif font-bold uppercase tracking-widest text-primary">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {bookings.filter(b => b.name.toLowerCase().includes(bookingSearch.toLowerCase())).length === 0 ? (
+                    {bookings.filter(b => 
+                      (b.name || "").toLowerCase().includes(bookingSearch.toLowerCase()) ||
+                      (b.phone || "").toLowerCase().includes(bookingSearch.toLowerCase()) ||
+                      (b.address || "").toLowerCase().includes(bookingSearch.toLowerCase()) ||
+                      (b.gotram || "").toLowerCase().includes(bookingSearch.toLowerCase())
+                    ).length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="py-8 text-center text-xs text-muted-foreground">
-                          No matching Seva bookings found in database.
+                        <td colSpan={7} className="py-8 text-center text-xs text-muted-foreground">
+                          No matching devotee records found in database.
                         </td>
                       </tr>
                     ) : (
                       bookings
-                        .filter(b => b.name.toLowerCase().includes(bookingSearch.toLowerCase()))
-                        .map((bk, i) => (
+                        .filter(b => 
+                          (b.name || "").toLowerCase().includes(bookingSearch.toLowerCase()) ||
+                          (b.phone || "").toLowerCase().includes(bookingSearch.toLowerCase()) ||
+                          (b.address || "").toLowerCase().includes(bookingSearch.toLowerCase()) ||
+                          (b.gotram || "").toLowerCase().includes(bookingSearch.toLowerCase())
+                        )
+                        .map((bk) => (
                           <tr key={bk.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                            <td className="py-4 px-4 text-xs font-semibold text-white">{bk.id}</td>
+                            <td className="py-4 px-4 text-xs font-semibold text-white/70 font-mono">{bk.id}</td>
                             <td className="py-4 px-4">
                               <p className="text-xs font-bold text-white">{bk.name}</p>
-                              <p className="text-[10px] text-muted-foreground mt-0.5">{bk.phone}</p>
+                              {bk.phone && (
+                                <p className="text-[11px] text-amber-400/90 font-mono mt-0.5">
+                                  📞 {bk.phone}
+                                </p>
+                              )}
                             </td>
-                            <td className="py-4 px-4 text-xs text-muted-foreground">{bk.gotram} {bk.nakshatram ? `(${bk.nakshatram})` : ""}</td>
-                            <td className="py-4 px-4 text-xs text-white">{bk.seva}</td>
-                            <td className="py-4 px-4 text-xs text-muted-foreground">{bk.date}</td>
-                            <td className="py-4 px-4">
-                              <p className="text-xs text-white font-medium">{bk.timeSlot || "5:30 PM - 8:00 PM"}</p>
-                              <p className="text-[9px] text-amber-500/80 font-mono mt-0.5 tracking-wider select-all">{bk.transactionId || "Manual Proof"}</p>
+                            <td className="py-4 px-4 text-xs text-stone-300 max-w-[200px]">
+                              {bk.address ? (
+                                <span className="line-clamp-2" title={bk.address}>📍 {bk.address}</span>
+                              ) : (
+                                <span className="text-zinc-600 italic">—</span>
+                              )}
                             </td>
-                            <td className="py-4 px-4">
-                              <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${
-                                bk.status === "Approved"
-                                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                  : bk.status === "Pending"
-                                    ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                                    : "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20"
-                              }`}>
-                                {bk.status}
-                              </span>
+                            <td className="py-4 px-4 text-xs text-muted-foreground">
+                              {bk.gotram ? `${bk.gotram} ${bk.nakshatram ? `(${bk.nakshatram})` : ""}` : "—"}
                             </td>
+                            <td className="py-4 px-4 text-xs text-white font-medium">{bk.seva}</td>
                             <td className="py-4 px-4">
-                              <div className="flex items-center justify-center gap-2">
-                                {bk.status !== "Completed" && (
-                                  <button
-                                    onClick={() => handleApproveSeva(bk.id)}
-                                    className="p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                                    title={bk.status === "Pending" ? "Approve Booking" : "Mark as Completed"}
-                                  >
-                                    <CheckCircle className="w-3.5 h-3.5" />
-                                  </button>
-                                )}
-                                <button
-                                  onClick={() => handleDeleteSeva(bk.id)}
-                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                                  title="Delete Booking"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
+                              {bk.amount && (
+                                <p className="text-xs font-bold text-primary">₹{Number(bk.amount).toLocaleString('en-IN')}</p>
+                              )}
+                              <p className="text-[9px] text-amber-500/80 font-mono mt-0.5 tracking-wider select-all">
+                                {bk.transactionId || "Manual Proof"}
+                              </p>
+                              {bk.date && <p className="text-[10px] text-zinc-500 mt-0.5">{bk.date}</p>}
+                            </td>
+                            <td className="py-4 px-4 text-center">
+                              <button
+                                onClick={() => handleDeleteSeva(bk.id)}
+                                className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer inline-flex items-center justify-center"
+                                title="Delete Record"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
                             </td>
                           </tr>
                         ))
@@ -891,7 +889,7 @@ const Admin = () => {
                     type="text"
                     value={donationSearch}
                     onChange={e => setDonationSearch(e.target.value)}
-                    placeholder="Search by donor name..."
+                    placeholder="Search by donor name, phone, or address..."
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-white/30 focus:border-primary/50 focus:outline-none transition-colors text-xs"
                   />
                 </div>
@@ -899,11 +897,12 @@ const Admin = () => {
 
               {/* Donations Ledger Grid */}
               <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/30">
-                <table className="w-full min-w-[700px]">
+                <table className="w-full min-w-[800px]">
                   <thead>
                     <tr className="border-b border-white/10 bg-zinc-900/50">
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Receipt No</th>
-                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Donor Name</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Donor & Contact</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Address</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Purpose / Seva</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Amount</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Payment Date</th>
@@ -912,21 +911,41 @@ const Admin = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {donations.filter(d => d.name.toLowerCase().includes(donationSearch.toLowerCase())).length === 0 ? (
+                    {donations.filter(d => 
+                      (d.name || "").toLowerCase().includes(donationSearch.toLowerCase()) ||
+                      (d.phone || "").toLowerCase().includes(donationSearch.toLowerCase()) ||
+                      (d.address || "").toLowerCase().includes(donationSearch.toLowerCase())
+                    ).length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="py-8 text-center text-xs text-muted-foreground">
+                        <td colSpan={8} className="py-8 text-center text-xs text-muted-foreground">
                           No matching donation records found in database.
                         </td>
                       </tr>
                     ) : (
                       donations
-                        .filter(d => d.name.toLowerCase().includes(donationSearch.toLowerCase()))
-                        .map((dn, i) => (
+                        .filter(d => 
+                          (d.name || "").toLowerCase().includes(donationSearch.toLowerCase()) ||
+                          (d.phone || "").toLowerCase().includes(donationSearch.toLowerCase()) ||
+                          (d.address || "").toLowerCase().includes(donationSearch.toLowerCase())
+                        )
+                        .map((dn) => (
                           <tr key={dn.receiptNo} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                            <td className="py-4 px-4 text-xs font-semibold text-white">{dn.receiptNo}</td>
-                            <td className="py-4 px-4 text-xs font-bold text-white">{dn.name}</td>
+                            <td className="py-4 px-4 text-xs font-semibold text-white font-mono">{dn.receiptNo}</td>
+                            <td className="py-4 px-4">
+                              <p className="text-xs font-bold text-white">{dn.name}</p>
+                              {dn.phone && (
+                                <p className="text-[11px] text-amber-400/90 font-mono mt-0.5">📞 {dn.phone}</p>
+                              )}
+                            </td>
+                            <td className="py-4 px-4 text-xs text-stone-300 max-w-[180px]">
+                              {dn.address ? (
+                                <span className="line-clamp-2" title={dn.address}>📍 {dn.address}</span>
+                              ) : (
+                                <span className="text-zinc-600 italic">—</span>
+                              )}
+                            </td>
                             <td className="py-4 px-4 text-xs text-muted-foreground">{dn.purpose}</td>
-                            <td className="py-4 px-4 text-xs font-semibold text-primary">₹{Number(dn.amount).toLocaleString('en-IN')}</td>
+                            <td className="py-4 px-4 text-xs font-bold text-primary">₹{Number(dn.amount).toLocaleString('en-IN')}</td>
                             <td className="py-4 px-4 text-xs text-muted-foreground">{dn.date}</td>
                             <td className="py-4 px-4">
                               <span className="text-[10px] px-2 py-0.5 rounded bg-zinc-900 border border-white/5 text-white/70 uppercase">

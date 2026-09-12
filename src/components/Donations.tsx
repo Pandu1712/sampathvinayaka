@@ -102,6 +102,10 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
         await addDoc(collection(db, "donations"), {
           receiptNo: receipt.receiptNo,
           name: receipt.name,
+          phone: receipt.phoneOrEmail || "",
+          address: receipt.address || "",
+          gotram: receipt.gotram || "",
+          nakshatram: receipt.nakshatram || "",
           purpose: receipt.purpose,
           amount: Number(receipt.amount),
           date: new Date().toISOString().split("T")[0],
@@ -110,26 +114,28 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
           transactionId: receipt.paymentId || ""
         });
 
-        // 2. Add to Seva Bookings calendar if it's a booking
-        if (receipt.purpose !== "General Donation /సాధారణ విరాళం" && receipt.purpose !== "General Donation") {
-          await addDoc(collection(db, "bookings"), {
-            name: receipt.name,
-            gotram: receipt.gotram || "",
-            nakshatram: receipt.nakshatram || "",
-            phone: receipt.phoneOrEmail,
-            seva: receipt.purpose,
-            date: receipt.poojaDate || new Date().toISOString().split("T")[0],
-            timeSlot: receipt.poojaTime || "5:30 PM - 8:00 PM",
-            status: "Pending",
-            transactionId: receipt.paymentId || "Manual Proof Uploaded"
-          });
-        }
+        // 2. Add to Seva Bookings record
+        await addDoc(collection(db, "bookings"), {
+          name: receipt.name,
+          phone: receipt.phoneOrEmail || "",
+          address: receipt.address || "",
+          gotram: receipt.gotram || "",
+          nakshatram: receipt.nakshatram || "",
+          seva: receipt.purpose,
+          amount: Number(receipt.amount),
+          date: new Date().toISOString().split("T")[0],
+          transactionId: receipt.paymentId || "Manual Proof Uploaded"
+        });
       } else {
         // Offline fallback: save to localStorage
         const localDonations = JSON.parse(localStorage.getItem("local_donations") || "[]");
         localDonations.push({
           receiptNo: receipt.receiptNo,
           name: receipt.name,
+          phone: receipt.phoneOrEmail || "",
+          address: receipt.address || "",
+          gotram: receipt.gotram || "",
+          nakshatram: receipt.nakshatram || "",
           purpose: receipt.purpose,
           amount: Number(receipt.amount),
           date: new Date().toISOString().split("T")[0],
@@ -139,22 +145,20 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
         });
         localStorage.setItem("local_donations", JSON.stringify(localDonations));
 
-        if (receipt.purpose !== "General Donation /సాధారణ విరాళం" && receipt.purpose !== "General Donation") {
-          const localBookings = JSON.parse(localStorage.getItem("local_bookings") || "[]");
-          localBookings.push({
-            id: `BK${Math.floor(100 + Math.random() * 900)}`,
-            name: receipt.name,
-            gotram: receipt.gotram || "",
-            nakshatram: receipt.nakshatram || "",
-            phone: receipt.phoneOrEmail,
-            seva: receipt.purpose,
-            date: receipt.poojaDate || new Date().toISOString().split("T")[0],
-            timeSlot: receipt.poojaTime || "5:30 PM - 8:00 PM",
-            status: "Pending",
-            transactionId: receipt.paymentId || "Manual Proof Uploaded"
-          });
-          localStorage.setItem("local_bookings", JSON.stringify(localBookings));
-        }
+        const localBookings = JSON.parse(localStorage.getItem("local_bookings") || "[]");
+        localBookings.push({
+          id: `BK${Math.floor(100 + Math.random() * 900)}`,
+          name: receipt.name,
+          phone: receipt.phoneOrEmail || "",
+          address: receipt.address || "",
+          gotram: receipt.gotram || "",
+          nakshatram: receipt.nakshatram || "",
+          seva: receipt.purpose,
+          amount: Number(receipt.amount),
+          date: new Date().toISOString().split("T")[0],
+          transactionId: receipt.paymentId || "Manual Proof Uploaded"
+        });
+        localStorage.setItem("local_bookings", JSON.stringify(localBookings));
       }
     } catch (error) {
       console.error("Error writing donation/booking to Firestore:", error);
@@ -538,12 +542,8 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
       return;
     }
 
-    // 4. Address Validation
+    // Address is optional - trimmed for records
     const addressTrimmed = address.trim();
-    if (addressTrimmed.length < 10) {
-      toast.error("Invalid Address: Please enter a detailed address (minimum 10 characters) for temple records.");
-      return;
-    }
 
     // If online payment method selected, trigger Razorpay checkout
     if (paymentMethod === "online") {
@@ -1323,15 +1323,14 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
                 <div className="space-y-1">
                   <label className="text-xs text-stone-600 font-bold uppercase tracking-wider flex items-center gap-1.5">
                     <MapPin size={13} className="text-amber-600" />
-                    Postal Address *
+                    Postal Address <span className="text-stone-400 font-normal lowercase">(optional)</span>
                   </label>
                   <textarea
-                    required
                     rows={2}
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all resize-none"
-                    placeholder="Enter full address for Devasthanam records"
+                    placeholder="Enter city / address (optional)"
                   />
                 </div>
 

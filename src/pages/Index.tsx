@@ -15,7 +15,7 @@ import male3 from "@/assets/member-male-3.png";
 import prasadRao from "@/assets/prasad-rao.jpg";
 import founderImage from "@/assets/rajeswaran.jpg";
 import priestPooja from "@/assets/priest-pooja.jpg";
-import { BookOpen, Download, Sparkles, FileText, ArrowRight, Calendar as CalendarIcon, Eye } from "lucide-react";
+import { BookOpen, Download, Sparkles, FileText, ArrowRight, Calendar as CalendarIcon, Eye, ZoomIn, X } from "lucide-react";
 
 
 /* ─── Data ─── */
@@ -132,6 +132,7 @@ const isNavaratriBookingExpired = () => {
 const Index = () => {
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
   const [homeLightboxIndex, setHomeLightboxIndex] = useState<number | null>(null);
+  const [selectedBannerImage, setSelectedBannerImage] = useState<string | null>(null);
   const [timelineLang, setTimelineLang] = useState<"en" | "te">("en");
   const [noteLang, setNoteLang] = useState<"en" | "te">("en");
   const [sevaLang, setSevaLang] = useState<"en" | "te">("en");
@@ -160,6 +161,79 @@ const Index = () => {
     <Layout>
       {/* ═══════ HERO ═══════ */}
       <HeroCarousel />
+
+      {/* ═══════ SACRED NOTICE & DEITY BANNERS ═══════ */}
+      <section className="relative py-6 sm:py-10 bg-gradient-to-b from-stone-950 via-[#16100b] to-stone-950 overflow-hidden border-b border-primary/20">
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
+        
+        <div className="container-custom relative z-10 px-4 sm:px-6">
+          <div className="flex flex-col gap-6 sm:gap-8 max-w-6xl mx-auto">
+            
+            {/* Banner 1: Deity Alankaram & Sacred Slokas */}
+            <div 
+              onClick={() => setSelectedBannerImage("/temple-deity-banner.png")}
+              className="group relative rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-primary/40 bg-black/80 shadow-2xl shadow-primary/10 hover:border-primary hover:shadow-primary/20 transition-all duration-500 cursor-pointer"
+            >
+              <div className="relative w-full overflow-hidden">
+                <img 
+                  src="/temple-deity-banner.png" 
+                  alt="Sri Sampath Vinayakagar Temple Deity and Sacred Slokas" 
+                  className="w-full h-auto object-cover sm:object-contain group-hover:scale-[1.01] transition-transform duration-500"
+                  loading="eager"
+                />
+              </div>
+              <div className="absolute top-3 right-3 sm:top-4 sm:right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/80 backdrop-blur-md text-primary text-xs font-serif font-bold px-3 py-1.5 rounded-full border border-primary/40 flex items-center gap-1.5 shadow-lg">
+                <ZoomIn className="w-3.5 h-3.5" />
+                <span>Click to Expand</span>
+              </div>
+            </div>
+
+            {/* Banner 2: Temple Darshanam Timings & Prasadam Rates */}
+            <div 
+              onClick={() => setSelectedBannerImage("/temple-timings-prasadam-chart.png")}
+              className="group relative rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-primary/40 bg-black/80 shadow-2xl shadow-primary/10 hover:border-primary hover:shadow-primary/20 transition-all duration-500 cursor-pointer"
+            >
+              <div className="relative w-full overflow-hidden">
+                <img 
+                  src="/temple-timings-prasadam-chart.png" 
+                  alt="Temple Darshanam Timings, Sevas, and Prasadam Distribution Chart" 
+                  className="w-full h-auto object-cover sm:object-contain group-hover:scale-[1.01] transition-transform duration-500"
+                  loading="lazy"
+                />
+              </div>
+              <div className="absolute top-3 right-3 sm:top-4 sm:right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/80 backdrop-blur-md text-primary text-xs font-serif font-bold px-3 py-1.5 rounded-full border border-primary/40 flex items-center gap-1.5 shadow-lg">
+                <ZoomIn className="w-3.5 h-3.5" />
+                <span>Click to Expand</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Lightbox Modal for Full View */}
+      {selectedBannerImage && (
+        <div 
+          onClick={() => setSelectedBannerImage(null)}
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 cursor-zoom-out animate-fade-in"
+        >
+          <div className="relative max-w-6xl max-h-[92vh] w-full flex items-center justify-center">
+            <button
+              onClick={() => setSelectedBannerImage(null)}
+              className="absolute -top-10 right-0 sm:top-3 sm:right-3 p-2 rounded-full bg-black/80 text-white hover:text-primary border border-white/20 hover:border-primary transition-all z-20 cursor-pointer"
+              title="Close Full View"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <img 
+              src={selectedBannerImage} 
+              alt="Enlarged Temple Banner" 
+              className="max-h-[85vh] w-auto max-w-full rounded-xl sm:rounded-2xl border-2 border-primary/40 shadow-2xl object-contain bg-black"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
 
       {/* ═══════ ABOUT / HISTORY ═══════ */}
       <section id="history" className="section-padding px-4 sm:px-4 relative">
