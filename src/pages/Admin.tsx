@@ -43,7 +43,10 @@ import {
   Copy,
   Check,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  Utensils,
+  Heart,
+  Package
 } from "lucide-react";
 import { toast } from "sonner";
 import { 
@@ -56,14 +59,6 @@ import {
   ResponsiveContainer 
 } from "recharts";
 
-// Mock data for seeding events if empty in database
-const initialEvents = [
-  { id: "EV001", title: "New Year's Day Spl Pooja", date: "2026-01-01", time: "6:00 AM – 9:00 PM", type: "Auspicious", status: "Active" },
-  { id: "EV002", title: "Ugadi (Telugu New Year)", date: "2026-03-19", time: "6:00 AM – 9:00 PM", type: "Festival", status: "Active" },
-  { id: "EV003", title: "Vinayaka Chavithi (Ganesh Chaturthi)", date: "2026-09-14", time: "All Day & Night", type: "Festival", status: "Active" },
-  { id: "EV004", title: "Vijayadashami Vahana Pooja", date: "2026-10-20", time: "5:00 AM – 11:00 PM", type: "Festival", status: "Active" }
-];
-
 const Admin = () => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState("");
@@ -71,24 +66,59 @@ const Admin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [user, setUser] = useState<FirebaseUser | { email: string } | null>(null);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "sevas" | "donations" | "events" | "feedback" | "panchangam" | "gallery">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "saswatha" | "annadanam" | "prasadam" | "general_donations" | "gallery">("dashboard");
 
   // Dashboard state and Firestore indicators
   const [bookings, setBookings] = useState<any[]>([]);
   const [donations, setDonations] = useState<any[]>([]);
-  const [events, setEvents] = useState<any[]>([]);
-  const [feedbacks, setFeedbacks] = useState<any[]>([]);
   const [galleryImages, setGalleryImages] = useState<any[]>([]);
   const [isDataLoading, setIsDataLoading] = useState(false);
   
-  // Search terms & filters
-  const [bookingSearch, setBookingSearch] = useState("");
-  const [donationSearch, setDonationSearch] = useState("");
-  const [donationCategoryFilter, setDonationCategoryFilter] = useState<"all" | "general" | "saswatha" | "navaratri" | "prasadam">("all");
+  // Search terms & filters for dedicated tabs
+  const [saswathaSearch, setSaswathaSearch] = useState("");
+  const [annadanamSearch, setAnnadanamSearch] = useState("");
+  const [prasadamSearch, setPrasadamSearch] = useState("");
+  const [generalSearch, setGeneralSearch] = useState("");
   const [gallerySearch, setGallerySearch] = useState("");
   const [galleryCategoryFilter, setGalleryCategoryFilter] = useState<string>("all");
   const [loginError, setLoginError] = useState("");
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+
+  // Categorization helpers
+  const isSaswathaItem = (item: any) => {
+    const p = ((item.seva || item.purpose || "") + "").toLowerCase();
+    const amt = Number(item.amount);
+    return (
+      p.includes("saswatha") || 
+      p.includes("శాశ్వత") || 
+      p.includes("navaratri") || 
+      p.includes("నవరాత్రి") || 
+      p.includes("నవరాత్రుల") ||
+      amt === 5000 || 
+      amt === 2500
+    );
+  };
+
+  const isAnnadanamItem = (item: any) => {
+    const p = ((item.seva || item.purpose || "") + "").toLowerCase();
+    return p.includes("annadanam") || p.includes("అన్నదానం") || p.includes("అన్నప్రసాద") || p.includes("అన్నదాన");
+  };
+
+  const isPrasadamItem = (item: any) => {
+    const p = ((item.seva || item.purpose || "") + "").toLowerCase();
+    return (
+      p.includes("pulihora") || p.includes("పులిహోర") ||
+      p.includes("pongal") || p.includes("పొంగలి") ||
+      p.includes("sanagalu") || p.includes("శనగలు") ||
+      p.includes("undrallu") || p.includes("ఉండ్రాళ్ళు") ||
+      p.includes("kesari")
+    );
+  };
+
+  const isGeneralDonationItem = (item: any) => {
+    const p = ((item.seva || item.purpose || "") + "").toLowerCase();
+    return p.includes("general") || p.includes("సాధారణ") || (!isSaswathaItem(item) && !isAnnadanamItem(item) && !isPrasadamItem(item));
+  };
 
   // Gallery Upload state
   const [galleryUploadFile, setGalleryUploadFile] = useState<File | null>(null);
@@ -97,78 +127,46 @@ const Admin = () => {
   const [galleryCategory, setGalleryCategory] = useState("Alankaram");
   const [gallerySpan, setGallerySpan] = useState("col-span-1 row-span-1");
   const [isGalleryUploading, setIsGalleryUploading] = useState(false);
-  
-  // Panchangam Editor state
-  const [panchangam, setPanchangam] = useState({
-    date: "2026-08-28",
-    tithi: "Krishna Paksha Dwitiya (until 04:12 PM)",
-    nakshatram: "Purvashadha (until 02:40 PM)",
-    yogam: "Siddha (until 11:20 AM)",
-    karanam: "Taitila (until 04:12 PM)",
-    rahuKalam: "10:30 AM – 12:00 PM",
-    varjyam: "08:15 PM – 09:45 PM"
-  });
-
-  // Modal event creation state
-  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
-  const [newEvent, setNewEvent] = useState({ title: "", date: "", time: "", type: "Festival" });
-
-  const fetchFirestoreData = async () => {
+  const fetchFirestoreData = async (isManualSync = false) => {
     setIsDataLoading(true);
     if (!db) {
       // Local fallback mode: load from localStorage
       const localB = JSON.parse(localStorage.getItem("local_bookings") || "[]");
       const localD = JSON.parse(localStorage.getItem("local_donations") || "[]");
-      const localE = JSON.parse(localStorage.getItem("local_events") || JSON.stringify(initialEvents));
-      const localF = JSON.parse(localStorage.getItem("local_feedbacks") || "[]");
       const localG = JSON.parse(localStorage.getItem("local_gallery") || "[]");
 
       setBookings(localB);
       setDonations(localD);
-      setEvents(localE);
-      setFeedbacks(localF);
       setGalleryImages(localG);
       setIsDataLoading(false);
+      if (isManualSync) toast.success("Local records synchronized!");
       return;
     }
 
+    // 1. Fetch Bookings
     try {
-      // Fetch Bookings
       const bookingsSnap = await getDocs(collection(db, "bookings"));
       const bookingsList = bookingsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setBookings(bookingsList);
+    } catch (err) {
+      console.warn("Bookings fetch error, using local fallback:", err);
+      const localB = JSON.parse(localStorage.getItem("local_bookings") || "[]");
+      setBookings(localB);
+    }
 
-      // Fetch Donations
+    // 2. Fetch Donations
+    try {
       const donationsSnap = await getDocs(collection(db, "donations"));
       const donationsList = donationsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setDonations(donationsList);
+    } catch (err) {
+      console.warn("Donations fetch error, using local fallback:", err);
+      const localD = JSON.parse(localStorage.getItem("local_donations") || "[]");
+      setDonations(localD);
+    }
 
-      // Fetch Events
-      const eventsSnap = await getDocs(collection(db, "events"));
-      const eventsList = eventsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      if (eventsList.length > 0) {
-        setEvents(eventsList);
-      } else {
-        const defaultEvents = initialEvents;
-        for (const ev of defaultEvents) {
-          await addDoc(collection(db, "events"), {
-            title: ev.title,
-            date: ev.date,
-            time: ev.time,
-            type: ev.type,
-            status: ev.status
-          });
-        }
-        const freshSnap = await getDocs(collection(db, "events"));
-        setEvents(freshSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-      }
-
-      // Fetch Feedbacks
-      const feedbacksSnap = await getDocs(collection(db, "feedbacks"));
-      const feedbacksList = feedbacksSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setFeedbacks(feedbacksList);
-
-      // Fetch Gallery Images
+    // 3. Fetch Gallery Images
+    try {
       try {
         const galleryQuery = query(collection(db, "gallery"), orderBy("createdAt", "desc"));
         const gallerySnap = await getDocs(galleryQuery);
@@ -177,13 +175,22 @@ const Admin = () => {
       } catch (galleryErr) {
         const gallerySnap = await getDocs(collection(db, "gallery"));
         const galleryList = gallerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        galleryList.sort((a: any, b: any) => {
+          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return timeB - timeA;
+        });
         setGalleryImages(galleryList);
       }
-    } catch (error) {
-      console.error("Error fetching Firestore collections:", error);
-      toast.error("Failed to query live Firestore database records.");
-    } finally {
-      setIsDataLoading(false);
+    } catch (err) {
+      console.warn("Gallery fetch error, using local fallback:", err);
+      const localG = JSON.parse(localStorage.getItem("local_gallery") || "[]");
+      setGalleryImages(localG);
+    }
+
+    setIsDataLoading(false);
+    if (isManualSync) {
+      toast.success("Live database synchronized successfully!");
     }
   };
 
@@ -278,6 +285,7 @@ const Admin = () => {
   };
 
   const handleDeleteSeva = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this seva booking?")) return;
     if (db) {
       try {
         const docRef = doc(db, "bookings", id);
@@ -296,111 +304,23 @@ const Admin = () => {
     setBookings(prev => prev.filter(b => b.id !== id));
   };
 
-  // Feedback actions
-  const handleResolveFeedback = async (id: any) => {
-    const target = feedbacks.find(f => f.id === id);
-    const updatedStatus = target?.status === "New" ? "Resolved" : "New";
-
+  const handleDeleteDonation = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this donation record?")) return;
     if (db) {
       try {
-        const docRef = doc(db, "feedbacks", id);
-        await updateDoc(docRef, { status: updatedStatus });
-        toast.success("Feedback status updated in Firestore!");
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to update status in Firestore.");
-        return;
-      }
-    } else {
-      const localF = feedbacks.map(f => f.id === id ? { ...f, status: updatedStatus } : f);
-      localStorage.setItem("local_feedbacks", JSON.stringify(localF));
-    }
-    
-    setFeedbacks(prev => 
-      prev.map(f => f.id === id ? { ...f, status: updatedStatus } : f)
-    );
-  };
-
-  const handleDeleteFeedback = async (id: any) => {
-    if (db) {
-      try {
-        const docRef = doc(db, "feedbacks", id);
+        const docRef = doc(db, "donations", id);
         await deleteDoc(docRef);
-        toast.success("Deleted query from Firestore!");
+        toast.success("Deleted donation record from Firestore!");
       } catch (err) {
         console.error(err);
-        toast.error("Failed to delete from Firestore.");
+        toast.error("Firestore delete failed.");
         return;
       }
     } else {
-      const localF = feedbacks.filter(f => f.id !== id);
-      localStorage.setItem("local_feedbacks", JSON.stringify(localF));
+      const localD = donations.filter(d => d.id !== id);
+      localStorage.setItem("local_donations", JSON.stringify(localD));
     }
-    
-    setFeedbacks(prev => prev.filter(f => f.id !== id));
-  };
-
-  // Event actions
-  const handleAddEventSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newEvent.title || !newEvent.date || !newEvent.time) {
-      toast.error("All event fields are required!");
-      return;
-    }
-    
-    const eventPayload = {
-      title: newEvent.title,
-      date: newEvent.date,
-      time: newEvent.time,
-      type: newEvent.type,
-      status: "Active"
-    };
-
-    if (db) {
-      try {
-        const docRef = await addDoc(collection(db, "events"), eventPayload);
-        setEvents(prev => [...prev, { id: docRef.id, ...eventPayload }]);
-        toast.success("Event stored in Firestore!");
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to store event in Firestore.");
-        return;
-      }
-    } else {
-      const createdEvent = { id: Date.now().toString(), ...eventPayload };
-      const localE = [...events, createdEvent];
-      localStorage.setItem("local_events", JSON.stringify(localE));
-      setEvents(localE);
-    }
-    
-    setIsEventModalOpen(false);
-    setNewEvent({ title: "", date: "", time: "", type: "Festival" });
-  };
-
-  const handleDeleteEvent = async (id: any, title: string) => {
-    if (db) {
-      try {
-        const docRef = doc(db, "events", id);
-        await deleteDoc(docRef);
-        toast.success(`Event "${title}" deleted from Firestore!`);
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to delete event.");
-        return;
-      }
-    } else {
-      const localE = events.filter(e => e.id !== id);
-      localStorage.setItem("local_events", JSON.stringify(localE));
-      toast.error(`Event "${title}" removed.`);
-    }
-    
-    setEvents(prev => prev.filter(e => e.id !== id));
-  };
-
-  // Panchangam Update
-  const handleUpdatePanchangam = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success("Daily Panchangam details updated successfully!");
+    setDonations(prev => prev.filter(d => d.id !== id));
   };
 
   // Gallery Actions (Cloudinary Upload & Firestore Sync)
@@ -680,13 +600,12 @@ const Admin = () => {
           {/* Navigation Links */}
           <nav className="p-4 space-y-1">
             {[
-              { id: "dashboard", label: "Overview", icon: LayoutDashboard },
-              { id: "sevas", label: "Seva Bookings", icon: BookOpen },
-              { id: "donations", label: "Donations Log", icon: DollarSign },
-              { id: "gallery", label: "Temple Gallery", icon: ImageIcon },
-              { id: "events", label: "Temple Events", icon: Calendar },
-              { id: "feedback", label: "Queries / Inbox", icon: MessageSquare },
-              { id: "panchangam", label: "Panchangam Editor", icon: FileText }
+              { id: "dashboard", label: "Overview", icon: LayoutDashboard, count: null },
+              { id: "saswatha", label: "Saswatha & Sevas", icon: Sparkles, count: bookings.filter(isSaswathaItem).length, badgeColor: "bg-amber-500/20 text-amber-300 border border-amber-500/30" },
+              { id: "annadanam", label: "Annadanam (అన్నదానం)", icon: Utensils, count: donations.filter(isAnnadanamItem).length, badgeColor: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" },
+              { id: "prasadam", label: "Prasadam Bookings", icon: Package, count: bookings.filter(isPrasadamItem).length, badgeColor: "bg-orange-500/20 text-orange-300 border border-orange-500/30" },
+              { id: "general_donations", label: "General Donations", icon: Heart, count: donations.filter(isGeneralDonationItem).length, badgeColor: "bg-purple-500/20 text-purple-300 border border-purple-500/30" },
+              { id: "gallery", label: "Temple Gallery", icon: ImageIcon, count: galleryImages.length }
             ].map(tab => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -694,14 +613,25 @@ const Admin = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`w-full px-4 py-3 rounded-xl text-xs font-medium transition-all flex items-center gap-3 border cursor-pointer text-left ${
+                  className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all flex items-center justify-between border cursor-pointer text-left ${
                     isActive
                       ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/10 font-bold"
                       : "bg-transparent border-transparent text-muted-foreground hover:text-white hover:bg-white/5"
                   }`}
                 >
-                  <Icon className="w-4 h-4 shrink-0" />
-                  {tab.label}
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Icon className="w-4 h-4 shrink-0" />
+                    <span className="truncate">{tab.label}</span>
+                  </div>
+                  {tab.count !== null && tab.count !== undefined && (
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
+                      isActive 
+                        ? "bg-black/40 text-white" 
+                        : (tab.badgeColor || "bg-white/10 text-stone-300")
+                    }`}>
+                      {tab.count}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -735,18 +665,17 @@ const Admin = () => {
           <div>
             <h1 className="text-lg font-bold font-serif text-white uppercase tracking-wider">
               {activeTab === "dashboard" && "Overview Command Center"}
-              {activeTab === "sevas" && "Seva Bookings Management"}
-              {activeTab === "donations" && "Donation Records Ledger"}
-              {activeTab === "gallery" && "Temple Gallery & Cloudinary Media Manager"}
-              {activeTab === "events" && "Scheduled Temple Events"}
-              {activeTab === "feedback" && "Devotee Message Queries"}
-              {activeTab === "panchangam" && "Traditional Panchangam Editor"}
+              {activeTab === "saswatha" && "Saswatha Abhishekam (₹5,000) & Special Sevas"}
+              {activeTab === "annadanam" && "Annadanam Contributions (అన్నదానం)"}
+              {activeTab === "prasadam" && "Prasadam Bookings Management (ప్రసాదాలు)"}
+              {activeTab === "general_donations" && "General Donations Ledger (సాధారణ విరాళాలు)"}
+              {activeTab === "gallery" && "Temple Gallery Publisher"}
             </h1>
           </div>
           
           <div className="flex items-center gap-4">
             <button
-              onClick={fetchFirestoreData}
+              onClick={() => fetchFirestoreData(true)}
               disabled={isDataLoading}
               className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-primary border border-white/5 hover:scale-103 active:scale-97 transition-all flex items-center gap-1.5 cursor-pointer text-[10px] font-semibold"
               title="Sync dynamic database records"
@@ -812,37 +741,36 @@ const Admin = () => {
                   </div>
                 </div>
 
-                {/* Stat 3 */}
-                <div className="p-6 rounded-2xl glass-dark border border-white/10 relative overflow-hidden group shadow-lg hover:border-primary/30 transition-all">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
+                {/* Stat 3: Annadanam */}
+                <div className="p-6 rounded-2xl glass-dark border border-white/10 relative overflow-hidden group shadow-lg hover:border-emerald-500/30 transition-all">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all" />
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-muted-foreground text-xs uppercase tracking-widest">Active Events</p>
-                      <h3 className="text-3xl font-black text-white mt-2">{events.length}</h3>
-                      <p className="text-muted-foreground text-xs mt-2">
-                        Upcoming celebrations
+                      <p className="text-muted-foreground text-xs uppercase tracking-widest">Annadanam Donors</p>
+                      <h3 className="text-3xl font-black text-white mt-2">{donations.filter(isAnnadanamItem).length}</h3>
+                      <p className="text-emerald-400 text-xs mt-2 font-medium">
+                        ₹{donations.filter(isAnnadanamItem).reduce((sum, d) => sum + (Number(d.amount) || 0), 0).toLocaleString('en-IN')} Raised
                       </p>
                     </div>
-                    <div className="p-3.5 rounded-xl bg-primary/10 text-primary border border-primary/20">
-                      <Calendar className="w-5 h-5" />
+                    <div className="p-3.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <Utensils className="w-5 h-5" />
                     </div>
                   </div>
                 </div>
 
-                {/* Stat 4 */}
-                <div className="p-6 rounded-2xl glass-dark border border-white/10 relative overflow-hidden group shadow-lg hover:border-primary/30 transition-all">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
+                {/* Stat 4: Prasadam Bookings */}
+                <div className="p-6 rounded-2xl glass-dark border border-white/10 relative overflow-hidden group shadow-lg hover:border-orange-500/30 transition-all">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/5 rounded-full blur-2xl group-hover:bg-orange-500/10 transition-all" />
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-muted-foreground text-xs uppercase tracking-widest">New Queries</p>
-                      <h3 className="text-3xl font-black text-white mt-2">{feedbacks.filter(f => f.status === "New").length}</h3>
-                      <p className="text-amber-400 text-xs mt-2 flex items-center gap-1 font-medium">
-                        <Clock className="w-3.5 h-3.5" />
-                        Requires response
+                      <p className="text-muted-foreground text-xs uppercase tracking-widest">Prasadam Orders</p>
+                      <h3 className="text-3xl font-black text-white mt-2">{bookings.filter(isPrasadamItem).length}</h3>
+                      <p className="text-orange-400 text-xs mt-2 font-medium">
+                        {galleryImages.length} Gallery Photos
                       </p>
                     </div>
-                    <div className="p-3.5 rounded-xl bg-primary/10 text-primary border border-primary/20">
-                      <MessageSquare className="w-5 h-5" />
+                    <div className="p-3.5 rounded-xl bg-orange-500/10 text-orange-400 border border-orange-500/20">
+                      <Package className="w-5 h-5" />
                     </div>
                   </div>
                 </div>
@@ -929,10 +857,10 @@ const Admin = () => {
                   </div>
 
                   <button 
-                    onClick={() => setActiveTab("sevas")}
+                    onClick={() => setActiveTab("saswatha")}
                     className="w-full mt-6 py-2.5 rounded-xl border border-primary/20 text-primary text-xs font-serif font-black tracking-widest uppercase hover:bg-primary hover:text-stone-950 transition-all text-center cursor-pointer"
                   >
-                    View All Seva Bookings
+                    View Saswatha & Seva Bookings
                   </button>
                 </div>
 
@@ -941,13 +869,20 @@ const Admin = () => {
             </div>
           )}
 
-          {/* TAB 2: SEVA BOOKINGS */}
-          {activeTab === "sevas" && (
+          {/* TAB 2: SASWATHA & SPECIAL SEVAS (₹5,000 & ₹2,500) */}
+          {activeTab === "saswatha" && (
             <div className="space-y-6 animate-fade-rise">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-xl font-bold font-serif text-white">Devotee Seva Bookings</h3>
-                  <p className="text-xs text-muted-foreground mt-1">Special & Annual Sevas (₹2,500 / ₹5,000 & Pooja Registrations)</p>
+                  <h3 className="text-xl font-bold font-serif text-white flex items-center gap-2">
+                    <span>Saswatha & Special Sevas</span>
+                    <span className="text-xs bg-amber-500/10 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full font-sans font-bold">
+                      ₹5,000 / ₹2,500
+                    </span>
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Lifetime Abhishekam (₹5,000) & Ganesha Navaratri Abhishekam (₹2,500) Registrations
+                  </p>
                 </div>
                 
                 {/* Search */}
@@ -955,114 +890,140 @@ const Admin = () => {
                   <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    value={bookingSearch}
-                    onChange={e => setBookingSearch(e.target.value)}
-                    placeholder="Search name, phone, address..."
+                    value={saswathaSearch}
+                    onChange={e => setSaswathaSearch(e.target.value)}
+                    placeholder="Search name, phone, gotram, address..."
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-white/30 focus:border-primary/50 focus:outline-none transition-colors text-xs"
                   />
                 </div>
               </div>
 
-              {/* Booking Data Grid */}
+              {/* Stats Bar */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="p-4 rounded-xl bg-zinc-900/60 border border-amber-500/20 flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Saswatha Abhishekam (₹5,000)</p>
+                    <p className="text-xl font-bold text-white mt-1">
+                      {bookings.filter(b => ((b.seva || "") + "").toLowerCase().includes("saswatha") || Number(b.amount) === 5000).length} Devotees
+                    </p>
+                  </div>
+                  <span className="p-2.5 rounded-lg bg-amber-500/10 text-amber-400 font-serif font-black text-xs border border-amber-500/20">₹5K</span>
+                </div>
+
+                <div className="p-4 rounded-xl bg-zinc-900/60 border border-primary/20 flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Navaratri Seva (₹2,500)</p>
+                    <p className="text-xl font-bold text-white mt-1">
+                      {bookings.filter(b => ((b.seva || "") + "").toLowerCase().includes("navaratri") || Number(b.amount) === 2500).length} Devotees
+                    </p>
+                  </div>
+                  <span className="p-2.5 rounded-lg bg-primary/10 text-primary font-serif font-black text-xs border border-primary/20">₹2.5K</span>
+                </div>
+
+                <div className="p-4 rounded-xl bg-zinc-900/60 border border-amber-500/30 flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Total Seva Revenue</p>
+                    <p className="text-xl font-bold text-amber-400 mt-1 font-mono">
+                      ₹{bookings.filter(isSaswathaItem).reduce((sum, b) => sum + (Number(b.amount) || 0), 0).toLocaleString('en-IN')}
+                    </p>
+                  </div>
+                  <Sparkles className="w-5 h-5 text-amber-400" />
+                </div>
+              </div>
+
+              {/* Data Table */}
               <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/30">
-                <table className="w-full min-w-[880px]">
+                <table className="w-full min-w-[900px]">
                   <thead>
                     <tr className="border-b border-white/10 bg-zinc-900/50">
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">ID</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Devotee Name & Phone</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Postal Address</th>
-                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Amount (₹)</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Gotram / Nakshatram</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Seva Ritual</th>
-                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Txn ID / Date</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Amount (₹)</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Date / Txn ID</th>
                       <th className="py-4 px-4 text-center text-xs font-serif font-bold uppercase tracking-widest text-primary">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {bookings.filter(b => {
-                      const s = (b.seva || "").toLowerCase();
-                      const isActualSeva = !s.includes("general donation") && !s.includes("సాధారణ విరాళం");
-                      const query = bookingSearch.toLowerCase();
-                      const matches = 
-                        (b.name || "").toLowerCase().includes(query) ||
-                        (b.phone || "").toLowerCase().includes(query) ||
-                        (b.address || "").toLowerCase().includes(query) ||
-                        (b.gotram || "").toLowerCase().includes(query) ||
-                        (b.seva || "").toLowerCase().includes(query);
-                      return isActualSeva && matches;
+                      if (!isSaswathaItem(b)) return false;
+                      const q = saswathaSearch.toLowerCase();
+                      return (
+                        (b.name || "").toLowerCase().includes(q) ||
+                        (b.phone || "").toLowerCase().includes(q) ||
+                        (b.address || "").toLowerCase().includes(q) ||
+                        (b.gotram || "").toLowerCase().includes(q) ||
+                        (b.seva || "").toLowerCase().includes(q) ||
+                        (b.transactionId || "").toLowerCase().includes(q)
+                      );
                     }).length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="py-8 text-center text-xs text-muted-foreground">
-                          No Seva bookings found matching your search. (General donations appear in Donations Ledger)
+                        <td colSpan={8} className="py-12 text-center text-xs text-muted-foreground">
+                          No Saswatha or Special Seva bookings found matching your search.
                         </td>
                       </tr>
                     ) : (
                       bookings
                         .filter(b => {
-                          const s = (b.seva || "").toLowerCase();
-                          const isActualSeva = !s.includes("general donation") && !s.includes("సాధారణ విరాళం");
-                          const query = bookingSearch.toLowerCase();
-                          const matches = 
-                            (b.name || "").toLowerCase().includes(query) ||
-                            (b.phone || "").toLowerCase().includes(query) ||
-                            (b.address || "").toLowerCase().includes(query) ||
-                            (b.gotram || "").toLowerCase().includes(query) ||
-                            (b.seva || "").toLowerCase().includes(query);
-                          return isActualSeva && matches;
-                        })
-                        .map((bk) => {
-                          const matched = donations.find(d => 
-                            (d.transactionId && bk.transactionId && d.transactionId === bk.transactionId) ||
-                            (d.phone && bk.phone && d.phone === bk.phone) ||
-                            (d.name && bk.name && d.name === bk.name)
-                          );
-                          const amountVal = bk.amount || matched?.amount;
-
+                          if (!isSaswathaItem(b)) return false;
+                          const q = saswathaSearch.toLowerCase();
                           return (
-                            <tr key={bk.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                              <td className="py-4 px-4 text-xs font-semibold text-white/70 font-mono">{bk.id}</td>
-                              <td className="py-4 px-4">
-                                <p className="text-xs font-bold text-white">{bk.name}</p>
-                                {bk.phone && (
-                                  <p className="text-[11px] text-amber-400/90 font-mono mt-0.5">
-                                    📞 {bk.phone}
-                                  </p>
-                                )}
-                              </td>
-                              <td className="py-4 px-4 text-xs text-stone-300 max-w-[180px]">
-                                {bk.address ? (
-                                  <span className="line-clamp-2" title={bk.address}>📍 {bk.address}</span>
-                                ) : (
-                                  <span className="text-zinc-600 italic">—</span>
-                                )}
-                              </td>
-                              <td className="py-4 px-4">
-                                <span className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/25 px-2.5 py-1 rounded-lg inline-block font-mono">
-                                  ₹{amountVal ? Number(amountVal).toLocaleString('en-IN') : "—"}
-                                </span>
-                              </td>
-                              <td className="py-4 px-4 text-xs text-muted-foreground">
-                                {bk.gotram ? `${bk.gotram} ${bk.nakshatram ? `(${bk.nakshatram})` : ""}` : "—"}
-                              </td>
-                              <td className="py-4 px-4 text-xs text-white font-medium">{bk.seva}</td>
-                              <td className="py-4 px-4">
-                                <p className="text-[10px] text-amber-500/80 font-mono tracking-wider select-all">
-                                  {bk.transactionId || "Manual Proof"}
-                                </p>
-                                {bk.date && <p className="text-[10px] text-zinc-500 mt-0.5">{bk.date}</p>}
-                              </td>
-                              <td className="py-4 px-4 text-center">
-                                <button
-                                  onClick={() => handleDeleteSeva(bk.id)}
-                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer inline-flex items-center justify-center"
-                                  title="Delete Record"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              </td>
-                            </tr>
+                            (b.name || "").toLowerCase().includes(q) ||
+                            (b.phone || "").toLowerCase().includes(q) ||
+                            (b.address || "").toLowerCase().includes(q) ||
+                            (b.gotram || "").toLowerCase().includes(q) ||
+                            (b.seva || "").toLowerCase().includes(q) ||
+                            (b.transactionId || "").toLowerCase().includes(q)
                           );
                         })
+                        .map((bk) => (
+                          <tr key={bk.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                            <td className="py-4 px-4 text-xs font-semibold text-white/70 font-mono">{bk.id}</td>
+                            <td className="py-4 px-4">
+                              <p className="text-xs font-bold text-white">{bk.name}</p>
+                              {bk.phone && (
+                                <p className="text-[11px] text-amber-400/90 font-mono mt-0.5">📞 {bk.phone}</p>
+                              )}
+                            </td>
+                            <td className="py-4 px-4 text-xs text-stone-300 max-w-[180px]">
+                              {bk.address ? (
+                                <span className="line-clamp-2" title={bk.address}>📍 {bk.address}</span>
+                              ) : (
+                                <span className="text-zinc-600 italic">—</span>
+                              )}
+                            </td>
+                            <td className="py-4 px-4 text-xs text-muted-foreground">
+                              {bk.gotram ? `${bk.gotram} ${bk.nakshatram ? `(${bk.nakshatram})` : ""}` : "—"}
+                            </td>
+                            <td className="py-4 px-4">
+                              <span className="text-xs font-bold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg inline-block">
+                                {bk.seva}
+                              </span>
+                            </td>
+                            <td className="py-4 px-4">
+                              <span className="text-xs font-bold text-amber-400 font-mono">
+                                ₹{Number(bk.amount || 5000).toLocaleString('en-IN')}
+                              </span>
+                            </td>
+                            <td className="py-4 px-4">
+                              <p className="text-[10px] text-amber-500/80 font-mono tracking-wider select-all">
+                                {bk.transactionId || "Manual Proof"}
+                              </p>
+                              {bk.date && <p className="text-[10px] text-zinc-500 mt-0.5">{bk.date}</p>}
+                            </td>
+                            <td className="py-4 px-4 text-center">
+                              <button
+                                onClick={() => handleDeleteSeva(bk.id)}
+                                className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer inline-flex items-center justify-center"
+                                title="Delete Record"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))
                     )}
                   </tbody>
                 </table>
@@ -1070,13 +1031,20 @@ const Admin = () => {
             </div>
           )}
 
-          {/* TAB 3: DONATION LOG */}
-          {activeTab === "donations" && (
+          {/* TAB 3: ANNADANAM (అన్నదానం) */}
+          {activeTab === "annadanam" && (
             <div className="space-y-6 animate-fade-rise">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-xl font-bold font-serif text-white">Donations Ledger</h3>
-                  <p className="text-xs text-muted-foreground mt-1">Audit trail of financial contributions (General & Seva Donations)</p>
+                  <h3 className="text-xl font-bold font-serif text-white flex items-center gap-2">
+                    <span>Annadanam Donor Ledger</span>
+                    <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-sans font-bold">
+                      అన్నదానం
+                    </span>
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Devotee Annadanam sponsorships & Nitya Anna Prasadam donor records
+                  </p>
                 </div>
                 
                 {/* Search */}
@@ -1084,168 +1052,433 @@ const Admin = () => {
                   <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    value={donationSearch}
-                    onChange={e => setDonationSearch(e.target.value)}
-                    placeholder="Search by donor name, phone, or address..."
+                    value={annadanamSearch}
+                    onChange={e => setAnnadanamSearch(e.target.value)}
+                    placeholder="Search donor name, phone, address..."
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-white/30 focus:border-primary/50 focus:outline-none transition-colors text-xs"
                   />
                 </div>
               </div>
 
-              {/* Category Filter Pills */}
-              <div className="flex flex-wrap items-center gap-2 pt-1 pb-2">
-                {[
-                  { id: "all", label: "All Contributions", icon: "✨" },
-                  { id: "general", label: "General Donations", icon: "🪙" },
-                  { id: "saswatha", label: "₹5,000 Saswatha Abhishekam", icon: "🪔" },
-                  { id: "navaratri", label: "₹2,500 Ganesha Navaratri", icon: "🌺" },
-                  { id: "prasadam", label: "Prasadam & Annadanam", icon: "🍚" },
-                ].map((cat) => {
-                  const isActive = donationCategoryFilter === cat.id;
-                  
-                  // Calculate category count and amount
-                  const catItems = donations.filter(d => {
-                    const purpose = (d.purpose || "").toLowerCase();
-                    const amt = Number(d.amount);
-                    if (cat.id === "all") return true;
-                    if (cat.id === "general") return purpose.includes("general donation") || purpose.includes("సాధారణ విరాళం");
-                    if (cat.id === "saswatha") return purpose.includes("saswatha") || purpose.includes("శాశ్వత") || amt === 5000;
-                    if (cat.id === "navaratri") return purpose.includes("navaratri") || purpose.includes("నవరాత్రి") || amt === 2500;
-                    if (cat.id === "prasadam") {
-                      return (
-                        purpose.includes("annadanam") || purpose.includes("అన్నదానం") ||
-                        purpose.includes("pulihora") || purpose.includes("పులిహోర") ||
-                        purpose.includes("pongal") || purpose.includes("పొంగలి") ||
-                        purpose.includes("sanagalu") || purpose.includes("శనగలు") ||
-                        purpose.includes("undrallu") || purpose.includes("ఉండ్రాళ్ళు") ||
-                        purpose.includes("kesari")
-                      );
-                    }
-                    return true;
-                  });
+              {/* Stats Bar */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="p-4 rounded-xl bg-zinc-900/60 border border-emerald-500/20 flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Total Annadanam Donors</p>
+                    <p className="text-xl font-bold text-white mt-1">
+                      {donations.filter(isAnnadanamItem).length} Contributions
+                    </p>
+                  </div>
+                  <Utensils className="w-5 h-5 text-emerald-400" />
+                </div>
 
-                  const catTotal = catItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+                <div className="p-4 rounded-xl bg-zinc-900/60 border border-emerald-500/30 flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Total Annadanam Funds</p>
+                    <p className="text-xl font-bold text-emerald-400 mt-1 font-mono">
+                      ₹{donations.filter(isAnnadanamItem).reduce((sum, d) => sum + (Number(d.amount) || 0), 0).toLocaleString('en-IN')}
+                    </p>
+                  </div>
+                  <DollarSign className="w-5 h-5 text-emerald-400" />
+                </div>
 
-                  return (
-                    <button
-                      key={cat.id}
-                      onClick={() => setDonationCategoryFilter(cat.id as any)}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 border cursor-pointer ${
-                        isActive
-                          ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 scale-[1.02] font-bold"
-                          : "bg-zinc-900/80 border-white/10 text-muted-foreground hover:text-white hover:bg-zinc-800"
-                      }`}
-                    >
-                      <span>{cat.icon}</span>
-                      <span>{cat.label}</span>
-                      <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${
-                        isActive ? "bg-black/30 text-white font-bold" : "bg-white/10 text-stone-300"
-                      }`}>
-                        {catItems.length}
-                      </span>
-                      {catTotal > 0 && (
-                        <span className={`text-[10px] font-mono ${
-                          isActive ? "text-primary-foreground/90 font-black" : "text-amber-400 font-bold"
-                        }`}>
-                          (₹{catTotal.toLocaleString('en-IN')})
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+                <div className="p-4 rounded-xl bg-zinc-900/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Online vs Manual</p>
+                    <p className="text-sm font-bold text-white mt-1">
+                      Online: {donations.filter(d => isAnnadanamItem(d) && d.method === "Online").length} | Manual: {donations.filter(d => isAnnadanamItem(d) && d.method !== "Online").length}
+                    </p>
+                  </div>
+                  <FileText className="w-5 h-5 text-muted-foreground" />
+                </div>
               </div>
 
-              {/* Donations Ledger Grid */}
+              {/* Data Table */}
               <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/30">
-                <table className="w-full min-w-[880px]">
+                <table className="w-full min-w-[900px]">
+                  <thead>
+                    <tr className="border-b border-white/10 bg-zinc-900/50">
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Receipt No</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Donor Name & Contact</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Postal Address</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Gotram / Nakshatram</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Offering Purpose</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Amount (₹)</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Date / Method</th>
+                      <th className="py-4 px-4 text-center text-xs font-serif font-bold uppercase tracking-widest text-primary">Proof / Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {donations.filter(d => {
+                      if (!isAnnadanamItem(d)) return false;
+                      const q = annadanamSearch.toLowerCase();
+                      return (
+                        (d.name || "").toLowerCase().includes(q) ||
+                        (d.phone || "").toLowerCase().includes(q) ||
+                        (d.address || "").toLowerCase().includes(q) ||
+                        (d.purpose || "").toLowerCase().includes(q) ||
+                        (d.receiptNo || "").toLowerCase().includes(q)
+                      );
+                    }).length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="py-12 text-center text-xs text-muted-foreground">
+                          No Annadanam donations found matching your search.
+                        </td>
+                      </tr>
+                    ) : (
+                      donations
+                        .filter(d => {
+                          if (!isAnnadanamItem(d)) return false;
+                          const q = annadanamSearch.toLowerCase();
+                          return (
+                            (d.name || "").toLowerCase().includes(q) ||
+                            (d.phone || "").toLowerCase().includes(q) ||
+                            (d.address || "").toLowerCase().includes(q) ||
+                            (d.purpose || "").toLowerCase().includes(q) ||
+                            (d.receiptNo || "").toLowerCase().includes(q)
+                          );
+                        })
+                        .map((dn) => (
+                          <tr key={dn.receiptNo || dn.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                            <td className="py-4 px-4 text-xs font-semibold text-white font-mono">{dn.receiptNo}</td>
+                            <td className="py-4 px-4">
+                              <p className="text-xs font-bold text-white">{dn.name}</p>
+                              {dn.phone && (
+                                <p className="text-[11px] text-emerald-400/90 font-mono mt-0.5">📞 {dn.phone}</p>
+                              )}
+                            </td>
+                            <td className="py-4 px-4 text-xs text-stone-300 max-w-[180px]">
+                              {dn.address ? (
+                                <span className="line-clamp-2" title={dn.address}>📍 {dn.address}</span>
+                              ) : (
+                                <span className="text-zinc-600 italic">—</span>
+                              )}
+                            </td>
+                            <td className="py-4 px-4 text-xs text-muted-foreground">
+                              {dn.gotram ? `${dn.gotram} ${dn.nakshatram ? `(${dn.nakshatram})` : ""}` : "—"}
+                            </td>
+                            <td className="py-4 px-4">
+                              <span className="text-xs font-medium text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg inline-block">
+                                {dn.purpose}
+                              </span>
+                            </td>
+                            <td className="py-4 px-4">
+                              <span className="text-xs font-bold text-emerald-400 font-mono">
+                                ₹{Number(dn.amount).toLocaleString('en-IN')}
+                              </span>
+                            </td>
+                            <td className="py-4 px-4">
+                              <p className="text-xs text-white">{dn.date}</p>
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-900 border border-white/5 text-white/70 uppercase font-mono mt-0.5 inline-block">
+                                {dn.method || "Online"}
+                              </span>
+                            </td>
+                            <td className="py-4 px-4 text-center">
+                              <div className="flex items-center justify-center gap-2">
+                                {dn.proofUrl && (
+                                  <a
+                                    href={dn.proofUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 text-[10px] font-bold inline-flex items-center gap-1"
+                                    title="View Payment Proof"
+                                  >
+                                    <FileText className="w-3 h-3" /> Slip
+                                  </a>
+                                )}
+                                <button
+                                  onClick={() => handleDeleteDonation(dn.id)}
+                                  className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20"
+                                  title="Delete Record"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: PRASADAM BOOKINGS */}
+          {activeTab === "prasadam" && (
+            <div className="space-y-6 animate-fade-rise">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-bold font-serif text-white flex items-center gap-2">
+                    <span>Prasadam Bookings</span>
+                    <span className="text-xs bg-orange-500/10 text-orange-400 border border-orange-500/30 px-2.5 py-0.5 rounded-full font-sans font-bold">
+                      ప్రసాదాలు
+                    </span>
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Pulihora, Sweet Pongal, Sanagalu, Undrallu daily & special offerings
+                  </p>
+                </div>
+                
+                {/* Search */}
+                <div className="relative w-full sm:max-w-xs">
+                  <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={prasadamSearch}
+                    onChange={e => setPrasadamSearch(e.target.value)}
+                    placeholder="Search prasadam type, devotee, phone..."
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-white/30 focus:border-primary/50 focus:outline-none transition-colors text-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Stats Bar */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="p-4 rounded-xl bg-zinc-900/60 border border-orange-500/20 flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Total Prasadam Orders</p>
+                    <p className="text-xl font-bold text-white mt-1">
+                      {bookings.filter(isPrasadamItem).length} Bookings
+                    </p>
+                  </div>
+                  <Package className="w-5 h-5 text-orange-400" />
+                </div>
+
+                <div className="p-4 rounded-xl bg-zinc-900/60 border border-orange-500/30 flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Total Prasadam Value</p>
+                    <p className="text-xl font-bold text-orange-400 mt-1 font-mono">
+                      ₹{bookings.filter(isPrasadamItem).reduce((sum, b) => sum + (Number(b.amount) || 0), 0).toLocaleString('en-IN')}
+                    </p>
+                  </div>
+                  <DollarSign className="w-5 h-5 text-orange-400" />
+                </div>
+
+                <div className="p-4 rounded-xl bg-zinc-900/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Offerings Menu</p>
+                    <p className="text-xs text-stone-300 mt-1">
+                      Pulihora, Pongal, Sanagalu, Undrallu
+                    </p>
+                  </div>
+                  <Utensils className="w-5 h-5 text-muted-foreground" />
+                </div>
+              </div>
+
+              {/* Data Table */}
+              <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/30">
+                <table className="w-full min-w-[900px]">
+                  <thead>
+                    <tr className="border-b border-white/10 bg-zinc-900/50">
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Order ID</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Devotee Name & Phone</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Postal Address</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Gotram / Nakshatram</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Prasadam Item</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Amount (₹)</th>
+                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Date / Txn ID</th>
+                      <th className="py-4 px-4 text-center text-xs font-serif font-bold uppercase tracking-widest text-primary">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bookings.filter(b => {
+                      if (!isPrasadamItem(b)) return false;
+                      const q = prasadamSearch.toLowerCase();
+                      return (
+                        (b.name || "").toLowerCase().includes(q) ||
+                        (b.phone || "").toLowerCase().includes(q) ||
+                        (b.address || "").toLowerCase().includes(q) ||
+                        (b.gotram || "").toLowerCase().includes(q) ||
+                        (b.seva || "").toLowerCase().includes(q) ||
+                        (b.transactionId || "").toLowerCase().includes(q)
+                      );
+                    }).length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="py-12 text-center text-xs text-muted-foreground">
+                          No Prasadam bookings found matching your search.
+                        </td>
+                      </tr>
+                    ) : (
+                      bookings
+                        .filter(b => {
+                          if (!isPrasadamItem(b)) return false;
+                          const q = prasadamSearch.toLowerCase();
+                          return (
+                            (b.name || "").toLowerCase().includes(q) ||
+                            (b.phone || "").toLowerCase().includes(q) ||
+                            (b.address || "").toLowerCase().includes(q) ||
+                            (b.gotram || "").toLowerCase().includes(q) ||
+                            (b.seva || "").toLowerCase().includes(q) ||
+                            (b.transactionId || "").toLowerCase().includes(q)
+                          );
+                        })
+                        .map((bk) => (
+                          <tr key={bk.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                            <td className="py-4 px-4 text-xs font-semibold text-white/70 font-mono">{bk.id}</td>
+                            <td className="py-4 px-4">
+                              <p className="text-xs font-bold text-white">{bk.name}</p>
+                              {bk.phone && (
+                                <p className="text-[11px] text-orange-400/90 font-mono mt-0.5">📞 {bk.phone}</p>
+                              )}
+                            </td>
+                            <td className="py-4 px-4 text-xs text-stone-300 max-w-[180px]">
+                              {bk.address ? (
+                                <span className="line-clamp-2" title={bk.address}>📍 {bk.address}</span>
+                              ) : (
+                                <span className="text-zinc-600 italic">—</span>
+                              )}
+                            </td>
+                            <td className="py-4 px-4 text-xs text-muted-foreground">
+                              {bk.gotram ? `${bk.gotram} ${bk.nakshatram ? `(${bk.nakshatram})` : ""}` : "—"}
+                            </td>
+                            <td className="py-4 px-4">
+                              <span className="text-xs font-bold text-orange-300 bg-orange-500/10 border border-orange-500/20 px-2.5 py-1 rounded-lg inline-block">
+                                {bk.seva}
+                              </span>
+                            </td>
+                            <td className="py-4 px-4">
+                              <span className="text-xs font-bold text-orange-400 font-mono">
+                                ₹{Number(bk.amount || 1000).toLocaleString('en-IN')}
+                              </span>
+                            </td>
+                            <td className="py-4 px-4">
+                              <p className="text-[10px] text-orange-400/80 font-mono tracking-wider select-all">
+                                {bk.transactionId || "Manual Proof"}
+                              </p>
+                              {bk.date && <p className="text-[10px] text-zinc-500 mt-0.5">{bk.date}</p>}
+                            </td>
+                            <td className="py-4 px-4 text-center">
+                              <button
+                                onClick={() => handleDeleteSeva(bk.id)}
+                                className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer inline-flex items-center justify-center"
+                                title="Delete Record"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: GENERAL DONATIONS */}
+          {activeTab === "general_donations" && (
+            <div className="space-y-6 animate-fade-rise">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-bold font-serif text-white flex items-center gap-2">
+                    <span>General Donations Ledger</span>
+                    <span className="text-xs bg-purple-500/10 text-purple-300 border border-purple-500/30 px-2.5 py-0.5 rounded-full font-sans font-bold">
+                      సాధారణ విరాళాలు
+                    </span>
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Temple development, hundi contributions, and general welfare donations
+                  </p>
+                </div>
+                
+                {/* Search */}
+                <div className="relative w-full sm:max-w-xs">
+                  <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={generalSearch}
+                    onChange={e => setGeneralSearch(e.target.value)}
+                    placeholder="Search donor name, receipt no, phone..."
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-white/30 focus:border-primary/50 focus:outline-none transition-colors text-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Stats Bar */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="p-4 rounded-xl bg-zinc-900/60 border border-purple-500/20 flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Total Donors</p>
+                    <p className="text-xl font-bold text-white mt-1">
+                      {donations.filter(isGeneralDonationItem).length} Contributions
+                    </p>
+                  </div>
+                  <Heart className="w-5 h-5 text-purple-400" />
+                </div>
+
+                <div className="p-4 rounded-xl bg-zinc-900/60 border border-purple-500/30 flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Total Donations</p>
+                    <p className="text-xl font-bold text-purple-300 mt-1 font-mono">
+                      ₹{donations.filter(isGeneralDonationItem).reduce((sum, d) => sum + (Number(d.amount) || 0), 0).toLocaleString('en-IN')}
+                    </p>
+                  </div>
+                  <DollarSign className="w-5 h-5 text-purple-400" />
+                </div>
+
+                <div className="p-4 rounded-xl bg-zinc-900/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Average Amount</p>
+                    <p className="text-xl font-bold text-white mt-1 font-mono">
+                      ₹{(() => {
+                        const items = donations.filter(isGeneralDonationItem);
+                        if (items.length === 0) return 0;
+                        const total = items.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+                        return Math.round(total / items.length).toLocaleString('en-IN');
+                      })()}
+                    </p>
+                  </div>
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                </div>
+              </div>
+
+              {/* Data Table */}
+              <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/30">
+                <table className="w-full min-w-[900px]">
                   <thead>
                     <tr className="border-b border-white/10 bg-zinc-900/50">
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Receipt No</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Donor & Contact</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Postal Address</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Amount (₹)</th>
-                      <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Purpose / Seva</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Payment Date</th>
                       <th className="py-4 px-4 text-left text-xs font-serif font-bold uppercase tracking-widest text-primary">Method</th>
-                      <th className="py-4 px-4 text-center text-xs font-serif font-bold uppercase tracking-widest text-primary">Document</th>
+                      <th className="py-4 px-4 text-center text-xs font-serif font-bold uppercase tracking-widest text-primary">Slip / Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {donations.filter(d => {
-                      const purpose = (d.purpose || "").toLowerCase();
-                      const amt = Number(d.amount);
-
-                      // 1. Category Filter
-                      let matchesCat = true;
-                      if (donationCategoryFilter === "general") {
-                        matchesCat = purpose.includes("general donation") || purpose.includes("సాధారణ విరాళం");
-                      } else if (donationCategoryFilter === "saswatha") {
-                        matchesCat = purpose.includes("saswatha") || purpose.includes("శాశ్వత") || amt === 5000;
-                      } else if (donationCategoryFilter === "navaratri") {
-                        matchesCat = purpose.includes("navaratri") || purpose.includes("నవరాత్రి") || amt === 2500;
-                      } else if (donationCategoryFilter === "prasadam") {
-                        matchesCat = (
-                          purpose.includes("annadanam") || purpose.includes("అన్నదానం") ||
-                          purpose.includes("pulihora") || purpose.includes("పులిహోర") ||
-                          purpose.includes("pongal") || purpose.includes("పొంగలి") ||
-                          purpose.includes("sanagalu") || purpose.includes("శనగలు") ||
-                          purpose.includes("undrallu") || purpose.includes("ఉండ్రాళ్ళు") ||
-                          purpose.includes("kesari")
-                        );
-                      }
-
-                      // 2. Search Query Filter
-                      const q = donationSearch.toLowerCase();
-                      const matchesSearch = 
+                      if (!isGeneralDonationItem(d)) return false;
+                      const q = generalSearch.toLowerCase();
+                      return (
                         (d.name || "").toLowerCase().includes(q) ||
                         (d.phone || "").toLowerCase().includes(q) ||
                         (d.address || "").toLowerCase().includes(q) ||
                         (d.purpose || "").toLowerCase().includes(q) ||
-                        (d.receiptNo || "").toLowerCase().includes(q);
-
-                      return matchesCat && matchesSearch;
+                        (d.receiptNo || "").toLowerCase().includes(q)
+                      );
                     }).length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="py-8 text-center text-xs text-muted-foreground">
-                          No matching donation records found for this filter.
+                        <td colSpan={7} className="py-12 text-center text-xs text-muted-foreground">
+                          No general donation records found matching your search.
                         </td>
                       </tr>
                     ) : (
                       donations
                         .filter(d => {
-                          const purpose = (d.purpose || "").toLowerCase();
-                          const amt = Number(d.amount);
-
-                          let matchesCat = true;
-                          if (donationCategoryFilter === "general") {
-                            matchesCat = purpose.includes("general donation") || purpose.includes("సాధారణ విరాళం");
-                          } else if (donationCategoryFilter === "saswatha") {
-                            matchesCat = purpose.includes("saswatha") || purpose.includes("శాశ్వత") || amt === 5000;
-                          } else if (donationCategoryFilter === "navaratri") {
-                            matchesCat = purpose.includes("navaratri") || purpose.includes("నవరాత్రి") || amt === 2500;
-                          } else if (donationCategoryFilter === "prasadam") {
-                            matchesCat = (
-                              purpose.includes("annadanam") || purpose.includes("అన్నదానం") ||
-                              purpose.includes("pulihora") || purpose.includes("పులిహోర") ||
-                              purpose.includes("pongal") || purpose.includes("పొంగలి") ||
-                              purpose.includes("sanagalu") || purpose.includes("శనగలు") ||
-                              purpose.includes("undrallu") || purpose.includes("ఉండ్రాళ్ళు") ||
-                              purpose.includes("kesari")
-                            );
-                          }
-
-                          const q = donationSearch.toLowerCase();
-                          const matchesSearch = 
+                          if (!isGeneralDonationItem(d)) return false;
+                          const q = generalSearch.toLowerCase();
+                          return (
                             (d.name || "").toLowerCase().includes(q) ||
                             (d.phone || "").toLowerCase().includes(q) ||
                             (d.address || "").toLowerCase().includes(q) ||
                             (d.purpose || "").toLowerCase().includes(q) ||
-                            (d.receiptNo || "").toLowerCase().includes(q);
-
-                          return matchesCat && matchesSearch;
+                            (d.receiptNo || "").toLowerCase().includes(q)
+                          );
                         })
                         .map((dn) => (
-                          <tr key={dn.receiptNo} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                          <tr key={dn.receiptNo || dn.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                             <td className="py-4 px-4 text-xs font-semibold text-white font-mono">{dn.receiptNo}</td>
                             <td className="py-4 px-4">
                               <p className="text-xs font-bold text-white">{dn.name}</p>
@@ -1265,33 +1498,33 @@ const Admin = () => {
                                 ₹{Number(dn.amount).toLocaleString('en-IN')}
                               </span>
                             </td>
-                            <td className="py-4 px-4 text-xs text-muted-foreground">{dn.purpose}</td>
                             <td className="py-4 px-4 text-xs text-muted-foreground">{dn.date}</td>
                             <td className="py-4 px-4">
                               <span className="text-[10px] px-2 py-0.5 rounded bg-zinc-900 border border-white/5 text-white/70 uppercase">
-                                {dn.method}
+                                {dn.method || "Online"}
                               </span>
                             </td>
                             <td className="py-4 px-4 text-center">
-                              {dn.proofUrl ? (
-                                <a
-                                  href={dn.proofUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-primary border border-primary/20 text-[10px] font-serif font-black tracking-widest uppercase hover:scale-103 active:scale-97 transition-all cursor-pointer inline-flex items-center gap-1.5"
-                                >
-                                  <FileText className="w-3 h-3" />
-                                  Proof / Slip
-                                </a>
-                              ) : (
+                              <div className="flex items-center justify-center gap-2">
+                                {dn.proofUrl && (
+                                  <a
+                                    href={dn.proofUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-primary border border-primary/20 text-[10px] font-bold inline-flex items-center gap-1"
+                                    title="View Payment Proof"
+                                  >
+                                    <FileText className="w-3 h-3" /> Proof
+                                  </a>
+                                )}
                                 <button
-                                  onClick={() => toast.info(`Exporting PDF Receipt for ${dn.receiptNo}...`)}
-                                  className="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-primary border border-primary/20 text-[10px] font-serif font-black tracking-widest uppercase hover:scale-103 active:scale-97 transition-all cursor-pointer inline-flex items-center gap-1.5"
+                                  onClick={() => handleDeleteDonation(dn.id)}
+                                  className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20"
+                                  title="Delete Record"
                                 >
-                                  <FileText className="w-3 h-3" />
-                                  Receipt
+                                  <Trash2 className="w-3.5 h-3.5" />
                                 </button>
-                              )}
+                              </div>
                             </td>
                           </tr>
                         ))
@@ -1302,314 +1535,7 @@ const Admin = () => {
             </div>
           )}
 
-          {/* TAB 4: TEMPLE EVENTS */}
-          {activeTab === "events" && (
-            <div className="space-y-6 animate-fade-rise">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-bold font-serif text-white">Event Scheduler</h3>
-                  <p className="text-xs text-muted-foreground mt-1">Add or update public temple events</p>
-                </div>
-                
-                <button
-                  onClick={() => setIsEventModalOpen(true)}
-                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-serif font-black tracking-widest uppercase hover:bg-primary/95 hover:scale-102 active:scale-95 transition-all shadow-md flex items-center gap-2 cursor-pointer"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Add Event
-                </button>
-              </div>
-
-              {/* Event grid list */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {events.length === 0 ? (
-                  <div className="col-span-2 p-8 rounded-2xl border border-white/5 bg-black/20 text-center text-xs text-muted-foreground">
-                    No scheduled events found in database.
-                  </div>
-                ) : (
-                  events.map(ev => (
-                    <div key={ev.id} className="p-6 rounded-2xl glass-dark border border-white/10 hover:border-primary/20 transition-all flex justify-between items-start gap-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold border border-primary/20 uppercase tracking-wider">{ev.type}</span>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">{ev.status}</span>
-                        </div>
-                        <h4 className="text-base font-bold font-serif text-white">{ev.title}</h4>
-                        <p className="text-xs text-muted-foreground">Date: {ev.date} | Timings: {ev.time}</p>
-                      </div>
-
-                      <button
-                        onClick={() => handleDeleteEvent(ev.id, ev.title)}
-                        className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                        title="Remove Event"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
-
-              {/* Add Event Modal overlay */}
-              {isEventModalOpen && (
-                <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-                  <div className="w-full max-w-md p-6 rounded-3xl glass-dark border border-primary/20 animate-fade-rise shadow-2xl relative">
-                    <h3 className="text-lg font-bold font-serif text-white mb-4">Add Temple Event</h3>
-                    
-                    <form onSubmit={handleAddEventSubmit} className="space-y-4 text-left">
-                      <div>
-                        <label className="block text-xs text-muted-foreground uppercase mb-1">Event Title</label>
-                        <input
-                          type="text"
-                          required
-                          value={newEvent.title}
-                          onChange={e => setNewEvent(prev => ({ ...prev, title: e.target.value }))}
-                          placeholder="e.g. Navaratri Festival Celebrations"
-                          className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:border-primary/50 focus:outline-none transition-colors"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs text-muted-foreground uppercase mb-1">Date</label>
-                          <input
-                            type="date"
-                            required
-                            value={newEvent.date}
-                            onChange={e => setNewEvent(prev => ({ ...prev, date: e.target.value }))}
-                            className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:border-primary/50 focus:outline-none transition-colors"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-muted-foreground uppercase mb-1">Category</label>
-                          <select
-                            value={newEvent.type}
-                            onChange={e => setNewEvent(prev => ({ ...prev, type: e.target.value }))}
-                            className="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-white/10 text-white text-xs focus:border-primary/50 focus:outline-none transition-colors"
-                          >
-                            <option value="Festival">Festival</option>
-                            <option value="Auspicious">Auspicious</option>
-                            <option value="Poornima">Poornima</option>
-                            <option value="Kalyanam">Kalyanam</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs text-muted-foreground uppercase mb-1">Timings</label>
-                        <input
-                          type="text"
-                          required
-                          value={newEvent.time}
-                          onChange={e => setNewEvent(prev => ({ ...prev, time: e.target.value }))}
-                          placeholder="e.g. 7:00 AM – 1:00 PM & 5:00 PM – 9:00 PM"
-                          className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:border-primary/50 focus:outline-none transition-colors"
-                        />
-                      </div>
-
-                      <div className="flex gap-3 justify-end mt-6">
-                        <button
-                          type="button"
-                          onClick={() => setIsEventModalOpen(false)}
-                          className="px-4 py-2 rounded-xl bg-zinc-800 text-white text-xs hover:bg-zinc-700 transition-all cursor-pointer border border-white/5"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-serif font-black tracking-widest uppercase hover:bg-primary/95 transition-all cursor-pointer border border-primary/20"
-                        >
-                          Save Event
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* TAB 5: FEEDBACK / INBOX */}
-          {activeTab === "feedback" && (
-            <div className="space-y-6 animate-fade-rise">
-              <div>
-                <h3 className="text-xl font-bold font-serif text-white">Devotee Inbox</h3>
-                <p className="text-xs text-muted-foreground mt-1">Read and respond to comments, questions, and inquiries</p>
-              </div>
-
-              {/* Feedbacks Grid */}
-              <div className="space-y-4">
-                {feedbacks.length === 0 ? (
-                  <div className="p-8 rounded-2xl border border-white/5 bg-black/20 text-center text-xs text-muted-foreground">
-                    No devotee support queries or feedbacks found in database.
-                  </div>
-                ) : (
-                  feedbacks.map(fb => (
-                    <div 
-                      key={fb.id} 
-                      className={`p-6 rounded-2xl glass-dark border transition-all flex flex-col gap-4 relative overflow-hidden ${
-                        fb.status === "New" 
-                          ? "border-primary/20 hover:border-primary/40 bg-primary/[0.01]" 
-                          : "border-white/5 opacity-70 hover:opacity-100"
-                      }`}
-                    >
-                      {fb.status === "New" && (
-                        <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
-                      )}
-
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3">
-                        <div>
-                          <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                            {fb.name}
-                            <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
-                              fb.status === "New"
-                                ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                                : "bg-zinc-500/10 text-zinc-400 border border-zinc-500/25"
-                            }`}>
-                              {fb.status}
-                            </span>
-                          </h4>
-                          <p className="text-[10px] text-muted-foreground mt-0.5">{fb.email} • Received: {fb.date}</p>
-                        </div>
-                        
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleResolveFeedback(fb.id)}
-                            className={`px-3 py-1.5 rounded-lg border text-[10px] font-bold tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
-                              fb.status === "New"
-                                ? "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/20"
-                                : "bg-zinc-800 hover:bg-zinc-700 text-white/70 border-white/5"
-                            }`}
-                          >
-                            <CheckCircle className="w-3 h-3" />
-                            {fb.status === "New" ? "Mark Resolved" : "Re-open Query"}
-                          </button>
-
-                          <button
-                            onClick={() => handleDeleteFeedback(fb.id)}
-                            className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="space-y-1">
-                        <p className="text-xs font-semibold text-primary">Subject: {fb.subject}</p>
-                        <p className="text-xs text-white/95 leading-relaxed font-sans font-light italic bg-black/20 p-3 rounded-xl border border-white/5">
-                          "{fb.message}"
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 6: PANCHANGAM EDITOR */}
-          {activeTab === "panchangam" && (
-            <div className="space-y-6 animate-fade-rise max-w-2xl">
-              <div>
-                <h3 className="text-xl font-bold font-serif text-white">Daily Panchangam Editor</h3>
-                <p className="text-xs text-muted-foreground mt-1">Update the traditional daily astrological data displayed on the homepage</p>
-              </div>
-
-              <div className="p-6 rounded-2xl glass-dark border border-white/10 shadow-lg">
-                <form onSubmit={handleUpdatePanchangam} className="space-y-6 text-left">
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-xs font-serif font-black tracking-widest text-primary uppercase mb-2">Calendar Date</label>
-                      <input
-                        type="date"
-                        value={panchangam.date}
-                        onChange={e => setPanchangam(prev => ({ ...prev, date: e.target.value }))}
-                        required
-                        className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:border-primary/50 focus:outline-none transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-serif font-black tracking-widest text-primary uppercase mb-2">Tithi</label>
-                      <input
-                        type="text"
-                        value={panchangam.tithi}
-                        onChange={e => setPanchangam(prev => ({ ...prev, tithi: e.target.value }))}
-                        required
-                        className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:border-primary/50 focus:outline-none transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-xs font-serif font-black tracking-widest text-primary uppercase mb-2">Nakshatram</label>
-                      <input
-                        type="text"
-                        value={panchangam.nakshatram}
-                        onChange={e => setPanchangam(prev => ({ ...prev, nakshatram: e.target.value }))}
-                        required
-                        className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:border-primary/50 focus:outline-none transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-serif font-black tracking-widest text-primary uppercase mb-2">Yogam</label>
-                      <input
-                        type="text"
-                        value={panchangam.yogam}
-                        onChange={e => setPanchangam(prev => ({ ...prev, yogam: e.target.value }))}
-                        required
-                        className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:border-primary/50 focus:outline-none transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-xs font-serif font-black tracking-widest text-primary uppercase mb-2">Karanam</label>
-                      <input
-                        type="text"
-                        value={panchangam.karanam}
-                        onChange={e => setPanchangam(prev => ({ ...prev, karanam: e.target.value }))}
-                        required
-                        className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:border-primary/50 focus:outline-none transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-serif font-black tracking-widest text-primary uppercase mb-2">Rahu Kalam</label>
-                      <input
-                        type="text"
-                        value={panchangam.rahuKalam}
-                        onChange={e => setPanchangam(prev => ({ ...prev, rahuKalam: e.target.value }))}
-                        required
-                        className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:border-primary/50 focus:outline-none transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-serif font-black tracking-widest text-primary uppercase mb-2">Varjyam</label>
-                      <input
-                        type="text"
-                        value={panchangam.varjyam}
-                        onChange={e => setPanchangam(prev => ({ ...prev, varjyam: e.target.value }))}
-                        required
-                        className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:border-primary/50 focus:outline-none transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-serif font-black tracking-widest text-xs uppercase hover:from-amber-600 hover:to-amber-700 hover:scale-[1.01] active:scale-95 transition-all shadow-md border border-primary/30 cursor-pointer"
-                  >
-                    Commit Panchangam Changes
-                  </button>
-
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 7: TEMPLE GALLERY & CLOUDINARY UPLOAD */}
+          {/* TAB 6: TEMPLE GALLERY & CLOUDINARY UPLOAD */}
           {activeTab === "gallery" && (
             <div className="space-y-8 animate-fade-rise">
               {/* Header Info */}
