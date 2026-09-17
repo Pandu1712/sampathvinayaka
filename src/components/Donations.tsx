@@ -23,6 +23,7 @@ import html2pdf from "html2pdf.js";
 import vinayakaLogo from "@/assets/vinayaka-logo.png";
 import { db } from "@/lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
+import { uploadImageSafely } from "@/utils/imageUpload";
 
 interface DonationsProps {
   preselectedSeva?: string | null;
@@ -271,18 +272,6 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
   };
 
   const handleOnlinePayment = async () => {
-    // Validate evening booking hours constraint (5:30 PM to 8:00 PM) for Sevas
-    if (sevaPurpose !== "General Donation" && sevaPurpose !== "Ganesha Navaratri Abhishekam") {
-      const now = new Date();
-      const currentMinutes = now.getHours() * 60 + now.getMinutes();
-      const startLimit = 17 * 60 + 30; // 17:30
-      const endLimit = 20 * 60; // 20:00
-      if (currentMinutes < startLimit || currentMinutes > endLimit) {
-        toast.error("Booking Window Closed: Seva bookings are strictly open only in the evening between 5:30 PM and 8:00 PM.");
-        return;
-      }
-    }
-
     setIsUploading(true);
     const loaded = await loadRazorpay();
     if (!loaded) {
@@ -509,18 +498,6 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate evening booking hours constraint (5:30 PM to 8:00 PM) for Sevas
-    if (sevaPurpose !== "General Donation" && sevaPurpose !== "Ganesha Navaratri Abhishekam") {
-      const now = new Date();
-      const currentMinutes = now.getHours() * 60 + now.getMinutes();
-      const startLimit = 17 * 60 + 30; // 17:30
-      const endLimit = 20 * 60; // 20:00
-      if (currentMinutes < startLimit || currentMinutes > endLimit) {
-        toast.error("Booking Window Closed: Seva bookings are strictly open only in the evening between 5:30 PM and 8:00 PM.");
-        return;
-      }
-    }
-
     // 1. Devotee Name Validation
     const nameTrimmed = devoteeName.trim();
     if (nameTrimmed.length < 3) {
@@ -580,30 +557,15 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
     }
 
     setIsUploading(true);
-
-    // Prepare Cloudinary Unsigned Upload
-    const formData = new FormData();
-    formData.append("file", screenshotFile);
-    formData.append("upload_preset", "receipts_preset"); // Unsigned preset
-
     let uploadedUrl = "";
     try {
-      // Unsigned upload attempt to Cloudinary cloud 'ddmzgotdd'
-      const res = await fetch("https://api.cloudinary.com/v1_1/ddmzgotdd/image/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        uploadedUrl = data.secure_url;
+      const result = await uploadImageSafely(screenshotFile, "receipts");
+      uploadedUrl = result.url;
+      if (result.method === "firebase-storage" || result.method === "cloudinary") {
         toast.success("Payment screenshot uploaded to Cloud Storage successfully!");
-      } else {
-        console.warn("Cloudinary preset not configured. Falling back to local secure URL.");
-        uploadedUrl = screenshotPreview;
       }
     } catch (err) {
-      console.error("Cloudinary upload error:", err);
+      console.error("Screenshot upload processing error:", err);
       uploadedUrl = screenshotPreview;
     }
 

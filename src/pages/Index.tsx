@@ -517,10 +517,10 @@ const Index = () => {
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
                   {sevaLang === "en" 
-                    ? "Available for booking in the evening (5:30 PM – 8:00 PM Only)" 
+                    ? "Online booking is open 24/7 for all Sevas and Prasadam" 
                     : sevaLang === "te" 
-                      ? "సాయంత్రం గం. 5:30 నుండి గం. 8:00 వరకు మాత్రమే బుక్ చేసుకొనవచ్చును" 
-                      : "केवल शाम 5:30 बजे से रात 8:00 बजे तक ही बुक किया जा सकता है"}
+                      ? "అన్ని సేవలు మరియు ప్రసాదముల ఆన్‌లైన్ బుకింగ్ 24/7 అందుబాటులో కలదు" 
+                      : "सभी सेवाओं और प्रसादम के लिए ऑनलाइन बुकिंग 24/7 खुली है"}
                 </p>
               </div>
 

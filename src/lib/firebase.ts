@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -13,18 +14,24 @@ const firebaseConfig = {
 
 // Check if Firebase is configured with real credentials
 export const isFirebaseConfigured = 
-  firebaseConfig.apiKey && 
-  firebaseConfig.apiKey !== "dummy_api_key_replace_me";
+  Boolean(firebaseConfig.apiKey && 
+  firebaseConfig.apiKey !== "dummy_api_key_replace_me");
 
 let app;
-let auth;
+let auth: any = null;
 let db: any = null;
+let storage: any = null;
 
 if (isFirebaseConfigured) {
   try {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
     auth = getAuth(app);
     db = getFirestore(app);
+    try {
+      storage = getStorage(app);
+    } catch (sErr) {
+      console.warn("Firebase Storage initialization skipped/failed:", sErr);
+    }
   } catch (error) {
     console.error("Error initializing Firebase:", error);
   }
@@ -34,4 +41,4 @@ if (isFirebaseConfigured) {
   );
 }
 
-export { auth, db };
+export { auth, db, storage };
