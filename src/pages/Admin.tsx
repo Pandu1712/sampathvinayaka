@@ -427,7 +427,7 @@ const Admin = () => {
     }
 
     setIsGalleryUploading(true);
-    const loadingToastId = toast.loading("Processing and uploading sacred photo...");
+    const loadingToastId = toast.loading("Optimizing & publishing photo to gallery...");
 
     let uploadedUrl = "";
     let uploadMethod: "firebase-storage" | "cloudinary" | "compressed-base64" | "fallback" = "fallback";
@@ -1647,8 +1647,8 @@ const Admin = () => {
                     <Upload className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-base font-bold text-white font-serif">Upload Sacred Photo to Cloudinary</h4>
-                    <p className="text-[11px] text-muted-foreground">Select an image file, choose category, and publish directly to Cloudinary storage.</p>
+                    <h4 className="text-base font-bold text-white font-serif">Upload Sacred Photo to Gallery</h4>
+                    <p className="text-[11px] text-muted-foreground">Select an image file, choose category, and publish live to the temple website.</p>
                   </div>
                 </div>
 
@@ -1759,12 +1759,12 @@ const Admin = () => {
                           {isGalleryUploading ? (
                             <>
                               <RefreshCw className="w-4 h-4 animate-spin text-stone-950" />
-                              <span>Uploading Directly to Cloudinary...</span>
+                              <span>Publishing Photo to Gallery...</span>
                             </>
                           ) : (
                             <>
                               <Upload className="w-4 h-4" />
-                              <span>Upload to Cloudinary & Publish Live</span>
+                              <span>Publish Photo to Temple Gallery</span>
                             </>
                           )}
                         </button>
