@@ -124,32 +124,15 @@ const aboutImages = [
   "https://res.cloudinary.com/ddmzgotdd/image/upload/v1779085980/DSC_1186_x046cn.jpg"
 ];
 
-const isNavaratriBookingExpired = () => {
-  const expiryDate = new Date("2026-09-16T00:00:00");
-  return new Date() >= expiryDate;
-};
-
 const Index = () => {
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
   const [homeLightboxIndex, setHomeLightboxIndex] = useState<number | null>(null);
   const [selectedBannerImage, setSelectedBannerImage] = useState<string | null>(null);
   const [timelineLang, setTimelineLang] = useState<"en" | "te">("en");
   const [noteLang, setNoteLang] = useState<"en" | "te">("en");
-  const [sevaLang, setSevaLang] = useState<"en" | "te">("en");
   const [eventsTab, setEventsTab] = useState<"events" | "tenders">("events");
   const [preselectedSeva, setPreselectedSeva] = useState<string | null>(null);
   const [preselectedAmount, setPreselectedAmount] = useState<number | null>(null);
-
-  const handleSevaBook = (sevaName: string, amount: number) => {
-    setPreselectedSeva(sevaName);
-    setPreselectedAmount(amount);
-    
-    // Scroll smoothly to donations section
-    const element = document.getElementById("donations");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -508,109 +491,6 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Sevas Details Section */}
-          <div className="mt-16 text-left">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-primary/10 pb-4 mb-8 gap-4">
-              <div>
-                <h3 className="text-2xl font-bold text-foreground font-serif">
-                  {sevaLang === "en" ? "Special Seva Bookings" : sevaLang === "te" ? "ప్రత్యేక సేవల వివరములు" : "विशेष सेवा बुकिंग विवरण"}
-                </h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {sevaLang === "en" 
-                    ? "Online booking is open 24/7 for all Sevas and Prasadam" 
-                    : sevaLang === "te" 
-                      ? "అన్ని సేవలు మరియు ప్రసాదముల ఆన్‌లైన్ బుకింగ్ 24/7 అందుబాటులో కలదు" 
-                      : "सभी सेवाओं और प्रसादम के लिए ऑनलाइन बुकिंग 24/7 खुली है"}
-                </p>
-              </div>
-
-              {/* Special Sevas Language Toggle Button */}
-              <div className="bg-gradient-to-b from-[#1C1917] to-[#000000] p-1 rounded-xl border border-primary/35 shadow-lg flex items-center gap-1 w-fit self-start sm:self-center">
-                <button
-                  type="button"
-                  onClick={() => setSevaLang("en")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-serif font-black tracking-widest transition-all duration-300 ${
-                    sevaLang === "en"
-                      ? "bg-primary text-primary-foreground shadow-sm scale-102"
-                      : "text-white/60 hover:text-white"
-                  }`}
-                >
-                  EN
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSevaLang("te")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-serif font-black tracking-widest transition-all duration-300 ${
-                    sevaLang === "te"
-                      ? "bg-primary text-primary-foreground shadow-sm scale-102"
-                      : "text-white/60 hover:text-white"
-                  }`}
-                >
-                  తెలుగు
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Seva 1: Saswatha Abhishekam */}
-              <div className="p-6 rounded-2xl glass border border-white/40 hover:border-primary/20 hover:scale-[1.01] transition-all duration-300 shadow-sm hover:shadow-lg flex flex-col justify-between gap-4 animate-fade-rise">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-start gap-2">
-                    <h4 className="text-primary font-bold text-base font-serif">
-                      {sevaLang === "en" 
-                        ? "Saswatha Abhisheka Seva (Lifetime Abhishekam)" 
-                        : "శాశ్వత అభిషేక సేవ"}
-                    </h4>
-                    <span className="text-lg font-black text-foreground shrink-0">
-                      {sevaLang === "en" ? "₹5,000" : "రూ. 5,000/-"}
-                    </span>
-                  </div>
-                  <p className="text-muted-foreground text-xs leading-relaxed font-sans font-light">
-                    {sevaLang === "en" 
-                      ? "Pooja performed every year on a date chosen by the devotee with their Gotra & Namam (For 10 Years)." 
-                      : "10 సంవత్సరముల పాటు భక్తులు కోరిన రోజున వారి గోత్ర నామములతో జరిపించు పూజ."}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleSevaBook("Saswatha Abhisheka Seva", 5000)}
-                  className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-serif font-black tracking-widest text-xs hover:from-amber-600 hover:to-amber-700 active:scale-95 transition-all shadow-sm hover:scale-[1.03]"
-                >
-                  {sevaLang === "en" ? "Pay Amount / Book Seva" : "విరాళం చెల్లించండి / బుక్ చేయండి"}
-                </button>
-              </div>
-
-              {/* Seva 2: Ganesha Navaratri Abhishekam */}
-              {!isNavaratriBookingExpired() && (
-                <div className="p-6 rounded-2xl glass border border-white/40 hover:border-primary/20 hover:scale-[1.01] transition-all duration-300 shadow-sm hover:shadow-lg flex flex-col justify-between gap-4 animate-fade-rise">
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-start gap-2">
-                      <h4 className="text-primary font-bold text-base font-serif">
-                        {sevaLang === "en" 
-                          ? "Ganesha Navaratri Abhishekam" 
-                          : "గణపతి నవరాత్రుల అభిషేకం"}
-                      </h4>
-                      <span className="text-lg font-black text-foreground shrink-0">
-                        {sevaLang === "en" ? "₹2,500" : "రూ. 2,500/-"}
-                      </span>
-                    </div>
-                    <p className="text-muted-foreground text-xs leading-relaxed font-sans font-light">
-                      {sevaLang === "en" 
-                        ? "Pooja performed on one of the 9 days of Ganesha Navaratri with the devotee's Gotra & Namam." 
-                        : "గణపతి నవరాత్రుల 9 రోజులలో ఒక రోజు భక్తుల గోత్ర నామములతో జరిపించు పూజ."}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleSevaBook("Ganesha Navaratri Abhishekam", 2500)}
-                    className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-serif font-black tracking-widest text-xs hover:from-amber-600 hover:to-amber-700 active:scale-95 transition-all shadow-sm hover:scale-[1.03]"
-                  >
-                    {sevaLang === "en" ? "Pay Amount / Book Seva" : "విరాళం చెల్లించండి / బుక్ చేయండి"}
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
 
           {/* Important Note for Homam & Abhishekam */}
           <div className="mt-12 p-6 md:p-8 rounded-3xl border border-primary/20 bg-primary/[0.02] backdrop-blur-sm relative overflow-hidden animate-fade-rise">

@@ -31,13 +31,8 @@ interface DonationsProps {
   clearPreselect?: () => void;
 }
 
-const isNavaratriBookingExpired = () => {
-  const expiryDate = new Date("2026-09-16T00:00:00");
-  return new Date() >= expiryDate;
-};
-
 const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: DonationsProps) => {
-  const [activeTab, setActiveTab] = useState<"prasada" | "anna" | "special">("prasada");
+  const [activeTab, setActiveTab] = useState<"prasada" | "anna">("prasada");
 
   // E-Receipt Form States
   const [isReceiptFormOpen, setIsReceiptFormOpen] = useState(false);
@@ -976,8 +971,7 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
             <div className="flex flex-wrap border-b border-stone-200 bg-stone-50 p-2 gap-2">
               {[
                 { id: "prasada", label: "Prasada Seva (ప్రసాద సేవ)", icon: <Sparkles size={16} /> },
-                { id: "anna", label: "Anna Prasadam (అన్న ప్రసాదం)", icon: <Utensils size={16} /> },
-                { id: "special", label: "Special Seva (ప్రత్యేక సేవ)", icon: <Star size={16} /> }
+                { id: "anna", label: "Anna Prasadam (అన్న ప్రసాదం)", icon: <Utensils size={16} /> }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -1090,54 +1084,6 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
                         Sponsor Annadanam (కనీస విరాళం ₹100)
                       </button>
                     </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === "special" && (
-                <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
-                    <div>
-                      <h4 className="text-amber-900 text-base font-bold font-serif">Special Puja & Abhisheka Sevas</h4>
-                      <p className="text-stone-500 text-xs mt-0.5">Sponsor special or annual deity services performed on your behalf.</p>
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-800 text-[10px] font-bold uppercase tracking-wider border border-amber-500/20">Special Seva</span>
-                  </div>
-
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs sm:text-sm border-collapse">
-                      <thead>
-                        <tr className="border-b border-stone-200 text-stone-500 font-bold uppercase tracking-wider text-[10px]">
-                          <th className="py-3 pb-4">Offering / సేవ</th>
-                          <th className="py-3 pb-4 text-center">Scheduled Day</th>
-                          <th className="py-3 pb-4 text-right">Price / ధర</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-stone-100 text-stone-700">
-                        {[
-                          { name: "Saswatha Abhisheka Seva", te: "శాశ్వత అభిషేక సేవ", day: "Annual (సంవత్సరానికి ఒకసారి)", price: 5000, key: "Saswatha Abhisheka Seva" },
-                          ...(!isNavaratriBookingExpired() ? [{ name: "Ganesha Navaratri Abhishekam", te: "గణపతి నవరాత్రుల అభిషేకం", day: "Navaratri Days (నవరాత్రులు)", price: 2500, key: "Ganesha Navaratri Abhishekam" }] : [])
-                        ].map((item, i) => (
-                          <tr key={i} className="hover:bg-stone-50/50 transition-colors">
-                            <td className="py-4">
-                              <span className="font-semibold text-stone-900 text-xs sm:text-sm">{item.name}</span>
-                              <div className="text-[11px] text-stone-500 font-sans mt-0.5">{item.te}</div>
-                            </td>
-                            <td className="py-4 text-center">
-                              <span className="px-2 py-1 rounded bg-stone-100 text-stone-600 text-[10px] font-semibold">{item.day}</span>
-                            </td>
-                            <td className="py-4 text-right">
-                              <button
-                                onClick={() => handleSponsorSelect(item.key, item.price)}
-                                className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold text-xs hover:from-amber-600 hover:to-amber-700 active:scale-95 transition-all shadow-sm hover:scale-[1.03]"
-                              >
-                                Sponsor ₹{item.price.toLocaleString('en-IN')}
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
                   </div>
                 </div>
               )}
@@ -1283,10 +1229,6 @@ const Donations = ({ preselectedSeva, preselectedAmount, clearPreselect }: Donat
                       <option value="Sanagalu Daily">Sanagalu (శనగలు - ₹1,000)</option>
                       <option value="Undrallu 10 Kg">Undrallu 10 Kg (10 కేజీల ఉండ్రాళ్ళు బుధవారం - ₹1,000)</option>
                       <option value="Sweet Undrallu 10 Kg">Sweet Undrallu 10 Kg (10 కేజీల తీపి ఉండ్రాళ్ళు శుక్రవారం - ₹1,800)</option>
-                      <option value="Saswatha Abhisheka Seva">Saswatha Abhisheka Seva (శాశ్వత అభిషేక సేవ - ₹5,000)</option>
-                      {!isNavaratriBookingExpired() && (
-                        <option value="Ganesha Navaratri Abhishekam">Ganesha Navaratri Abhishekam (గణపతి నవరాత్రుల అభిషేకం - ₹2,500)</option>
-                      )}
                     </select>
                   </div>
                 </div>
